@@ -102,8 +102,33 @@ step('Creating pint.json', function () {
 // ------------------------------------------------------------
 step('Setting up support/helpers.php', function () {
     @mkdir(__DIR__.'/support', 0755, true);
-    if (! file_exists(__DIR__.'/support/helpers.php')) {
-        file_put_contents(__DIR__.'/support/helpers.php', "<?php\n\nfunction require_all_in(string \$path) {}\n");
+    $helpersFile = __DIR__.'/support/helpers.php';
+    if (! file_exists($helpersFile)) {
+        $content = <<<PHP
+<?php
+
+if (! function_exists('require_all_in')) {
+    /**
+     * Require all files in the given path.
+     *
+     * @param string \$path File path pattern. eg. routes/web/*.php
+     * @return void
+     */
+    function require_all_in(string \$path): void
+    {
+        collect(glob(\$path))
+            ->each(function (\$path) {
+                if (basename(\$path) !== basename(__FILE__)) {
+                    require \$path;
+                }
+            });
+    }
+}
+
+// Auto-load all helpers in support/
+require_all_in(__DIR__.'/*.php');
+PHP;
+        file_put_contents($helpersFile, $content);
     }
 });
 
