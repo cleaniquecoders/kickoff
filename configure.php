@@ -149,6 +149,11 @@ step('Organising routes', function () {
     }
 });
 
+step('Creating todo.md', function () {
+    file_put_contents(__DIR__.'/todo.md', "# TODO\n");
+    file_put_contents(__DIR__.'/.gitignore', "\ntodo.md\n", FILE_APPEND);
+});
+
 step('Creating tinker/ with .gitignore', function () {
     @mkdir(__DIR__.'/tinker', 0755, true);
     file_put_contents(__DIR__.'/tinker/.gitignore', "*\n!.gitignore\n");
