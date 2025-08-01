@@ -54,6 +54,22 @@ This script bootstraps a **new Laravel project** with all the essential tools, c
 - 🛠️ Infrastructure Templates:
   - Sets up `.config/` with Nginx and Supervisor templates
 
+## 🛡️ Automation Scripts
+
+- Creates executable scripts in `bin/` for common project tasks:
+  - **backup-app**: Backup your application files
+  - **backup-media**: Backup only media files changed in the last 24 hours
+  - **build-fe-assets**: Build and commit frontend assets
+  - **deploy**: Deploy code to your server with branch/tag support
+  - **update-dependencies**: Update Composer and npm dependencies, audit and build assets
+  - **reinstall-npm**: Remove and reinstall npm modules and lock file
+  - **install**: Project initialization, database setup, and environment configuration
+  - **phpstan**: Run PHPStan and generate readable reports per identifier
+
+- All scripts use the current directory name as the project name for dynamic configuration.
+- Scripts are made executable and can be run directly from the `bin/` directory.
+
+
 ## 📥 Usage
 
 > ⚠️ This script is for **new Laravel projects only**. Do not run on an existing project unless you know what you’re doing.
