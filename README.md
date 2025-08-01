@@ -28,6 +28,10 @@ This script bootstraps a **new Laravel project** with all the essential tools, c
   - `tinker/` with `.gitignore`
   - `docs/README.md` with a placeholder TOC
 
+- 🛡️ Automation Scripts:
+  - Creates executable scripts in `bin/` for tasks like backup, deployment, PHPStan reporting, dependency updates, and project install
+  - All scripts use the current directory name as the project name
+
 - ✅ Testing:
   - Generates `tests/Feature/ArchitectureTest.php` using Pest Arch
 
@@ -41,10 +45,14 @@ This script bootstraps a **new Laravel project** with all the essential tools, c
   - Tests (Pest)
   - Changelog updater
 
-- 🔧 Artisan Tasks:
-  - Clears config cache
+- 🔧 Artisan & Project Tasks:
+  - Clears config and view caches
   - Runs migrations
   - Creates storage symlink
+  - Publishes package configs and migrations
+
+- 🛠️ Infrastructure Templates:
+  - Sets up `.config/` with Nginx and Supervisor templates
 
 ## 📥 Usage
 
