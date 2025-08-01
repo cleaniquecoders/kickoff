@@ -17,6 +17,7 @@ define('PROJECT_NAME', basename(BASE_PATH));
  * - Sets up tinker/ and docs/README.md with TOC
  * - Creates executable bin/ scripts for project automation
  * - Sets up .config directory with Nginx and Supervisor templates
+ * - Sets up VS Code IDE Extension Recommendation
  * - Generates tests/Feature/ArchitectureTest.php with Pest Arch rules
  * - Creates documentation templates (CHANGELOG, CONTRIBUTING, etc.)
  * - Publishes package configs and migrations via artisan
@@ -770,6 +771,17 @@ BASH,
         ensureFile($file_path, replaceProjectName($content));
     }
 
+});
+
+// ------------------------------------------------------------
+// 4d. Sets up VS Code IDE Extension Recommendation
+// ------------------------------------------------------------
+step('Setup VS Code IDE Extension Recommendation', function () {
+    $path = BASE_PATH.'/.vscode';
+    ensureDir($path);
+    $file_path = $path.DIRECTORY_SEPARATOR.'extensions.json';
+    $content = '{"recommendations":["bmewburn.vscode-intelephense-client","amiralizadeh9480.laravel-extra-intellisense","junstyle.php-cs-fixer","codingyu.laravel-goto-view","onecentlin.laravel-blade","ryannaddy.laravel-artisan","shufo.vscode-blade-formatter","mikestead.dotenv","esbenp.prettier-vscode","bradlc.vscode-tailwindcss","eamodio.gitlens","mhutchie.git-graph","ms-azuretools.vscode-docker","adpyke.vscode-sql-formatter","clarkyu.vscode-sql-beautify","deerawan.vscode-faker","ritwickdey.liveserver","dansysanalyst.pest-snippets","shashraf.vscode-pestphp"]}';
+    ensureFile($file_path, $content);
 });
 
 // ------------------------------------------------------------
