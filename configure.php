@@ -5,7 +5,7 @@ define('PROJECT_NAME', basename(BASE_PATH));
 
 /**
  * Elegant Project Setup Script
- * 
+ *
  * This script automates the following for a Laravel project:
  * - Installs required and development Composer packages
  * - Updates composer.json with scripts and helpers autoload
@@ -115,7 +115,7 @@ function replaceProjectName(string $content): string
 }
 
 // ------------------------------------------------------------
-// 1. Install packages
+// Install packages
 // ------------------------------------------------------------
 step('Installing required packages', function () {
     $require = [
@@ -135,7 +135,7 @@ step('Installing required packages', function () {
 });
 
 // ------------------------------------------------------------
-// 2. Update composer.json with scripts & helpers autoload
+// Update composer.json with scripts & helpers autoload
 // ------------------------------------------------------------
 step('Updating composer.json', function () {
     $composerFile = BASE_PATH.'/composer.json';
@@ -157,7 +157,7 @@ step('Updating composer.json', function () {
 });
 
 // ------------------------------------------------------------
-// 3. Create configs
+// Create configs
 // ------------------------------------------------------------
 step('Creating rector.php', function () {
     ensureFile(BASE_PATH.'/rector.php', "<?php\n\n// Rector config\n");
@@ -170,7 +170,7 @@ step('Creating pint.json', function () {
 });
 
 // ------------------------------------------------------------
-// 4a. Setup directories: support/, routes/, tinker/, docs/
+// Setup directories: support/, routes/, tinker/, docs/
 // ------------------------------------------------------------
 step('Setting up support/helpers.php', function () {
     $helpersDir = BASE_PATH.'/support';
@@ -239,7 +239,7 @@ step('Creating docs/README.md with TOC', function () {
 });
 
 // ------------------------------------------------------------
-// 4b. Setup bin/ script
+// Setup bin/ script
 // ------------------------------------------------------------
 $scripts = [
     'backup-app' => <<<'BASH'
@@ -639,7 +639,7 @@ foreach ($scripts as $name => $content) {
 }
 
 // ------------------------------------------------------------
-// 4c. Setup .config
+// Setup .config
 // ------------------------------------------------------------
 step('Setting up .config', function () {
     $configurations = [
@@ -774,7 +774,7 @@ BASH,
 });
 
 // ------------------------------------------------------------
-// 4d. Sets up VS Code IDE Extension Recommendation
+// Sets up VS Code IDE Extension Recommendation
 // ------------------------------------------------------------
 step('Setup VS Code IDE Extension Recommendation', function () {
     $path = BASE_PATH.'/.vscode';
@@ -785,7 +785,7 @@ step('Setup VS Code IDE Extension Recommendation', function () {
 });
 
 // ------------------------------------------------------------
-// 5. Create ArchitectureTest.php
+// Create ArchitectureTest.php
 // ------------------------------------------------------------
 step('Creating ArchitectureTest.php', function () {
     $testDir = BASE_PATH.'/tests/Feature';
@@ -868,7 +868,7 @@ PHP;
 });
 
 // ------------------------------------------------------------
-// 6. Create documentation templates
+// Create documentation templates
 // ------------------------------------------------------------
 $templates = [
     'CHANGELOG.md' => "# Changelog\n\n## [Unreleased]\n- Initial setup\n",
@@ -885,7 +885,7 @@ foreach ($templates as $file => $content) {
 }
 
 // ------------------------------------------------------------
-// 7. Publish package configs/migrations
+// Publish package configs/migrations
 // ------------------------------------------------------------
 step('Publishing package configs & migrations', function () {
     $tags = [
@@ -899,7 +899,7 @@ step('Publishing package configs & migrations', function () {
 });
 
 // ------------------------------------------------------------
-// 8. GitHub Actions Workflows (minimal placeholders here)
+// GitHub Actions Workflows (minimal placeholders here)
 // ------------------------------------------------------------
 step('Creating GitHub Actions workflows', function () {
     $workflowDir = BASE_PATH.'/.github/workflows';
@@ -912,7 +912,7 @@ step('Creating GitHub Actions workflows', function () {
 });
 
 // ------------------------------------------------------------
-// 9. Artisan tasks
+// Artisan tasks
 // ------------------------------------------------------------
 step('Running artisan tasks', function () {
     runSilent('php artisan config:clear');
@@ -921,6 +921,6 @@ step('Running artisan tasks', function () {
 });
 
 // ------------------------------------------------------------
-// Done
+//ne
 // ------------------------------------------------------------
 echo "\n🎉 Project setup completed successfully!\n";
