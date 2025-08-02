@@ -280,14 +280,24 @@ class StartCommand extends Command
 
     private function setupCiCd(OutputInterface $output)
     {
-        step('Creating GitHub Actions workflows', function () {
-            $workflowDir = $this->getProjectPath().'/.github/workflows';
-            ensureDir($workflowDir);
-            ensureFile("$workflowDir/pint.yml", "name: PHP Linting (Pint)\n");
-            ensureFile("$workflowDir/phpstan.yml", "name: PHPStan\n");
-            ensureFile("$workflowDir/rector.yml", "name: Rector CI\n");
-            ensureFile("$workflowDir/tests.yml", "name: Test\n");
-            ensureFile("$workflowDir/changelog.yml", "name: Update Changelog\n");
+        step('Setup Github Actions', function () {
+            $source = __DIR__.'/../stubs/github';
+            $destination = $this->getProjectPath().'/.github';
+            if (is_dir($source)) {
+                ensureDir($destination);
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($source, \FilesystemIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::SELF_FIRST
+                );
+                foreach ($iterator as $item) {
+                    $destPath = $destination.DIRECTORY_SEPARATOR.$iterator->getSubPathName();
+                    if ($item->isDir()) {
+                        ensureDir($destPath);
+                    } else {
+                        copy($item, $destPath);
+                    }
+                }
+            }
         }, $output);
     }
 

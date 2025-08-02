@@ -26,7 +26,7 @@ class StartCommandTest extends TestCase
 
     public function test_configure_sets_arguments()
     {
-        $command = new \CleaniqueCoders\Kickoff\Console\StartCommand();
+        $command = new \CleaniqueCoders\Kickoff\Console\StartCommand;
         $definition = $command->getDefinition();
 
         $this->assertTrue($definition->hasArgument('projectName'));
@@ -35,7 +35,7 @@ class StartCommandTest extends TestCase
 
     public function test_get_project_name_and_path()
     {
-        $command = new \CleaniqueCoders\Kickoff\Console\StartCommand();
+        $command = new \CleaniqueCoders\Kickoff\Console\StartCommand;
         $reflection = new \ReflectionClass($command);
 
         $nameProp = $reflection->getProperty('projectName');
