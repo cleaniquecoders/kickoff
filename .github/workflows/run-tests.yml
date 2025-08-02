@@ -40,8 +40,8 @@ jobs:
       - name: Install Composer dependencies
         run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-      - name: Test with Pest
-        run: vendor/bin/pest
+      - name: Test
+        run: vendor/bin/phpunit
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: ":memory:"
