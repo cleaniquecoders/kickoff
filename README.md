@@ -1,8 +1,10 @@
 [![PHP Linting (Pint)](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/lint.yml/badge.svg)](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/lint.yml) [![Test](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/run-tests.yml/badge.svg)](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/run-tests.yml)
 
-# 🚀 Laravel Starter
+# 🚀 Kickoff
 
-This script bootstraps a **new Laravel project** with all the essential tools, configs, and workflows you need for a modern and maintainable setup.
+This package bootstraps a **new Laravel project** with all the essential tools, configs, and workflows you need for a modern and maintainable setup.
+
+The setup is based on this repository - [Project Template](https://github.com/nasrulhazim/project-template).
 
 ## ✨ Features
 
