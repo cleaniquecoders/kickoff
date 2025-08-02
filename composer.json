@@ -13,8 +13,6 @@
     ],
     "require": {
         "php": "^8.2",
-        "cleaniquecoders/laravel-media-secure": "^3.0",
-        "cleaniquecoders/traitify": "^1.1",
         "illuminate/filesystem": "^10.20|^11.0|^12.0",
         "illuminate/support": "^10.20|^11.0|^12.0",
         "symfony/console": "^6.2|^7.0",
