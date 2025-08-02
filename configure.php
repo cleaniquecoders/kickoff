@@ -921,6 +921,6 @@ step('Running artisan tasks', function () {
 });
 
 // ------------------------------------------------------------
-//ne
+// ne
 // ------------------------------------------------------------
 echo "\n🎉 Project setup completed successfully!\n";

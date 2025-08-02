@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+LOCK_FILE=package-lock.json
+MODULE_DIR=node_modules/
+
+rm $LOCK_FILE
+rm -fr $MODULE_DIR
+
+npm upgrade
+npm audit fix --force
+npm install
+npm run build
