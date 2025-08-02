@@ -1,0 +1,9 @@
+[program:horizon]
+process_name=%(program_name)s
+command=php /var/www/${PROJECT_NAME}/artisan horizon
+autostart=true
+autorestart=true
+user=nginx
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/${PROJECT_NAME}-horizon.log
+stopwaitsecs=3600

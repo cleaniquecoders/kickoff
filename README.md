@@ -1,3 +1,5 @@
+[![PHP Linting (Pint)](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/lint.yml/badge.svg)](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/lint.yml) [![Test](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/run-tests.yml/badge.svg)](https://github.com/cleaniquecoders/laravel-starter/actions/workflows/run-tests.yml)
+
 # 🚀 Laravel Starter
 
 This script bootstraps a **new Laravel project** with all the essential tools, configs, and workflows you need for a modern and maintainable setup.
@@ -74,8 +76,14 @@ This script bootstraps a **new Laravel project** with all the essential tools, c
 
 > ⚠️ This script is for **new Laravel projects only**. Do not run on an existing project unless you know what you’re doing.
 
-Run the script in your fresh Laravel project root:
+Install this package at global:
 
 ```bash
-curl -s https://raw.githubusercontent.com/cleaniquecoders/laravel-starter/main/configure.php | php
+composer global require cleaniquecoders/kickoff
+```
+
+Then run:
+
+```bash
+kickoff start <project-name> <project-path>
 ```
