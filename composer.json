@@ -17,16 +17,11 @@
         "cleaniquecoders/traitify": "^1.1",
         "illuminate/filesystem": "^10.20|^11.0|^12.0",
         "illuminate/support": "^10.20|^11.0|^12.0",
-        "laravel/prompts": "^0.1.18|^0.2.0|^0.3.0",
-        "owen-it/laravel-auditing": "^14.0",
-        "spatie/laravel-medialibrary": "^11.13",
-        "spatie/laravel-permission": "^6.21",
         "symfony/console": "^6.2|^7.0",
         "symfony/polyfill-mbstring": "^1.31",
         "symfony/process": "^6.2|^7.0"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.16",
         "driftingly/rector-laravel": "^2.0",
         "larastan/larastan": "^3.6",
         "laravel/pint": "^1.24",
