@@ -19,10 +19,9 @@ class Menu
     public function build(string $builder): Builder|ContractsMenu
     {
         $class = match ($builder) {
-            'navbar' => Navbar::class,
             'sidebar' => Sidebar::class,
             'administration' => Administration::class,
-            default => Navbar::class,
+            default => Sidebar::class,
         };
 
         /**
