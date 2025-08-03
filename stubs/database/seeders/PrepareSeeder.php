@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Actions\Fortify\CreateNewUser;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
