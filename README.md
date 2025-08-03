@@ -36,7 +36,8 @@ kickoff start nasrulhazim project-template
 ⏳ Update project name in bin/ directory... ✅
 ⏳ Update README... ✅
 ⏳ Update .env.example... ✅
-⏳ Changing to project directory...... ✅
+⏳ Update project environment file... ✅
+⏳ Changing to project directory... ✅
 ⏳ Installing required packages... ✅
 ⏳ Publishing package configs & migrations... ✅
 ⏳ Install tippy.js... ✅

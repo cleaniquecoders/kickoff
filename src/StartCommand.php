@@ -77,6 +77,8 @@ class StartCommand extends Command
 
         $this->setupProjectName($output);
 
+        $this->setupEnvironmentFile($output);
+
         $this->installPackages($output);
 
         $this->runTasks($output);
@@ -153,6 +155,40 @@ class StartCommand extends Command
         }, $output);
     }
 
+    private function setupEnvironmentFile(OutputInterface $output)
+    {
+        step('Update project environment file', function () {
+            copy($this->getProjectPath().'/.env.example', $this->getProjectPath().'/.env');
+
+            $envFile = $this->getProjectPath().'/.env';
+
+            $content = file_get_contents($envFile);
+            $content = str_replace(
+                ['DB_DATABASE=kickoff'],
+                ['DB_DATABASE='.$this->getDatabaseName()],
+                $content
+            );
+            file_put_contents(
+                $envFile,
+                $content
+            );
+        }, $output);
+
+    }
+
+    private function getDatabaseName(): string
+    {
+        $name = $this->getProjectName();
+        // Convert to snake_case and lower case, ensuring no repeated underscores
+        $snake = strtolower(preg_replace('/[^\w]+/', '_', $name));
+        // Replace multiple underscores with a single underscore
+        $snake = preg_replace('/_+/', '_', $snake);
+        // Trim leading/trailing underscores
+        $snake = trim($snake, '_');
+
+        return $snake;
+    }
+
     private function updatePlaceholder($placeholder, $file)
     {
         if (is_file($file)) {
@@ -168,7 +204,7 @@ class StartCommand extends Command
 
     private function installPackages(OutputInterface $output)
     {
-        step('Changing to project directory...', function () {
+        step('Changing to project directory', function () {
             chdir($this->getProjectPath());
         }, $output);
         step('Installing required packages', function () {
@@ -217,7 +253,9 @@ class StartCommand extends Command
     private function runTasks(OutputInterface $output)
     {
         step('Building application', function () {
+            runSilent('bin/install');
             runSilent('npm run build');
+            runSilent('php artisan key:generate');
             runSilent('php artisan reload:all');
         }, $output);
     }
