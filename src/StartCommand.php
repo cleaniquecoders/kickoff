@@ -117,32 +117,32 @@ class StartCommand extends Command
             $composer['config']['allow-plugins']['pestphp/pest-plugin'] = true;
 
             $composer['scripts'] = [
-                "post-autoload-dump" => [
-                    "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-                    "@php artisan package:discover --ansi"
+                'post-autoload-dump' => [
+                    'Illuminate\\Foundation\\ComposerScripts::postAutoloadDump',
+                    '@php artisan package:discover --ansi',
                 ],
-                "post-update-cmd" => [
-                    "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+                'post-update-cmd' => [
+                    '@php artisan vendor:publish --tag=laravel-assets --ansi --force',
                 ],
-                "post-root-package-install" => [
-                    "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+                'post-root-package-install' => [
+                    "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
                 ],
-                "post-create-project-cmd" => [
-                    "@php artisan key:generate --ansi",
+                'post-create-project-cmd' => [
+                    '@php artisan key:generate --ansi',
                     "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
-                    "@php artisan migrate --graceful --ansi"
+                    '@php artisan migrate --graceful --ansi',
                 ],
-                "dev" => [
-                    "Composer\\Config::disableProcessTimeout",
-                    "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+                'dev' => [
+                    'Composer\\Config::disableProcessTimeout',
+                    'npx concurrently -c "#93c5fd,#c4b5fd,#fb7185,#fdba74" "php artisan serve" "php artisan queue:listen --tries=1" "php artisan pail --timeout=0" "npm run dev" --names=server,queue,logs,vite --kill-others',
                 ],
-                "analyse" => "@php vendor/bin/phpstan analyse",
-                "test" => "@php vendor/bin/pest",
-                "test-arch" => "@php vendor/bin/pest tests/Feature/ArchitectureTest.php",
-                "test-coverage" => "vendor/bin/pest --coverage",
-                "format" => "@php vendor/bin/pint",
-                "lint" => "@php vendor/bin/phplint",
-                "rector" => "vendor/bin/rector process",
+                'analyse' => '@php vendor/bin/phpstan analyse',
+                'test' => '@php vendor/bin/pest',
+                'test-arch' => '@php vendor/bin/pest tests/Feature/ArchitectureTest.php',
+                'test-coverage' => 'vendor/bin/pest --coverage',
+                'format' => '@php vendor/bin/pint',
+                'lint' => '@php vendor/bin/phplint',
+                'rector' => 'vendor/bin/rector process',
             ];
 
             putFile($composerFile, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
