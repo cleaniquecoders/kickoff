@@ -31,31 +31,30 @@ return [
             'module' => 'General',
             'functions' => [
                 'administration' => ['manage'],
-                'security'       => ['manage'],
-                'settings'       => ['manage'],
-                'impersonation'  => ['enter', 'leave'],
+                'security' => ['manage'],
+                'settings' => ['manage'],
+                'impersonation' => ['enter', 'leave'],
             ],
         ],
         [
             'module' => 'Security',
             'functions' => [
                 'access-control' => ['manage'],
-                'role'           => ['manage'],
-                'user'           => ['manage'],
-                'issues'         => ['view', 'update'],
-                'queues'         => ['view', 'update'],
-                'audit'          => ['view'],
+                'role' => ['manage'],
+                'user' => ['manage'],
+                'issues' => ['view', 'update'],
+                'queues' => ['view', 'update'],
+                'audit' => ['view'],
             ],
         ],
         [
             'module' => 'Dashboard',
             'functions' => [
-                'user'          => ['view'],
+                'user' => ['view'],
                 'administrator' => ['view'],
             ],
         ],
     ],
-
 
     /*
     |--------------------------------------------------------------------------

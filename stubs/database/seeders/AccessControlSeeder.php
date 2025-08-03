@@ -28,9 +28,9 @@ class AccessControlSeeder extends Seeder
                 ['name' => $role],
                 [
                     'display_name' => str($role)->headline()->toString(),
-                    'guard_name'   => 'web',
-                    'description'  => $description,
-                    'is_enabled'   => true,
+                    'guard_name' => 'web',
+                    'description' => $description,
+                    'is_enabled' => true,
                 ]
             );
         }
@@ -49,12 +49,12 @@ class AccessControlSeeder extends Seeder
                 foreach ($actions as $action) {
                     Permission::updateOrCreate(
                         [
-                            'name'       => "{$action}-{$function}",
+                            'name' => "{$action}-{$function}",
                             'guard_name' => 'web',
                         ],
                         [
-                            'module'     => $module,
-                            'function'   => str($function)->title()->toString(),
+                            'module' => $module,
+                            'function' => str($function)->title()->toString(),
                             'is_enabled' => true,
                         ]
                     );
@@ -80,6 +80,7 @@ class AccessControlSeeder extends Seeder
             // Superadmin (wildcard *)
             if ($scopes === '*') {
                 $role->syncPermissions(Permission::all());
+
                 continue;
             }
 
