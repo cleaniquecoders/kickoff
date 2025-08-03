@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Actions\Fortify\CreateNewUser;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class PrepareSeeder extends Seeder
@@ -18,7 +19,7 @@ class PrepareSeeder extends Seeder
 
     private function createSuperUser()
     {
-        $user = (new CreateNewUser)->create(config('seeder.users.superadmin'));
+        $user = User::create(config('seeder.users.superadmin'));
         $user->assignRole('superadmin');
         $user->assignRole('user');
         $user->update(['email_verified_at' => now()]);
