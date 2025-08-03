@@ -6,6 +6,45 @@ This package bootstraps a **new Laravel project** with all the essential tools, 
 
 The setup is based on this repository - [Project Template](https://github.com/nasrulhazim/project-template).
 
+## 📥 Usage
+
+> ⚠️ This script is for **new Laravel projects only**. Do not run on an existing project unless you know what you’re doing.
+
+Install this package at global:
+
+```bash
+composer global require cleaniquecoders/kickoff
+```
+
+Then run:
+
+```bash
+kickoff start <owner> <project-name> <project-path>
+```
+
+> By default it will use current directory `<project-path>` is optional. It will use current directory path. `<project-path>` can accept relative or absolute path to the project.
+
+Example:
+
+```bash
+kickoff start nasrulhazim project-template
+
+🎉 Let's kickoff your nasrulhazim/project-template now!
+
+⏳ Copy application stubs... ✅
+⏳ Update composer.json for helper, config plugins and scripts... ✅
+⏳ Update project name in bin/ directory... ✅
+⏳ Update README... ✅
+⏳ Update .env.example... ✅
+⏳ Changing to project directory...... ✅
+⏳ Installing required packages... ✅
+⏳ Publishing package configs & migrations... ✅
+⏳ Install tippy.js... ✅
+⏳ Building application... ✅
+
+🎉 Project setup completed successfully!
+```
+
 ## ✨ Features
 
 - 📦 Installs required Laravel packages:
@@ -74,18 +113,16 @@ The setup is based on this repository - [Project Template](https://github.com/na
 - Scripts are made executable and can be run directly from the `bin/` directory.
 
 
-## 📥 Usage
+## Security Vulnerabilities
 
-> ⚠️ This script is for **new Laravel projects only**. Do not run on an existing project unless you know what you’re doing.
+If you discover a security vulnerability within AirBox, please send an e-mail to Nasrul Hazim via [nasrulhazim.m@gmail.com](mailto:nasrulhazim.m@gmail.com). All security vulnerabilities will be promptly addressed.
 
-Install this package at global:
+## Contributors
 
-```bash
-composer global require cleaniquecoders/kickoff
-```
+<a href="https://github.com/cleaniquecoders/kickoff/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=cleaniquecoders/kickoff"  alt="project-template Contributors"/>
+</a>
 
-Then run:
+## License
 
-```bash
-kickoff start <project-name> <project-path>
-```
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
