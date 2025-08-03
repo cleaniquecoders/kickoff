@@ -2,78 +2,84 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Access Control Toggle
+    |--------------------------------------------------------------------------
+    */
     'enabled' => env('ACCESS_CONTROL_ENABLED', true),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Roles
+    |--------------------------------------------------------------------------
+    */
     'roles' => [
-        'superadmin' => 'Dictactor',
-        'administrator' => 'Play a role in working with administration works.',
-        'user' => 'Default user role that able to create event, participate in events, etc.',
+        'superadmin' => 'Full system access (Dictator)',
+        'administrator' => 'Handles administration and security related works.',
+        'user' => 'Default user role, can create and participate in events.',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Permissions
+    |--------------------------------------------------------------------------
+    | Using verb-first convention. CRUD-heavy functions are grouped under "manage".
+    */
     'permissions' => [
         [
             'module' => 'General',
             'functions' => [
-                'administration' => ['view', 'update'],
-                'security' => ['view', 'update'],
-                'settings' => ['view', 'update'],
-                'impersonate' => ['view', 'create', 'update'],
+                'administration' => ['manage'],
+                'security'       => ['manage'],
+                'settings'       => ['manage'],
+                'impersonation'  => ['enter', 'leave'],
             ],
         ],
         [
             'module' => 'Security',
             'functions' => [
-                'access-control' => ['view', 'create', 'update', 'delete'],
-                'role' => ['view', 'create', 'update', 'delete'],
-                'user' => ['view', 'create', 'update', 'delete'],
-                'issues' => ['view', 'update'],
-                'queues' => ['view', 'update'],
-                'audit' => ['view'],
+                'access-control' => ['manage'],
+                'role'           => ['manage'],
+                'user'           => ['manage'],
+                'issues'         => ['view', 'update'],
+                'queues'         => ['view', 'update'],
+                'audit'          => ['view'],
             ],
         ],
         [
             'module' => 'Dashboard',
             'functions' => [
-                'user' => ['view'],
+                'user'          => ['view'],
                 'administrator' => ['view'],
             ],
         ],
     ],
 
-    'roles_permissions' => [
 
-        /** General */
-        'update-administration-general' => ['superadmin'],
-        'view-administration-general' => ['superadmin'],
-        'update-security-general' => ['superadmin'],
-        'view-security-general' => ['superadmin'],
-        'update-settings-general' => ['superadmin'],
-        'view-settings-general' => ['superadmin'],
-        'view-impersonate-general' => ['superadmin'],
-        'create-impersonate-general' => ['superadmin'],
-        'update-impersonate-general' => ['superadmin'],
+    /*
+    |--------------------------------------------------------------------------
+    | Role Scopes
+    |--------------------------------------------------------------------------
+    | Define what each role can access.
+    | Supports wildcard (*) or prefix matching for simplicity.
+    */
+    'role_scope' => [
+        'superadmin' => '*', // semua permissions
 
-        /** Security */
-        'view-access-control-security' => ['superadmin'],
-        'create-access-control-security' => ['superadmin'],
-        'update-access-control-security' => ['superadmin'],
-        'delete-access-control-security' => ['superadmin'],
-        'view-role-security' => ['superadmin'],
-        'create-role-security' => ['superadmin'],
-        'update-role-security' => ['superadmin'],
-        'delete-role-security' => ['superadmin'],
-        'view-user-security' => ['superadmin'],
-        'create-user-security' => ['superadmin'],
-        'update-user-security' => ['superadmin'],
-        'delete-user-security' => ['superadmin'],
-        'view-issues-security' => ['superadmin'],
-        'update-issues-security' => ['superadmin'],
-        'view-queues-security' => ['superadmin'],
-        'update-queues-security' => ['superadmin'],
-        'view-audit-security' => ['superadmin'],
+        'administrator' => [
+            'manage-administration',
+            'manage-security',
+            'manage-settings',
+            'view-impersonate',
+            'manage-user',
+            'manage-role',
+            'view-dashboard',
+        ],
 
-        /** Dashboard */
-        'view-user-dashboard' => ['superadmin'],
-        'view-administrator-dashboard' => ['superadmin'],
+        'user' => [
+            'view-dashboard',
+            'view-user-dashboard',
+        ],
     ],
 ];
