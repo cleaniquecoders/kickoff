@@ -15,54 +15,91 @@ class AccessControlSeeder extends Seeder
     {
         $this->seedRoles();
         $this->seedPermissions();
-        $this->mapPermissionRole();
+        $this->mapPermissionsToRoles();
     }
 
-    private function seedRoles()
+    /**
+     * Seed roles from config.
+     */
+    private function seedRoles(): void
     {
         foreach (config('access-control.roles') as $role => $description) {
-            Role::updateOrCreate([
-                'name' => $role,
-                'display_name' => str($role)->headline()->toString(),
-                'guard_name' => 'web',
-            ], [
-                'description' => $description,
-            ]);
+            Role::updateOrCreate(
+                ['name' => $role],
+                [
+                    'display_name' => str($role)->headline()->toString(),
+                    'guard_name'   => 'web',
+                    'description'  => $description,
+                    'is_enabled'   => true,
+                ]
+            );
         }
     }
 
-    private function seedPermissions()
+    /**
+     * Seed permissions from config without auto expanding manage.
+     */
+    private function seedPermissions(): void
     {
-        collect(config('access-control.permissions'))
-            ->each(function ($permission) {
-                $module = $permission['module'];
-                $functions = $permission['functions'];
+        collect(config('access-control.permissions'))->each(function ($permission) {
+            $module = $permission['module'];
+            $functions = $permission['functions'];
 
-                foreach ($functions as $function => $operations) {
-                    foreach ($operations as $operation) {
-                        Permission::updateOrCreate([
-                            'module' => $module,
-                            'function' => str($function)
-                                ->replace('-', ' ')
-                                ->title()
-                                ->toString(),
-                            'name' => $operation.'-'.$function.'-'.str($module)->kebab()->toString(),
+            foreach ($functions as $function => $actions) {
+                foreach ($actions as $action) {
+                    Permission::updateOrCreate(
+                        [
+                            'name'       => "{$action}-{$function}",
                             'guard_name' => 'web',
-                        ]);
-                    }
-                }
-            });
-    }
-
-    private function mapPermissionRole()
-    {
-        foreach (config('access-control.roles_permissions') as $permission => $roles) {
-            $roles = Role::whereIn('name', $roles)->get();
-            foreach ($roles as $role) {
-                if (! $role->hasPermissionTo($permission)) {
-                    $role->givePermissionTo($permission);
+                        ],
+                        [
+                            'module'     => $module,
+                            'function'   => str($function)->title()->toString(),
+                            'is_enabled' => true,
+                        ]
+                    );
                 }
             }
+        });
+    }
+
+    /**
+     * Map permissions to roles based on role_scope.
+     */
+    private function mapPermissionsToRoles(): void
+    {
+        $roleScopes = config('access-control.role_scope');
+
+        foreach ($roleScopes as $roleName => $scopes) {
+            $role = Role::where('name', $roleName)->first();
+
+            if (! $role) {
+                continue;
+            }
+
+            // Superadmin (wildcard *)
+            if ($scopes === '*') {
+                $role->syncPermissions(Permission::all());
+                continue;
+            }
+
+            $permissions = collect();
+
+            foreach ($scopes as $scope) {
+                if (str($scope)->contains('*')) {
+                    // prefix search
+                    $prefix = rtrim($scope, '*');
+                    $permissions = $permissions->merge(
+                        Permission::where('name', 'like', "{$prefix}%")->get()
+                    );
+                } else {
+                    $permissions = $permissions->merge(
+                        Permission::where('name', $scope)->get()
+                    );
+                }
+            }
+
+            $role->syncPermissions($permissions);
         }
     }
 }
