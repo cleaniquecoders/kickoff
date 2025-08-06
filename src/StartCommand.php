@@ -7,6 +7,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'start')]
 class StartCommand extends Command
@@ -27,7 +28,8 @@ class StartCommand extends Command
             ->setDescription('Kickoff a new Laravel project setup')
             ->addArgument('owner', InputArgument::REQUIRED, 'The project owner.')
             ->addArgument('name', InputArgument::REQUIRED, 'The project name.')
-            ->addArgument('path', InputArgument::OPTIONAL, 'The project path.');
+            ->addArgument('path', InputArgument::OPTIONAL, 'The project path.')
+            ->addOption('verbose', 'v', InputOption::VALUE_NONE, 'Run with verbose output.');
     }
 
     public function getProjectName(): string
@@ -47,6 +49,8 @@ class StartCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $verbose = $input->getOption('verbose');
+
         $this->projectOwner = $projectOwner = $input->getArgument('owner');
         $this->projectName = $projectName = $input->getArgument('name');
         $this->projectPath = $projectPath = $input->getArgument('path');
@@ -57,13 +61,11 @@ class StartCommand extends Command
 
         if (! file_exists($projectPath)) {
             $output->writeln("<error>$projectPath does not exist!</error>");
-
             return Command::FAILURE;
         }
 
         if (! file_exists($projectPath.'/composer.json')) {
             $output->writeln("<error>$projectPath/composer.json does not exist! Invalid Laravel project.</error>");
-
             return Command::FAILURE;
         }
 
@@ -71,17 +73,17 @@ class StartCommand extends Command
 
         $output->writeln("\n🎉 Let's kickoff your <info>$projectOwner/$projectName</info> now!\n");
 
-        $this->copyStubs($output);
+        $this->copyStubs($output, $verbose);
 
-        $this->setupComposer($output);
+        $this->setupComposer($output, $verbose);
 
-        $this->setupProjectName($output);
+        $this->setupProjectName($output, $verbose);
 
-        $this->setupEnvironmentFile($output);
+        $this->setupEnvironmentFile($output, $verbose);
 
-        $this->installPackages($output);
+        $this->installPackages($output, $verbose);
 
-        $this->runTasks($output);
+        $this->runTasks($output, $verbose);
 
         $output->writeln("\n🎉 Project setup completed successfully!\n");
 
@@ -96,24 +98,20 @@ class StartCommand extends Command
         }
     }
 
-    private function copyStubs(OutputInterface $output)
+    private function copyStubs(OutputInterface $output, bool $verbose)
     {
-        step('Copy application stubs', function () {
-            copyRecursively(
-                __DIR__.'/../stubs/',
-                $this->getProjectPath()
-            );
-        }, $output);
+        step('Copy application stubs', function () use ($verbose, $output) {
+            copyRecursively(__DIR__.'/../stubs/', $this->getProjectPath(), $verbose, $output);
+        }, $output, $verbose);
     }
 
-    private function setupComposer(OutputInterface $output)
+    private function setupComposer(OutputInterface $output, bool $verbose)
     {
-        step('Update composer.json for helper, config plugins and scripts', function () {
+        step('Update composer.json for helper, config plugins and scripts', function () use ($verbose) {
             $composerFile = $this->getProjectPath().'/composer.json';
             $composer = json_decode(file_get_contents($composerFile), true);
 
             $composer['autoload']['files'] = ['support/helpers.php'];
-
             $composer['config']['allow-plugins']['pestphp/pest-plugin'] = true;
 
             $composer['scripts'] = [
@@ -146,11 +144,11 @@ class StartCommand extends Command
             ];
 
             putFile($composerFile, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            runSilent('composer dump-autoload');
-        }, $output);
+            runCommand('composer dump-autoload', $verbose);
+        }, $output, $verbose);
     }
 
-    private function setupProjectName(OutputInterface $output)
+    private function setupProjectName(OutputInterface $output, bool $verbose)
     {
         step('Update project name in bin/ directory', function () {
             $binDir = $this->getProjectPath().'/bin';
@@ -158,54 +156,37 @@ class StartCommand extends Command
             foreach (glob($binDir.'/*') as $file) {
                 $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
             }
-        }, $output);
+        }, $output, $verbose);
 
         step('Update README', function () {
             $file = $this->getProjectPath().'/README.md';
-
             $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
             $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $file);
-        }, $output);
+        }, $output, $verbose);
 
         step('Update .env.example', function () {
             $file = $this->getProjectPath().'/.env.example';
-
             $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
-        }, $output);
+        }, $output, $verbose);
     }
 
-    private function setupEnvironmentFile(OutputInterface $output)
+    private function setupEnvironmentFile(OutputInterface $output, bool $verbose)
     {
         step('Update project environment file', function () {
             copy($this->getProjectPath().'/.env.example', $this->getProjectPath().'/.env');
-
             $envFile = $this->getProjectPath().'/.env';
-
             $content = file_get_contents($envFile);
-            $content = str_replace(
-                ['DB_DATABASE=kickoff'],
-                ['DB_DATABASE='.$this->getDatabaseName()],
-                $content
-            );
-            file_put_contents(
-                $envFile,
-                $content
-            );
-        }, $output);
-
+            $content = str_replace(['DB_DATABASE=kickoff'], ['DB_DATABASE='.$this->getDatabaseName()], $content);
+            file_put_contents($envFile, $content);
+        }, $output, $verbose);
     }
 
     private function getDatabaseName(): string
     {
         $name = $this->getProjectName();
-        // Convert to snake_case and lower case, ensuring no repeated underscores
         $snake = strtolower(preg_replace('/[^\w]+/', '_', $name));
-        // Replace multiple underscores with a single underscore
         $snake = preg_replace('/_+/', '_', $snake);
-        // Trim leading/trailing underscores
-        $snake = trim($snake, '_');
-
-        return $snake;
+        return trim($snake, '_');
     }
 
     private function updatePlaceholder($placeholder, $file)
@@ -214,19 +195,20 @@ class StartCommand extends Command
             $content = file_get_contents($file);
             $newContent = str_replace(
                 $placeholder,
-                $placeholder === self::PLACEHOLDER_PROJECT_NAME
-                    ? $this->getProjectName() : $this->getProjectOwner(),
-                $content);
+                $placeholder === self::PLACEHOLDER_PROJECT_NAME ? $this->getProjectName() : $this->getProjectOwner(),
+                $content
+            );
             file_put_contents($file, $newContent);
         }
     }
 
-    private function installPackages(OutputInterface $output)
+    private function installPackages(OutputInterface $output, bool $verbose)
     {
         step('Changing to project directory', function () {
             chdir($this->getProjectPath());
-        }, $output);
-        step('Installing required packages', function () {
+        }, $output, $verbose);
+
+        step('Installing required packages', function () use ($verbose) {
             $require = [
                 'spatie/laravel-permission',
                 'spatie/laravel-medialibrary',
@@ -247,11 +229,12 @@ class StartCommand extends Command
                 'driftingly/rector-laravel',
                 'pestphp/pest-plugin-arch',
             ];
-            installPackages($require, $requireDev, $this->getProjectPath());
-        }, $output);
-        step('Publishing package configs & migrations', function () {
+            installPackages($require, $requireDev, $this->getProjectPath(), $verbose);
+        }, $output, $verbose);
+
+        step('Publishing package configs & migrations', function () use ($verbose) {
             $tags = [
-                '--provider="OwenIt\Auditing\AuditingServiceProvider"',
+                '--provider="OwenIt\\Auditing\\AuditingServiceProvider"',
                 '--tag=permission-migrations', '--tag=permission-config',
                 '--tag=medialibrary-migrations', '--tag=medialibrary-config',
                 '--tag=media-secure-config', '--tag=laravel-errors',
@@ -260,22 +243,22 @@ class StartCommand extends Command
                 '--tag=blade-lucide-icons', '--tag=blade-lucide-icons-config',
             ];
             foreach ($tags as $tag) {
-                runSilent("php artisan vendor:publish {$tag}");
+                runCommand("php artisan vendor:publish {$tag}", $verbose);
             }
-        }, $output);
+        }, $output, $verbose);
 
-        step('Install tippy.js', function () {
-            runSilent('npm install tippy.js');
-        }, $output);
+        step('Install tippy.js', function () use ($verbose) {
+            runCommand('npm install tippy.js', $verbose);
+        }, $output, $verbose);
     }
 
-    private function runTasks(OutputInterface $output)
+    private function runTasks(OutputInterface $output, bool $verbose)
     {
-        step('Building application', function () {
-            runSilent('bin/install');
-            runSilent('npm run build');
-            runSilent('php artisan key:generate');
-            runSilent('php artisan reload:all');
-        }, $output);
+        step('Building application', function () use ($verbose) {
+            runCommand('bin/install', $verbose);
+            runCommand('npm run build', $verbose);
+            runCommand('php artisan key:generate', $verbose);
+            runCommand('php artisan reload:db', $verbose);
+        }, $output, $verbose);
     }
 }
