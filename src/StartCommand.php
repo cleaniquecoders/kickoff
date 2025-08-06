@@ -28,8 +28,7 @@ class StartCommand extends Command
             ->setDescription('Kickoff a new Laravel project setup')
             ->addArgument('owner', InputArgument::REQUIRED, 'The project owner.')
             ->addArgument('name', InputArgument::REQUIRED, 'The project name.')
-            ->addArgument('path', InputArgument::OPTIONAL, 'The project path.')
-            ->addOption('verbose', 'v', InputOption::VALUE_NONE, 'Run with verbose output.');
+            ->addArgument('path', InputArgument::OPTIONAL, 'The project path.');
     }
 
     public function getProjectName(): string
