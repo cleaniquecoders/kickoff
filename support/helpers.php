@@ -66,7 +66,7 @@ function putFile(string $path, string $content): void
 /**
  * Recursively copy a source directory to a destination using iterators with verbosity.
  */
-function copyRecursively(string $src, string $dst, bool $verbose = false, OutputInterface $output = null): void
+function copyRecursively(string $src, string $dst, bool $verbose = false, ?OutputInterface $output = null): void
 {
     ensureDir($dst);
 
