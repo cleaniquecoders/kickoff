@@ -49,7 +49,7 @@ class StartCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $verbose = $input->getOption('verbose');
+        $verbose = $output->isVerbose() || $output->isVeryVerbose() || $output->isDebug();
 
         $this->projectOwner = $projectOwner = $input->getArgument('owner');
         $this->projectName = $projectName = $input->getArgument('name');
