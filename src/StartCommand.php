@@ -6,8 +6,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'start')]
 class StartCommand extends Command
@@ -61,11 +61,13 @@ class StartCommand extends Command
 
         if (! file_exists($projectPath)) {
             $output->writeln("<error>$projectPath does not exist!</error>");
+
             return Command::FAILURE;
         }
 
         if (! file_exists($projectPath.'/composer.json')) {
             $output->writeln("<error>$projectPath/composer.json does not exist! Invalid Laravel project.</error>");
+
             return Command::FAILURE;
         }
 
@@ -186,6 +188,7 @@ class StartCommand extends Command
         $name = $this->getProjectName();
         $snake = strtolower(preg_replace('/[^\w]+/', '_', $name));
         $snake = preg_replace('/_+/', '_', $snake);
+
         return trim($snake, '_');
     }
 
