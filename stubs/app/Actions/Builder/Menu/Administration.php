@@ -33,7 +33,7 @@ class Administration implements Builder, Menu
                 ->setVisible(fn () => Gate::allows('viewTelescope'))
                 ->setTooltip(__('View Telescope issues'))
                 ->setDescription(__('Access application issues using Laravel Telescope'))
-                ->setIcon('o-bug'), // Heroicon outline for a bug
+                ->setIcon('bug'), // Heroicon outline for a bug
 
             (new MenuItem)
                 ->setLabel(__('Queues'))
@@ -42,7 +42,7 @@ class Administration implements Builder, Menu
                 ->setVisible(fn () => Gate::allows('viewHorizon'))
                 ->setTooltip(__('Manage queues'))
                 ->setDescription(__('Access Laravel Horizon to monitor and manage queues'))
-                ->setIcon('o-cog'), // Heroicon outline for settings/tasks
+                ->setIcon('arrow-right-left'), // Heroicon outline for settings/tasks
 
             (new MenuItem)
                 ->setLabel(__('Access Control'))
@@ -50,7 +50,7 @@ class Administration implements Builder, Menu
                 ->setVisible(fn () => Gate::allows('viewAccessControl'))
                 ->setTooltip(__('Manage access control'))
                 ->setDescription(__('Define and manage access control rules'))
-                ->setIcon('o-lock-closed'), // Heroicon outline for a lock
+                ->setIcon('lock'), // Heroicon outline for a lock
 
             (new MenuItem)
                 ->setLabel(__('Users'))
@@ -58,7 +58,7 @@ class Administration implements Builder, Menu
                 ->setVisible(fn () => Gate::allows('viewUser'))
                 ->setTooltip(__('Manage users'))
                 ->setDescription(__('View and manage user accounts'))
-                ->setIcon('o-user-group'), // Heroicon outline for a group of users
+                ->setIcon('users'), // Heroicon outline for a group of users
 
             (new MenuItem)
                 ->setLabel(__('Audit Trail'))
@@ -66,7 +66,7 @@ class Administration implements Builder, Menu
                 ->setVisible(fn () => Gate::allows('viewAudit'))
                 ->setTooltip(__('View audit trails'))
                 ->setDescription(__('Audit logs for security and activity tracking'))
-                ->setIcon('o-document-text'), // Heroicon outline for a document
+                ->setIcon('scroll-text'), // Heroicon outline for a document
         ])->reject(fn (MenuItem $menu) => ! $menu->isVisible())
             ->map(fn (MenuItem $menu) => $menu->build()->toArray());
 

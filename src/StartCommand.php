@@ -229,6 +229,7 @@ class StartCommand extends Command
                 'larastan/larastan',
                 'driftingly/rector-laravel',
                 'pestphp/pest-plugin-arch',
+                'cleaniquecoders/laravel-db-doc',
             ];
             installPackages($require, $requireDev, $this->getProjectPath(), $verbose);
         }, $output, $verbose);
@@ -242,6 +243,7 @@ class StartCommand extends Command
                 '--tag=authentication-log-migrations', '--tag=authentication-log-config',
                 '--tag=impersonate', '--tag=telescope-migrations',
                 '--tag=blade-lucide-icons', '--tag=blade-lucide-icons-config',
+                '--tag=livewire:assets',
             ];
             foreach ($tags as $tag) {
                 runCommand("php artisan vendor:publish {$tag}", $verbose);

@@ -32,17 +32,17 @@ class AdminServiceProvider extends ServiceProvider
     private function defineGates()
     {
         Gate::define('viewAdmin', function ($user) {
-            return $user->can('view-administration-general');
+            return $user->can('manage-administration');
         });
 
         Gate::define('viewUser', function ($user) {
-            return $user->can('view-user-security');
+            return $user->can('manage-user');
         });
         Gate::define('viewAudit', function ($user) {
-            return $user->can('view-audit-security');
+            return $user->can('view-audit');
         });
         Gate::define('viewAccessControl', function ($user) {
-            return config('access-control.enabled') && $user->can('view-access-control-security');
+            return config('access-control.enabled') && $user->can('manage-access-control');
         });
     }
 

@@ -30,7 +30,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewHorizon', function ($user) {
-            return config('horizon.enabled') && $user->can('view-horizon');
+            return config('horizon.enabled') && $user->can('manage-queue');
         });
     }
 }

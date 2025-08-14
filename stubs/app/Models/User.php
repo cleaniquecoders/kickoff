@@ -48,17 +48,6 @@ class User extends Authenticatable implements AuditableContract, HasMedia, MustV
     protected $hidden = [
         'password',
         'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
-    ];
-
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
-    protected $appends = [
-        'profile_photo_url',
     ];
 
     public function canImpersonate(): bool

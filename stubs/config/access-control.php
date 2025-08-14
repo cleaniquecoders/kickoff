@@ -30,6 +30,8 @@ return [
         [
             'module' => 'General',
             'functions' => [
+                'telescope' => ['manage'],
+                'queue' => ['manage'],
                 'administration' => ['manage'],
                 'security' => ['manage'],
                 'settings' => ['manage'],
