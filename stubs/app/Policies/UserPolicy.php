@@ -14,7 +14,7 @@ class UserPolicy
      */
     public function viewAny(User $user): \Illuminate\Auth\Access\Response|bool
     {
-        return auth()->user()->can('view-user-security');
+        return auth()->user()->can('users.view.list');
     }
 
     /**
@@ -22,7 +22,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): \Illuminate\Auth\Access\Response|bool
     {
-        return auth()->user()->can('view-user-security');
+        return auth()->user()->can('users.view.profile');
     }
 
     /**
@@ -30,7 +30,7 @@ class UserPolicy
      */
     public function create(User $user): \Illuminate\Auth\Access\Response|bool
     {
-        return auth()->user()->can('create-user-security');
+        return auth()->user()->can('users.create.account');
     }
 
     /**
@@ -38,7 +38,7 @@ class UserPolicy
      */
     public function update(User $user, User $model): \Illuminate\Auth\Access\Response|bool
     {
-        return auth()->user()->can('update-user-security') || $model->id == $user->id;
+        return auth()->user()->can('users.update.account') || $model->id == $user->id;
     }
 
     /**
@@ -50,7 +50,7 @@ class UserPolicy
             return false;
         }
 
-        return $user->can('delete-user-security');
+        return $user->can('users.delete.account');
     }
 
     /**

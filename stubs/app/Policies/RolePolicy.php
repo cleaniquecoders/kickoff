@@ -17,7 +17,7 @@ class RolePolicy
      */
     public function viewAny(User $user)
     {
-        return $user->can('manage-access-control');
+        return $user->can('roles.view.list');
     }
 
     /**
@@ -27,7 +27,7 @@ class RolePolicy
      */
     public function view(User $user, Role $role)
     {
-        return $user->can('manage-access-control');
+        return $user->can('roles.view.list');
     }
 
     /**
@@ -37,7 +37,7 @@ class RolePolicy
      */
     public function create(User $user)
     {
-        return $user->can('manage-access-control');
+        return $user->can('roles.create.role');
     }
 
     /**
@@ -47,7 +47,7 @@ class RolePolicy
      */
     public function update(User $user, Role $role)
     {
-        return $user->can('manage-access-control');
+        return $user->can('roles.update.role');
     }
 
     /**
@@ -57,7 +57,7 @@ class RolePolicy
      */
     public function delete(User $user, Role $role)
     {
-        return $user->can('manage-access-control');
+        return $user->can('roles.delete.role');
     }
 
     /**
