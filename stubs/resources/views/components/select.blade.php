@@ -1,4 +1,4 @@
-<select {{ $attributes->merge(['class' => 'block w-full rounded-md shadow-sm transition duration-150 ease-in-out focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-white dark:border-gray-600']) }}>
+<select {{ $attributes->merge(['class' => 'block w-full rounded-lg border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-zinc-800']) }}>
     <option>{{ __('Please select') }}</option>
     {{ $slot }}
 </select>

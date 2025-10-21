@@ -1,1 +1,1 @@
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-300">{{ $slot }}</p>
+<p class="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ $slot }}</p>
