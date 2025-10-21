@@ -18,14 +18,6 @@ class Administration extends Base
 
         $this->menus = collect([
             (new MenuItem)
-                ->setLabel(__('Users'))
-                ->setUrl(route('admin.users.index'))
-                ->setVisible(fn () => Gate::allows('manage.users'))
-                ->setTooltip(__('Manage users'))
-                ->setDescription(__('View and manage user accounts'))
-                ->setIcon('users'),
-
-            (new MenuItem)
                 ->setLabel(__('Roles'))
                 ->setUrl(route('admin.roles.index'))
                 ->setVisible(fn () => Gate::allows('manage.roles'))
