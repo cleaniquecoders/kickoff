@@ -18,7 +18,7 @@ Each output file is named after the **`identifier`** (e.g. `assign.propertyType.
 
 Here’s an example of what you’ll get in `.phpstan/summary.txt`:
 
-```
+```bash
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔎 PHPStan Scan Summary
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -41,7 +41,7 @@ For every unique issue identifier (e.g., `property.notFound`), you get a dedicat
 
 With formatted entries:
 
-```
+```bash
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📂 File       : /app/Http/Controllers/Admin/LetterTemplates/GeneratePdfController.php
 🔢 Line       : 90

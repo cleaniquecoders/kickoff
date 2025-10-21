@@ -24,37 +24,52 @@ return [
     |--------------------------------------------------------------------------
     | Permissions
     |--------------------------------------------------------------------------
-    | Using verb-first convention. CRUD-heavy functions are grouped under "manage".
+    | Using grouped structure with action.target format and hyphens for multi-words.
+    | Each permission key serves as both identifier and description.
     */
     'permissions' => [
-        [
-            'module' => 'General',
-            'functions' => [
-                'telescope' => ['manage'],
-                'queue' => ['manage'],
-                'administration' => ['manage'],
-                'security' => ['manage'],
-                'settings' => ['manage'],
-                'impersonation' => ['enter', 'leave'],
-            ],
+        'admin' => [
+            'view.panel' => 'View Admin Panel',
+            'manage.settings' => 'Manage System Settings',
+            'access.telescope' => 'Access Telescope Debugging',
+            'access.horizon' => 'Access Horizon Queue Monitor',
+            'impersonate.users' => 'Impersonate Other Users',
         ],
-        [
-            'module' => 'Security',
-            'functions' => [
-                'access-control' => ['manage'],
-                'role' => ['manage'],
-                'user' => ['manage'],
-                'issues' => ['view', 'update'],
-                'queues' => ['view', 'update'],
-                'audit' => ['view'],
-            ],
+
+        'users' => [
+            'view.list' => 'View User List',
+            'view.profile' => 'View User Profile',
+            'create.account' => 'Create User Account',
+            'update.account' => 'Update User Account',
+            'delete.account' => 'Delete User Account',
         ],
-        [
-            'module' => 'Dashboard',
-            'functions' => [
-                'user' => ['view'],
-                'administrator' => ['view'],
-            ],
+
+        'roles' => [
+            'view.list' => 'View Role List',
+            'create.role' => 'Create New Role',
+            'update.role' => 'Update Role Permissions',
+            'delete.role' => 'Delete Role',
+        ],
+
+        'security' => [
+            'manage.access-control' => 'Manage Access Control',
+            'view.audit-logs' => 'View Audit Logs',
+        ],
+
+        'profile' => [
+            'view.own' => 'View Own Profile',
+            'update.own' => 'Update Own Profile',
+        ],
+
+        'notifications' => [
+            'view.own' => 'View Own Notifications',
+            'update.own' => 'Update Own Notification Settings',
+            'mark.read' => 'Mark Notifications as Read',
+        ],
+
+        'dashboard' => [
+            'access.user' => 'Access User Dashboard',
+            'access.admin' => 'Access Admin Dashboard',
         ],
     ],
 
@@ -62,25 +77,48 @@ return [
     |--------------------------------------------------------------------------
     | Role Scopes
     |--------------------------------------------------------------------------
-    | Define what each role can access.
-    | Supports wildcard (*) or prefix matching for simplicity.
+    | Define what each role can access using the new permission structure.
+    | Format: module.action.target
     */
     'role_scope' => [
-        'superadmin' => '*', // semua permissions
+        'superadmin' => '*', // All permissions
 
         'administrator' => [
-            'manage-administration',
-            'manage-security',
-            'manage-settings',
-            'view-impersonate',
-            'manage-user',
-            'manage-role',
-            'view-dashboard',
+            // Admin Panel Access
+            'admin.view.panel',
+            'admin.manage.settings',
+            'admin.access.telescope',
+            'admin.access.horizon',
+            'admin.impersonate.users',
+
+            // User Management
+            'users.view.list',
+            'users.view.profile',
+            'users.create.account',
+            'users.update.account',
+            'users.delete.account',
+
+            // Role Management
+            'roles.view.list',
+            'roles.create.role',
+            'roles.update.role',
+            'roles.delete.role',
+
+            // Security
+            'security.manage.access-control',
+            'security.view.audit-logs',
+
+            // Dashboard
+            'dashboard.access.admin',
         ],
 
         'user' => [
-            'view-dashboard',
-            'view-user-dashboard',
+            'dashboard.access.user',
+            'profile.view.own',
+            'profile.update.own',
+            'notifications.view.own',
+            'notifications.update.own',
+            'notifications.mark.read',
         ],
     ],
 ];

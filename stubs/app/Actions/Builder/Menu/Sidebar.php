@@ -3,34 +3,25 @@
 namespace App\Actions\Builder\Menu;
 
 use App\Actions\Builder\MenuItem;
-use CleaniqueCoders\Traitify\Contracts\Builder;
-use CleaniqueCoders\Traitify\Contracts\Menu;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
-class Sidebar implements Builder, Menu
+class Sidebar extends Base
 {
-    private Collection $menus;
-
     /**
-     * Return the list of menus.
-     */
-    public function menus(): Collection
-    {
-        return $this->menus;
-    }
-
-    /**
-     * Build the administration menu items.
+     * Build the sidebar menu items.
      */
     public function build(): self
     {
+        $this->setHeadingLabel(__('Navigation'))
+            ->setHeadingIcon('menu')
+            ->setAuthorization('access.dashboard');
+
         $this->menus = collect([
 
             (new MenuItem)
                 ->setLabel(__('Dashboard'))
                 ->setUrl(route('dashboard'))
-                ->setVisible(fn () => Auth::check())
+                ->setVisible(fn () => Gate::allows('access.dashboard'))
                 ->setTooltip(__('Dashboard'))
                 ->setIcon('layout-dashboard')
                 ->setDescription(__('Access to your dashboard.')),

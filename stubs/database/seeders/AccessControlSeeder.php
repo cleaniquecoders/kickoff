@@ -37,30 +37,28 @@ class AccessControlSeeder extends Seeder
     }
 
     /**
-     * Seed permissions from config without auto expanding manage.
+     * Seed permissions from the new grouped permission structure.
+     * Creates permissions with format: module.action.target (e.g., users.view.list)
      */
     private function seedPermissions(): void
     {
-        collect(config('access-control.permissions'))->each(function ($permission) {
-            $module = $permission['module'];
-            $functions = $permission['functions'];
+        $permissions = config('access-control.permissions');
 
-            foreach ($functions as $function => $actions) {
-                foreach ($actions as $action) {
-                    Permission::updateOrCreate(
-                        [
-                            'name' => "{$action}-{$function}",
-                            'guard_name' => 'web',
-                        ],
-                        [
-                            'module' => $module,
-                            'function' => str($function)->title()->toString(),
-                            'is_enabled' => true,
-                        ]
-                    );
-                }
+        foreach ($permissions as $module => $modulePermissions) {
+            foreach ($modulePermissions as $permissionKey => $description) {
+                Permission::updateOrCreate(
+                    [
+                        'name' => "{$module}.{$permissionKey}",
+                        'guard_name' => 'web',
+                    ],
+                    [
+                        'module' => str($module)->title()->toString(),
+                        'function' => $description,
+                        'is_enabled' => true,
+                    ]
+                );
             }
-        });
+        }
     }
 
     /**

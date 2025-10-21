@@ -23,7 +23,7 @@ class MenuItem implements Builder
     /** @var array<MenuItem> */
     private array $children = [];
 
-    private string $icon = 'o-squares-2x2';
+    private string $icon = 'grid-2x2';
 
     private ?string $description = null;
 
@@ -175,6 +175,13 @@ class MenuItem implements Builder
      */
     public function build(): self
     {
+        // If the item is not visible, return empty output
+        if (! $this->isVisible()) {
+            $this->output = [];
+
+            return $this;
+        }
+
         $this->output = [
             'label' => $this->label,
             'url' => $this->url,
@@ -190,6 +197,7 @@ class MenuItem implements Builder
                 array_map(fn (MenuItem $child) => $child->build()->toArray(), $this->children),
                 fn (array $child) => $child !== [] // Exclude hidden children
             ),
+            'visible' => true, // Add visible flag to output for blade template
         ];
 
         return $this;
