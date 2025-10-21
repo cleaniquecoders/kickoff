@@ -17,6 +17,11 @@ class Base implements Builder, Menu
     /** @var callable|string|null */
     private $authorization = null;
 
+    public function __construct()
+    {
+        $this->menus = collect();
+    }
+
     /**
      * Return the list of menus.
      */

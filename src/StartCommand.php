@@ -211,25 +211,27 @@ class StartCommand extends Command
 
         step('Installing required packages', function () use ($verbose) {
             $require = [
-                'spatie/laravel-permission',
-                'spatie/laravel-medialibrary',
-                'cleaniquecoders/traitify',
-                'cleaniquecoders/laravel-media-secure',
-                'owen-it/laravel-auditing',
-                'yadahan/laravel-authentication-log',
-                'lab404/laravel-impersonate',
-                'laravel/telescope',
-                'laravel/horizon',
-                'predis/predis',
                 'blade-ui-kit/blade-icons',
+                'cleaniquecoders/laravel-media-secure',
+                'cleaniquecoders/traitify',
+                'lab404/laravel-impersonate',
+                'laravel/horizon',
+                'laravel/telescope',
                 'mallardduck/blade-lucide-icons',
+                'owen-it/laravel-auditing',
+                'predis/predis',
+                'rappasoft/laravel-livewire-tables',
+                'spatie/laravel-activitylog',
+                'spatie/laravel-medialibrary',
+                'spatie/laravel-permission',
+                'yadahan/laravel-authentication-log',
             ];
             $requireDev = [
                 'barryvdh/laravel-debugbar',
-                'larastan/larastan',
-                'driftingly/rector-laravel',
-                'pestphp/pest-plugin-arch',
                 'cleaniquecoders/laravel-db-doc',
+                'driftingly/rector-laravel',
+                'larastan/larastan',
+                'pestphp/pest-plugin-arch',
             ];
             installPackages($require, $requireDev, $this->getProjectPath(), $verbose);
         }, $output, $verbose);
@@ -237,13 +239,24 @@ class StartCommand extends Command
         step('Publishing package configs & migrations', function () use ($verbose) {
             $tags = [
                 '--provider="OwenIt\\Auditing\\AuditingServiceProvider"',
-                '--tag=permission-migrations', '--tag=permission-config',
-                '--tag=medialibrary-migrations', '--tag=medialibrary-config',
-                '--tag=media-secure-config', '--tag=laravel-errors',
-                '--tag=authentication-log-migrations', '--tag=authentication-log-config',
-                '--tag=impersonate', '--tag=telescope-migrations',
-                '--tag=blade-lucide-icons', '--tag=blade-lucide-icons-config',
+                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-config',
+                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-public',
+                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-translations',
+                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-views',
+                '--provider="Spatie\\Activitylog\\ActivitylogServiceProvider" --tag=activitylog-migrations',
+                '--tag=authentication-log-config',
+                '--tag=authentication-log-migrations',
+                '--tag=blade-lucide-icons',
+                '--tag=blade-lucide-icons-config',
+                '--tag=impersonate',
+                '--tag=laravel-errors',
                 '--tag=livewire:assets',
+                '--tag=media-secure-config',
+                '--tag=medialibrary-config',
+                '--tag=medialibrary-migrations',
+                '--tag=permission-config',
+                '--tag=permission-migrations',
+                '--tag=telescope-migrations',
             ];
             foreach ($tags as $tag) {
                 runCommand("php artisan vendor:publish {$tag}", $verbose);
