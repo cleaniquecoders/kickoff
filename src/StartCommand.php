@@ -211,6 +211,7 @@ class StartCommand extends Command
 
         step('Installing required packages', function () use ($verbose) {
             $require = [
+                'laravel/sanctum',
                 'blade-ui-kit/blade-icons',
                 'cleaniquecoders/laravel-media-secure',
                 'cleaniquecoders/traitify',
@@ -259,6 +260,7 @@ class StartCommand extends Command
                 '--tag=medialibrary-migrations',
                 '--tag=permission-config',
                 '--tag=permission-migrations',
+                '--tag=sanctum-config',
                 '--tag=telescope-migrations',
             ];
             foreach ($tags as $tag) {
