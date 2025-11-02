@@ -2,6 +2,10 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## Laravel Sanctum - 2025-11-02
+
+Added Laravel Sanctum
+
 ## 1.3.3 - 2025-11-02
 
 ### Release Notes - Kickoff v1.3.3
@@ -99,11 +103,13 @@ The new Copilot instructions document covers:
 ```bash
 composer global require cleaniquecoders/kickoff
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 ```
 #### 🚀 Quick Start
@@ -114,11 +120,13 @@ After installation, create a new Laravel project and run:
 cd your-laravel-project
 kickoff start your-owner your-project-name
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 ```
 #### 🔮 What's Next?
