@@ -1,10 +1,10 @@
----
+------
 applyTo: '**'
----
+------
 
-# Temula Backend Development Instructions
+# Backend Development Instructions
 
-This document defines backend development standards, patterns, and best practices for the Temula event management platform.
+This document defines backend development standards, patterns, and best practices for the application.
 
 ## Core Principles
 
@@ -29,7 +29,7 @@ class YourModel extends Base
     use SoftDeletes;
 
     protected $fillable = [
-        'organization_id', // Required for multi-tenant models
+        'organization_id',
         'name',
         'status',
         // ... other fields
@@ -55,12 +55,11 @@ class YourModel extends Base
 
 ### Multi-Tenancy with organization_id
 
-**All user-facing models MUST include `organization_id`:**
+**Models that require multi-tenant isolation SHOULD include `organization_id`:**
 
 ```php
 protected $fillable = [
-    'organization_id', // REQUIRED - scopes data to organization
-    'event_id',
+    'organization_id', // For multi-tenant scoping
     // ... other fields
 ];
 
@@ -70,7 +69,7 @@ public function organization(): BelongsTo
     return $this->belongsTo(Organization::class);
 }
 
-// Always scope queries
+// Scope queries by organization
 public function scopeForOrganization(Builder $query, string $organizationId): Builder
 {
     return $query->where('organization_id', $organizationId);
@@ -78,14 +77,12 @@ public function scopeForOrganization(Builder $query, string $organizationId): Bu
 ```
 
 **When to include organization_id:**
-- Events, tickets, registrations, attendees, check-ins
-- Forms, campaigns, certificates, kits
-- Any data that belongs to an organizer
+- Data that belongs to a specific organization
+- Resources with organization-level access control
 
 **When NOT to include organization_id:**
-- Global catalogs (payment_gateways, subscription_plans)
 - System-level data (users, permissions, roles - managed by Spatie)
-- Pivot tables (derive from related models)
+- Global resources
 
 ### Soft Deletes
 
@@ -145,32 +142,29 @@ namespace App\Enums;
 use CleaniqueCoders\Traitify\Contracts\Enum as Contract;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithEnum;
 
-enum EventStatus: string implements Contract
+enum Status: string implements Contract
 {
     use InteractsWithEnum;
 
     case DRAFT = 'draft';
     case ACTIVE = 'active';
-    case CANCELLED = 'cancelled';
-    case COMPLETED = 'completed';
+    case INACTIVE = 'inactive';
 
     public function label(): string
     {
         return match ($this) {
             self::DRAFT => 'Draft',
             self::ACTIVE => 'Active',
-            self::CANCELLED => 'Cancelled',
-            self::COMPLETED => 'Completed',
+            self::INACTIVE => 'Inactive',
         };
     }
 
     public function description(): string
     {
         return match ($this) {
-            self::DRAFT => 'Event is being prepared and not yet published.',
-            self::ACTIVE => 'Event is live and accepting registrations.',
-            self::CANCELLED => 'Event has been cancelled.',
-            self::COMPLETED => 'Event has concluded successfully.',
+            self::DRAFT => 'Resource is being prepared.',
+            self::ACTIVE => 'Resource is active.',
+            self::INACTIVE => 'Resource is inactive.',
         };
     }
 }
@@ -182,9 +176,8 @@ enum EventStatus: string implements Contract
 
 ```php
 protected $casts = [
-    'status' => EventStatus::class,
-    'visibility' => EventVisibility::class,
-    'method' => CheckInMethod::class,
+    'status' => Status::class,
+    'type' => Type::class,
 ];
 ```
 
@@ -193,9 +186,9 @@ protected $casts = [
 **Use native enum in migrations:**
 
 ```php
-Schema::create('events', function (Blueprint $table) {
+Schema::create('resources', function (Blueprint $table) {
     $table->uuid('id')->primary();
-    $table->enum('status', ['draft', 'active', 'cancelled', 'completed'])
+    $table->enum('status', ['draft', 'active', 'inactive'])
         ->default('draft');
 });
 ```
@@ -205,51 +198,31 @@ Schema::create('events', function (Blueprint $table) {
 **Use enum cases in factories:**
 
 ```php
-use App\Enums\EventStatus;
-use App\Enums\EventVisibility;
+use App\Enums\Status;
 
 public function definition(): array
 {
     return [
         'status' => fake()->randomElement([
-            EventStatus::DRAFT,
-            EventStatus::ACTIVE,
-            EventStatus::COMPLETED,
+            Status::DRAFT,
+            Status::ACTIVE,
+            Status::INACTIVE,
         ]),
-        'visibility' => EventVisibility::PUBLIC,
     ];
 }
 
 // State methods
 public function active(): static
 {
-    return $this->state(['status' => EventStatus::ACTIVE]);
+    return $this->state(['status' => Status::ACTIVE]);
 }
 ```
 
-### Available Enums Reference
+### Common Enum Examples
 
-**Event Management:**
+**Events:**
 - `EventStatus` - draft, active, cancelled, completed
 - `EventVisibility` - public, private, unlisted
-- `EventMemberRole` - owner, manager, crew, finance, checkin, member
-
-**Ticketing & Registration:**
-- `TicketType` - general, vip, early_bird, group, student, member, custom
-- `TicketInstanceStatus` - issued, void, used
-- `AttendeeStatus` - pending, confirmed, registered, checked_in, cancelled, waitlist
-- `RegistrationStatus` - pending, paid, active, cancelled, refunded
-
-**Payments & Billing:**
-- `PaymentStatus` - pending, initiated, paid, succeeded, failed, refunded
-- `SubscriptionStatus` - trialing, active, past_due, canceled
-- `SubscriptionInterval` - monthly, yearly
-- `InvoiceStatus` - draft, open, paid, void, uncollectible
-
-**Operations:**
-- `CheckInMethod` - qr_code, manual, rfid, mobile_app, scan
-- `CouponType` - percent, fixed
-- `FormFieldType` - text, email, phone, select, checkbox, textarea, date
 
 **Communications:**
 - `EmailCampaignStatus` - draft, scheduled, sent
