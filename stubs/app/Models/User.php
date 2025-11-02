@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Lab404\Impersonate\Models\Impersonate;
+use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Spatie\MediaLibrary\HasMedia;
@@ -22,6 +23,7 @@ class User extends Authenticatable implements AuditableContract, HasMedia, MustV
 {
     use AuditableTrait;
     use AuthenticationLogable;
+    use HasApiTokens;
     use HasFactory;
     use HasRoles;
     use Impersonate;

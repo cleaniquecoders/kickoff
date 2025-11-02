@@ -2,20 +2,26 @@
 
 namespace App\Actions\Builder\Menu;
 
+use App\Concerns\ProcessesMenuItems;
+use App\Contracts\AuthorizedMenuBuilder;
+use App\Contracts\HeadingMenuBuilder;
 use CleaniqueCoders\Traitify\Contracts\Builder;
 use CleaniqueCoders\Traitify\Contracts\Menu;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 
-class Base implements Builder, Menu
+abstract class Base implements AuthorizedMenuBuilder, Builder, HeadingMenuBuilder, Menu
 {
-    private Collection $menus;
+    use ProcessesMenuItems;
 
-    private ?string $headingLabel = null;
+    protected Collection $menus;
 
-    private ?string $headingIcon = null;
+    protected ?string $headingLabel = null;
 
-    /** @var callable|string|null */
-    private $authorization = null;
+    protected ?string $headingIcon = null;
+
+    /** @var callable|string|bool|null */
+    protected $authorization = null;
 
     public function __construct()
     {
@@ -28,6 +34,36 @@ class Base implements Builder, Menu
     public function menus(): Collection
     {
         return $this->menus;
+    }
+
+    /**
+     * Set the menus collection.
+     */
+    protected function setMenus(Collection $menus): self
+    {
+        $this->menus = $menus;
+
+        return $this;
+    }
+
+    /**
+     * Add menu items to the collection.
+     */
+    protected function addMenuItems(Collection $menuItems): self
+    {
+        $this->menus = $this->menus->merge($menuItems);
+
+        return $this;
+    }
+
+    public function hasHeadingLabel(): bool
+    {
+        return ! empty($this->getHeadingLabel());
+    }
+
+    public function hasHeadingIcon(): bool
+    {
+        return ! empty($this->getHeadingIcon());
     }
 
     /**
@@ -69,7 +105,7 @@ class Base implements Builder, Menu
     /**
      * Set the authorization requirement for the menu.
      *
-     * @param  callable|string  $authorization  Gate name or callable that returns boolean
+     * @param callable|string|bool $authorization Gate name, callable, or boolean
      */
     public function setAuthorization($authorization): self
     {
@@ -81,7 +117,7 @@ class Base implements Builder, Menu
     /**
      * Get the authorization requirement for the menu.
      *
-     * @return callable|string|null
+     * @return callable|string|bool|null
      */
     public function getAuthorization()
     {
@@ -93,19 +129,13 @@ class Base implements Builder, Menu
      */
     public function isAuthorized(): bool
     {
-        if ($this->authorization === null) {
-            return true;
-        }
-
-        if (is_callable($this->authorization)) {
-            return call_user_func($this->authorization);
-        }
-
-        if (is_string($this->authorization)) {
-            return \Illuminate\Support\Facades\Gate::allows($this->authorization);
-        }
-
-        return true;
+        return match (true) {
+            $this->authorization === null => true,
+            is_callable($this->authorization) => call_user_func($this->authorization),
+            is_string($this->authorization) => Gate::allows($this->authorization),
+            is_bool($this->authorization) => $this->authorization,
+            default => true,
+        };
     }
 
     /**
@@ -122,9 +152,15 @@ class Base implements Builder, Menu
 
     /**
      * Build the menu items.
+     * This method should be implemented by concrete menu classes.
      */
-    public function build(): self
-    {
-        return $this;
-    }
+    abstract public function build(): self;
+
+    /**
+     * Get menu configuration for the concrete menu class.
+     * This method should return an array of menu item configurations.
+     *
+     * @return array<callable>
+     */
+    abstract protected function getMenuConfiguration(): array;
 }

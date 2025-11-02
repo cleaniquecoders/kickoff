@@ -214,6 +214,7 @@ class StartCommand extends Command
                 'blade-ui-kit/blade-icons',
                 'cleaniquecoders/laravel-media-secure',
                 'cleaniquecoders/traitify',
+                'diglactic/laravel-breadcrumbs',
                 'lab404/laravel-impersonate',
                 'laravel/horizon',
                 'laravel/telescope',
@@ -224,6 +225,7 @@ class StartCommand extends Command
                 'spatie/laravel-activitylog',
                 'spatie/laravel-medialibrary',
                 'spatie/laravel-permission',
+                'spatie/laravel-settings',
                 'yadahan/laravel-authentication-log',
             ];
             $requireDev = [
@@ -243,7 +245,8 @@ class StartCommand extends Command
                 '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-public',
                 '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-translations',
                 '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-views',
-                '--provider="Spatie\\Activitylog\\ActivitylogServiceProvider" --tag=activitylog-migrations',
+                '--provider="Spatie\\Activitylog\\ActivitylogServiceProvider"',
+                '--provider="Spatie\\LaravelSettings\\LaravelSettingsServiceProvider"',
                 '--tag=authentication-log-config',
                 '--tag=authentication-log-migrations',
                 '--tag=blade-lucide-icons',

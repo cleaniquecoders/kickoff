@@ -18,13 +18,16 @@
 
             <flux:navlist variant="outline">
                 <x-menu menu-builder="sidebar" />
-                <x-menu menu-builder="event" />
                 <x-menu menu-builder="administration" />
                 <x-menu menu-builder="security" />
-                <x-menu menu-builder="support" />
             </flux:navlist>
 
             <flux:spacer />
+
+            <flux:navlist variant="outline">
+                <x-menu menu-builder="sidebar-footer" />
+                <x-menu menu-builder="support" />
+            </flux:navlist>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
@@ -53,7 +56,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>
+                        <flux:menu.item :href="route('settings.profile.edit')" icon="cog" wire:navigate>
                             {{ __('Settings') }}
                         </flux:menu.item>
                     </flux:menu.radio.group>
@@ -101,7 +104,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>
+                        <flux:menu.item :href="route('settings.profile.edit')" icon="cog" wire:navigate>
                             {{ __('Settings') }}
                         </flux:menu.item>
                     </flux:menu.radio.group>

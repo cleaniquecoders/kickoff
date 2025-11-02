@@ -38,9 +38,11 @@ function runCommand(string $cmd, bool $verbose = false)
 function installPackages(array $require, array $requireDev, string $path, bool $verbose = false): void
 {
     if ($require) {
+        runCommand('rm composer.lock');
         runCommand('composer require '.implode(' ', $require), $verbose);
     }
     if ($requireDev) {
+        runCommand('rm composer.lock');
         runCommand('composer require --dev '.implode(' ', $requireDev), $verbose);
     }
 }
