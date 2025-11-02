@@ -54,7 +54,7 @@ class Administration extends Base
      */
     private function createSettingsMenuItem(): MenuItem
     {
-         return (new MenuItem)
+        return (new MenuItem)
             ->setLabel(__('Settings'))
             ->setUrl(route('admin.settings.index'))
             ->setVisible(fn () => true)

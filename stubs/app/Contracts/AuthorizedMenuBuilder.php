@@ -17,7 +17,7 @@ interface AuthorizedMenuBuilder
     /**
      * Set the authorization requirement for the menu.
      *
-     * @param callable|string|bool $authorization Gate name, callable, or boolean
+     * @param  callable|string|bool  $authorization  Gate name, callable, or boolean
      */
     public function setAuthorization($authorization): self;
 
