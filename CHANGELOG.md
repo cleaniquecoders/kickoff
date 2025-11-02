@@ -2,6 +2,10 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.3.2 - 2025-10-21
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.3.1...1.3.2
+
 ## 1.3.1 - 2025-10-21
 
 **Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.3.0...1.3.1
