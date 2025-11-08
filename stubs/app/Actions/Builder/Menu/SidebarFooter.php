@@ -32,7 +32,6 @@ class SidebarFooter extends Base
             fn () => $this->createDocumentationMenuItem(),
             fn () => $this->createSupportMenuItem(),
             fn () => $this->createChangelogMenuItem(),
-            // fn () => $this->createLogoutMenuItem(),
         ];
     }
 
@@ -43,8 +42,7 @@ class SidebarFooter extends Base
     {
         return (new MenuItem)
             ->setLabel(__('Documentation'))
-            ->setUrl('#')
-            ->setTarget('_blank')
+            ->setUrl(route('documentation'))
             ->setIcon('book-open')
             ->setDescription(__('View Documentation'))
             ->setVisible(fn () => Gate::allows('access.dashboard'));
@@ -57,8 +55,7 @@ class SidebarFooter extends Base
     {
         return (new MenuItem)
             ->setLabel(__('Support'))
-            ->setUrl('#')
-            ->setTarget('_blank')
+            ->setUrl(route('support'))
             ->setIcon('life-buoy')
             ->setDescription(__('Get help and support'))
             ->setVisible(fn () => Gate::allows('access.dashboard'));
@@ -71,24 +68,9 @@ class SidebarFooter extends Base
     {
         return (new MenuItem)
             ->setLabel(__('Changelog'))
-            ->setUrl('#')
-            ->setTarget('_blank')
+            ->setUrl(route('changelog'))
             ->setIcon('newspaper')
             ->setDescription(__('View latest updates'))
-            ->setVisible(fn () => Gate::allows('access.dashboard'));
-    }
-
-    /**
-     * Create the logout menu item.
-     */
-    private function createLogoutMenuItem(): MenuItem
-    {
-        return (new MenuItem)
-            ->setLabel(__('Logout'))
-            ->setUrl(route('logout'))
-            ->setType('form')
-            ->setIcon('log-out')
-            ->setDescription(__('Sign out of your account'))
             ->setVisible(fn () => Gate::allows('access.dashboard'));
     }
 }
