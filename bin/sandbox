@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# Sandbox helper for repeatedly testing `kickoff start` against the tracked `test-output/` directory
+# without accidentally committing those changes. Designed for macOS (zsh/bash compatible).
+#
+# Commands:
+#   init                Mark test-output as skip-worktree (local only) so git stops showing changes
+#   run <owner> <name>  Execute kickoff start into test-output/ (path fixed)
+#   reset               Restore test-output/ back to HEAD (discard all changes)
+#   snapshot            Create/refresh a tar baseline in .sandbox/ for fast non-git restore
+#   restore             Replace test-output/ from tar baseline (if exists) then reapply skip-worktree
+#   allow-commit        Remove skip-worktree flag so updates to baseline CAN be committed
+#   status              Show skip-worktree flag + diff status for test-output
+#
+# Typical cycle:
+#   bin/sandbox init
+#   bin/sandbox run Demo Project
+#   (inspect changes)
+#   bin/sandbox reset    # OR bin/sandbox restore if using tar baseline
+#
+# To update the committed baseline (e.g. after legitimately changing stubs):
+#   bin/sandbox allow-commit
+#   (make changes / run kickoff)
+#   git add test-output && git commit -m "Refresh test-output baseline"
+#   bin/sandbox init
+#
+set -euo pipefail
+
+SANDBOX_DIR=".sandbox"
+BASELINE_TAR="$SANDBOX_DIR/test-output-baseline.tar.gz"
+TEST_DIR="test-output"
+
+ensure_sandbox_dir() { [ -d "$SANDBOX_DIR" ] || mkdir -p "$SANDBOX_DIR"; }
+
+is_skip_worktree() {
+  git ls-files -v "$TEST_DIR" | grep "^S" >/dev/null 2>&1 && return 0 || return 1
+}
+
+cmd_init() {
+  git update-index --skip-worktree "$TEST_DIR" || true
+  echo "Marked $TEST_DIR as skip-worktree (local only)."
+}
+
+cmd_run() {
+  if [ $# -lt 2 ]; then
+    echo "Usage: $0 run <owner> <project-name>" >&2
+    exit 1
+  fi
+  local owner="$1"; shift
+  local name="$1"; shift
+  php bin/kickoff start "$owner" "$name" "$TEST_DIR/"
+}
+
+cmd_reset() {
+  echo "Reverting $TEST_DIR back to HEAD..."
+  git checkout HEAD -- "$TEST_DIR" || {
+    echo "Failed to restore from git. Does $TEST_DIR exist and is it tracked?" >&2
+    exit 1
+  }
+  echo "Done."
+}
+
+cmd_snapshot() {
+  ensure_sandbox_dir
+  echo "Creating tar baseline of $TEST_DIR → $BASELINE_TAR ..."
+  tar -czf "$BASELINE_TAR" "$TEST_DIR" || {
+    echo "Tar snapshot failed." >&2
+    exit 1
+  }
+  echo "Baseline snapshot created.";
+}
+
+cmd_restore() {
+  if [ ! -f "$BASELINE_TAR" ]; then
+    echo "No baseline tar found ($BASELINE_TAR). Run snapshot first." >&2
+    exit 1
+  fi
+  echo "Restoring $TEST_DIR from baseline tar..."
+  rm -rf "$TEST_DIR"
+  tar -xzf "$BASELINE_TAR"
+  git update-index --skip-worktree "$TEST_DIR" || true
+  echo "Restored and re-applied skip-worktree.";
+}
+
+cmd_allow_commit() {
+  git update-index --no-skip-worktree "$TEST_DIR" || true
+  echo "Removed skip-worktree flag. Changes in $TEST_DIR will now appear in diffs and can be committed.";
+}
+
+cmd_status() {
+  echo "== Sandbox Status =="
+  echo -n "skip-worktree: "
+  if is_skip_worktree; then echo "ON"; else echo "OFF"; fi
+  echo "Git diff (cached) for $TEST_DIR:"; git diff --name-status --cached -- "$TEST_DIR" || true
+  echo "Git diff (working) for $TEST_DIR:"; git diff --name-status -- "$TEST_DIR" || true
+  if [ -f "$BASELINE_TAR" ]; then
+    echo "Baseline tar exists: $BASELINE_TAR ($(du -h "$BASELINE_TAR" | cut -f1))"
+  else
+    echo "No baseline tar found.";
+  fi
+}
+
+main() {
+  local cmd="${1:-}"; shift || true
+  case "$cmd" in
+    init) cmd_init "$@" ;;
+    run) cmd_run "$@" ;;
+    reset) cmd_reset ;;
+    snapshot) cmd_snapshot ;;
+    restore) cmd_restore ;;
+    allow-commit) cmd_allow_commit ;;
+    status) cmd_status ;;
+    *) echo "Usage: $0 {init|run|reset|snapshot|restore|allow-commit|status}" >&2; exit 1 ;;
+  esac
+}
+
+main "$@"
