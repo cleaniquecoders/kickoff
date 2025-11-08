@@ -38,11 +38,11 @@ $saveSettings = function () {
 ?>
 
 <div>
-    <flux:card>
-        <flux:card.header>
+    <x-card>
+        <x-card.header>
             <flux:heading size="lg">{{ ucfirst($section) }} Settings</flux:heading>
-        </flux:card.header>
-        <flux:card.body>
+        </x-card.header>
+        <x-card.body>
             @if($section === 'general')
                 <form wire:submit="saveSettings" class="space-y-6">
                     <div>
@@ -201,6 +201,6 @@ $saveSettings = function () {
                     Settings section not found.
                 </p>
             @endif
-        </flux:card.body>
-    </flux:card>
+        </x-card.body>
+    </x-card>
 </div>

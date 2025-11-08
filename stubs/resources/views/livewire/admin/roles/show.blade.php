@@ -25,11 +25,11 @@ $updatePermissions = function () {
 ?>
 
 <div>
-    <flux:card class="mb-6">
-        <flux:card.header>
+    <x-card class="mb-6">
+        <x-card.header>
             <flux:heading size="lg">Role Information</flux:heading>
-        </flux:card.header>
-        <flux:card.body>
+        </x-card.header>
+        <x-card.body>
             <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                 <div>
                     <dt class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</dt>
@@ -44,14 +44,14 @@ $updatePermissions = function () {
                     <dd class="mt-1 text-sm text-zinc-900 dark:text-white">{{ $role->description ?? 'No description' }}</dd>
                 </div>
             </dl>
-        </flux:card.body>
-    </flux:card>
+        </x-card.body>
+    </x-card>
 
-    <flux:card>
-        <flux:card.header>
+    <x-card>
+        <x-card.header>
             <flux:heading size="lg">Permissions</flux:heading>
-        </flux:card.header>
-        <flux:card.body>
+        </x-card.header>
+        <x-card.body>
             <form wire:submit="updatePermissions">
                 <div class="space-y-4">
                     @foreach ($this->permissions as $permission)
@@ -86,6 +86,6 @@ $updatePermissions = function () {
                     </flux:button>
                 </div>
             </form>
-        </flux:card.body>
-    </flux:card>
+        </x-card.body>
+    </x-card>
 </div>

@@ -5,44 +5,44 @@
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @can('manage.roles')
-                    <flux:card>
-                        <flux:card.header>
+                    <x-card>
+                        <x-card.header>
                             <div class="flex items-center">
                                 <x-lucide-shield-check class="h-6 w-6 text-brand-500 me-3" />
                                 <flux:heading size="lg">Roles</flux:heading>
                             </div>
-                        </flux:card.header>
-                        <flux:card.body>
+                        </x-card.header>
+                        <x-card.body>
                             <p class="text-sm text-zinc-600 dark:text-zinc-400">
                                 Manage user roles and permissions
                             </p>
-                        </flux:card.body>
-                        <flux:card.footer>
+                        </x-card.body>
+                        <x-card.footer>
                             <flux:button variant="primary" :href="route('admin.roles.index')" wire:navigate>
                                 Manage Roles
                             </flux:button>
-                        </flux:card.footer>
-                    </flux:card>
+                        </x-card.footer>
+                    </x-card>
                 @endcan
 
-                <flux:card>
-                    <flux:card.header>
+                <x-card>
+                    <x-card.header>
                         <div class="flex items-center">
                             <x-lucide-settings class="h-6 w-6 text-brand-500 me-3" />
                             <flux:heading size="lg">Settings</flux:heading>
                         </div>
-                    </flux:card.header>
-                    <flux:card.body>
+                    </x-card.header>
+                    <x-card.body>
                         <p class="text-sm text-zinc-600 dark:text-zinc-400">
                             Configure application settings
                         </p>
-                    </flux:card.body>
-                    <flux:card.footer>
+                    </x-card.body>
+                    <x-card.footer>
                         <flux:button variant="primary" :href="route('admin.settings.index')" wire:navigate>
                             Manage Settings
                         </flux:button>
-                    </flux:card.footer>
-                </flux:card>
+                    </x-card.footer>
+                </x-card>
             </div>
         </div>
     </div>
