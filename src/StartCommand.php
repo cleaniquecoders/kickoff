@@ -219,6 +219,7 @@ class StartCommand extends Command
                 'lab404/laravel-impersonate',
                 'laravel/horizon',
                 'laravel/telescope',
+                'livewire/flux',
                 'mallardduck/blade-lucide-icons',
                 'owen-it/laravel-auditing',
                 'predis/predis',
