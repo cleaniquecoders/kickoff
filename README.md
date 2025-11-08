@@ -4,47 +4,73 @@
 
 This package bootstraps a **new Laravel project** with all the essential tools, configs, and workflows you need for a modern and maintainable setup.
 
-The setup is based on this repository - [Project Template](https://github.com/nasrulhazim/project-template).
+## 🎯 Target Setup
+
+Kickoff is designed for Laravel projects with this starter configuration:
+
+```bash
+laravel new myapp --git --livewire --pest --npm --livewire-class-components
+```
+
+**Includes:**
+
+- ✅ Git repository initialization
+- ✅ Livewire for reactive components
+- ✅ Pest for testing
+- ✅ NPM for asset management
+- ✅ Livewire class-based components
+
+The complete setup is based on [Project Template](https://github.com/nasrulhazim/project-template).
 
 ## 📥 Usage
 
-> ⚠️ This script is for **new Laravel projects only**. Do not run on an existing project unless you know what you’re doing.
-
-Install this package at global:
+### Quick Start
 
 ```bash
+# 1. Install globally
 composer global require cleaniquecoders/kickoff
+
+# 2. Create Laravel project with the recommended setup
+laravel new my-project --git --livewire --pest --npm --livewire-class-components
+cd my-project
+
+# 3. Bootstrap with kickoff
+kickoff start <owner> <project-name>
 ```
 
-Then run:
+**Complete Example:**
 
 ```bash
-kickoff start <owner> <project-name> <project-path>
+# Create project with full stack
+laravel new blog --git --livewire --pest --npm --livewire-class-components
+cd blog
+
+# Apply kickoff configuration
+kickoff start johndoe blog
 ```
 
-> By default it will use current directory `<project-path>` is optional. It will use current directory path. `<project-path>` can accept relative or absolute path to the project.
+### Options
 
-Example:
+- `<owner>` - Your name or organization (required)
+- `<project-name>` - Project name (required)
+- `<project-path>` - Project directory (optional, defaults to current directory)
+
+### What Happens
 
 ```bash
-kickoff start nasrulhazim project-template
-
-🎉 Let's kickoff your nasrulhazim/project-template now!
+🎉 Let's kickoff your johndoe/blog now!
 
 ⏳ Copy application stubs... ✅
-⏳ Update composer.json for helper, config plugins and scripts... ✅
-⏳ Update project name in bin/ directory... ✅
-⏳ Update README... ✅
-⏳ Update .env.example... ✅
-⏳ Update project environment file... ✅
-⏳ Changing to project directory... ✅
-⏳ Installing required packages... ✅
-⏳ Publishing package configs & migrations... ✅
-⏳ Install tippy.js... ✅
-⏳ Building application... ✅
+⏳ Update composer.json... ✅
+⏳ Update project files... ✅
+⏳ Configure environment... ✅
+⏳ Install packages... ✅
+⏳ Build assets... ✅
 
 🎉 Project setup completed successfully!
 ```
+
+> ⚠️ **Warning**: Only run on fresh Laravel projects. Existing projects will be overwritten.
 
 ## ✨ Features
 
@@ -97,6 +123,53 @@ kickoff start nasrulhazim project-template
 
 - 🛠️ Infrastructure Templates:
   - Sets up `.config/` with Nginx and Supervisor templates
+
+## 🧪 Development & Testing
+
+### For Contributors
+
+Test your changes to kickoff using the sandbox script:
+
+```bash
+# Create fresh Laravel app and apply kickoff
+bin/sandbox run
+
+# Inspect the generated project
+cd test-output/sandbox
+# create a database in mysql named `sandbox`
+```
+
+Then create tables & seed data:
+
+```bash
+php artisan reload:db
+```
+
+Run the sandbox app:
+
+```bash
+npm run build
+php artisan serve
+```
+
+To clean up sandbox, run:
+
+```bash
+bin/sandbox reset
+```
+
+**Sandbox Features:**
+
+- ✅ Automated testing workflow (30 seconds vs 10 minutes manually)
+- ✅ Git-safe (uses skip-worktree to prevent accidental commits)
+- ✅ Repeatable testing cycles
+- ✅ Isolated test environment
+
+**Requirements:**
+
+- Laravel installer: `composer global require laravel/installer`
+
+See `bin/sandbox` for detailed usage and commands.
 
 ## 🛡️ Automation Scripts
 
