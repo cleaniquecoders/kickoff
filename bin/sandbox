@@ -21,38 +21,59 @@
 #
 set -euo pipefail
 
-TEST_DIR="test-output"
+# Minimal sandbox helper for creating/removing a Laravel sandbox inside test-output/
 
-cmd_run() {
-  local owner="${1:-Demo}"; [ $# -gt 0 ] && shift || true
-  local name="${1:-Project}"; [ $# -gt 0 ] && shift || true
-  # Mark skip-worktree to keep changes local only
-  git update-index --skip-worktree "$TEST_DIR" || true
-  echo "Running kickoff with owner='$owner' name='$name' into '$TEST_DIR/'" >&2
-  php bin/kickoff start "$owner" "$name" "$TEST_DIR/"
-}
+SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+TEST_DIR="$REPO_ROOT/test-output"
+SANDBOX_DIR="$TEST_DIR/sandbox"
 
-cmd_reset() {
-  echo "Deleting $TEST_DIR ..."
-  rm -rf "$TEST_DIR"
-  echo "Restoring $TEST_DIR from Git HEAD..."
-  # Fully restore both index and working tree from HEAD using git restore
-  git restore --source=HEAD --staged --worktree -- "$TEST_DIR" || {
-    echo "Failed to restore from git. Does $TEST_DIR exist in the repository?" >&2
-    exit 1
+need_installer() {
+  command -v laravel >/dev/null 2>&1 || {
+    echo "Missing 'laravel' installer. Install with: composer global require laravel/installer" >&2
+    exit 127
   }
-  # Ensure local skip-worktree is kept so subsequent runs don't show diffs
-  git update-index --skip-worktree "$TEST_DIR" || true
-  echo "Reset complete."
 }
 
-main() {
-  local cmd="${1:-}"; shift || true
-  case "$cmd" in
-    run) cmd_run "$@" ;;
-    reset) cmd_reset ;;
-    *) echo "Usage: $0 {run|reset} (run accepts optional <owner> <name>, defaults: Demo Project)" >&2; exit 1 ;;
-  esac
+git_mark_skip() { git -C "$(cd -- "$SCRIPT_DIR/.." && pwd)" update-index --skip-worktree test-output 2>/dev/null || true; }
+
+need_kickoff() {
+  [ -f "$REPO_ROOT/bin/kickoff" ] || {
+    echo "Missing kickoff binary at $REPO_ROOT/bin/kickoff" >&2
+    exit 2
+  }
 }
 
-main "$@"
+run() {
+  need_installer
+  need_kickoff
+  git_mark_skip
+  mkdir -p "$TEST_DIR"
+  if [ -d "$SANDBOX_DIR" ]; then
+    echo "Removing existing sandbox ..." >&2
+    rm -rf "$SANDBOX_DIR"
+  fi
+  echo "Creating Laravel sandbox ..." >&2
+  (cd "$TEST_DIR" && laravel new sandbox --git --livewire --pest --npm --livewire-class-components --no-interaction)
+  echo "Sandbox scaffolded: $SANDBOX_DIR" >&2
+
+  # Run kickoff against the freshly created sandbox (use sandbox identifiers)
+  echo "Running kickoff start for sandbox/sandbox ..." >&2
+  php "$REPO_ROOT/bin/kickoff" start sandbox sandbox "$SANDBOX_DIR"
+  echo "Sandbox ready with kickoff applied: $SANDBOX_DIR" >&2
+}
+
+reset() {
+  if [ -d "$SANDBOX_DIR" ]; then
+    echo "Deleting $SANDBOX_DIR" >&2
+    rm -rf "$SANDBOX_DIR"
+  else
+    echo "No sandbox directory to delete." >&2
+  fi
+}
+
+case "${1:-}" in
+  run) shift; run ;;
+  reset) shift; reset ;;
+  *) echo "Usage: $0 {run|reset}\n  run                 Create Laravel app then run kickoff start (owner/name: sandbox)\n  reset               Delete test-output/sandbox" >&2; exit 1 ;;
+esac
