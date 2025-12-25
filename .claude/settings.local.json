@@ -5,7 +5,8 @@
       "Bash(markdownlint:*)",
       "Bash(tree:*)",
       "Bash(wc:*)",
-      "Bash(php artisan tinker:*)"
+      "Bash(php artisan tinker:*)",
+      "Bash(ls:*)"
     ]
   }
 }
