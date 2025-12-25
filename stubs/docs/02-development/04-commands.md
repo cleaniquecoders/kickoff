@@ -3,7 +3,7 @@
 You may found the following commands are useful during development:
 
 | Command | Description |
-|---------|-------------|
+| ------- | ----------- |
 | `php artisan reload:db` | Drop all tables and remigrate and seed database |
 | `php artisan reload:cache` | Clear all caches and cache back all caches available |
 | `php artisan reload:all` | Run `reload:cache` and `reload:db` |

@@ -69,6 +69,7 @@ class MyComponent extends Component
 ## Toast Types
 
 ### Success
+
 ```php
 $this->dispatch('toast',
     type: 'success',
@@ -77,6 +78,7 @@ $this->dispatch('toast',
 ```
 
 ### Error
+
 ```php
 $this->dispatch('toast',
     type: 'error',
@@ -85,6 +87,7 @@ $this->dispatch('toast',
 ```
 
 ### Warning
+
 ```php
 $this->dispatch('toast',
     type: 'warning',
@@ -93,6 +96,7 @@ $this->dispatch('toast',
 ```
 
 ### Info
+
 ```php
 $this->dispatch('toast',
     type: 'info',
@@ -103,6 +107,7 @@ $this->dispatch('toast',
 ## Examples
 
 ### Form Validation
+
 ```php
 $validate = function () {
     $validated = $this->validate([
@@ -117,6 +122,7 @@ $validate = function () {
 ```
 
 ### Error Handling
+
 ```php
 try {
     // Your code here
@@ -129,6 +135,7 @@ try {
 ```
 
 ### Custom Duration
+
 ```php
 $this->dispatch('toast',
     type: 'warning',

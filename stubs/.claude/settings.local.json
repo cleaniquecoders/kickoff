@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(command -v:*)",
+      "Bash(markdownlint:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)"
+    ]
+  }
+}
