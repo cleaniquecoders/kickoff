@@ -2,6 +2,10 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.4.2 - 2025-12-25
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.4.1...1.4.2
+
 ## Release Notes - Kickoff v1.4.1 - 2025-12-25
 
 **Release Date:** December 25, 2024
@@ -19,9 +23,13 @@ All notable changes to `kickoff` will be documented in this file.
 #### Settings Management
 
 - 💾 Settings now persist to `.env` file (environment-based configuration)
+  
 - ✅ Full validation for all settings sections
+  
 - 🔐 Authorization with `manage.settings` gate
+  
 - 📧 **Enhanced Email Settings** with complete SMTP configuration:
+  
   - Mail Driver (SMTP, Sendmail, Mailgun, SES, Log)
   - SMTP Host, Port, Username, Password
   - Encryption (TLS, SSL, None)
@@ -29,7 +37,9 @@ All notable changes to `kickoff` will be documented in this file.
   - Organized in 2-column grid layout with helper text showing ENV keys
   
 - 📋 Settings sections: General, Email, Notifications
+  
 - 🎯 Toast notifications for save/update feedback
+  
 
 #### Application Branding
 
@@ -101,16 +111,17 @@ All examples updated to use correct Livewire 3 named parameter syntax:
   ```php
   // ✅ Correct
 $this->dispatch('toast',
-    type: 'success',
-    message: 'Success!',
-    duration: 3000
+  type: 'success',
+  message: 'Success!',
+  duration: 3000
 );
 
 // ❌ Old (incorrect)
 $this->dispatch('toast', [
-    'type' => 'success',
-    'message' => 'Success!'
+  'type' => 'success',
+  'message' => 'Success!'
 ]);
+
 
   ```
 ### 💡 Migration Guide
@@ -131,6 +142,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 ```
@@ -160,6 +172,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 ```
@@ -264,6 +277,7 @@ kickoff start owner project
 # repeat
 
 
+
 ```
 **After (Automated):**
 
@@ -273,6 +287,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 ```
@@ -287,11 +302,13 @@ cd test-output/sandbox
 # create a database in mysql named `sandbox`
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 ```
@@ -302,11 +319,13 @@ npm run build
 php artisan serve
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 ```
@@ -482,11 +501,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -503,11 +524,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
