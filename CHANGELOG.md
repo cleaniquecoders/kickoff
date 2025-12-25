@@ -2,6 +2,125 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## Release Notes - Kickoff v1.4.1 - 2025-12-25
+
+**Release Date:** December 25, 2024
+
+### 🎉 What's New
+
+#### Toast Notification System
+
+- ✨ Added fully functional toast notification component with Alpine.js
+- 🎨 Support for 4 notification types: success, error, warning, info
+- 🌙 Dark mode support with proper color contrast
+- ⚡ Auto-dismiss with configurable duration (default 3000ms)
+- 🔄 Smooth animations and transitions
+
+#### Settings Management
+
+- 💾 Settings now persist to `.env` file (environment-based configuration)
+- ✅ Full validation for all settings sections
+- 🔐 Authorization with `manage.settings` gate
+- 📧 **Enhanced Email Settings** with complete SMTP configuration:
+  - Mail Driver (SMTP, Sendmail, Mailgun, SES, Log)
+  - SMTP Host, Port, Username, Password
+  - Encryption (TLS, SSL, None)
+  - Sender information (From Address, From Name)
+  - Organized in 2-column grid layout with helper text showing ENV keys
+  
+- 📋 Settings sections: General, Email, Notifications
+- 🎯 Toast notifications for save/update feedback
+
+#### Application Branding
+
+- 🚀 New app logo component with Kickoff rocket icon
+- 🎨 Dynamic project name display from `APP_NAME` env variable
+- 🌓 Proper light/dark mode support with contrasting colors
+- 💎 Clean design with white border and subtle shadow
+- 📱 Responsive layout
+
+#### Installation Improvements
+
+- 🏷️ `.env.example` now uses project name placeholders
+- ⚙️ Automatic replacement of `${PROJECT_NAME}` and `${OWNER}` during installation
+- 🗄️ Database name automatically set to snake_case project name
+- 📧 Superadmin email uses owner domain
+- 🪣 MinIO bucket uses project name
+
+### 🐛 Bug Fixes
+
+#### Toast Notifications
+
+- Fixed Livewire dispatch syntax (must use named parameters, not array)
+- Fixed Alpine.js SVG icon rendering (`x-show` instead of `<template x-if>`)
+- Added proper fallback classes for all toast states
+- Fixed text visibility in both light and dark modes
+
+#### Settings
+
+- Replaced database-based settings with `.env` file approach
+- Added proper `.env` file update helper functions
+- Fixed settings not persisting after save
+
+#### UI/UX
+
+- Fixed app logo visibility in light mode
+- Improved color contrast for better accessibility
+- Changed from `brand-*` to `blue-*` colors for easier customization
+
+### 🔧 Technical Changes
+
+#### New Files
+
+- `stubs/resources/views/components/toast.blade.php` - Toast notification component
+- `stubs/resources/views/components/app-logo.blade.php` - Application logo component
+- `stubs/support/env.php` - Environment file update helpers
+- `stubs/docs/toast-notifications.md` - Toast documentation
+
+#### Modified Files
+
+- `stubs/.env.example` - Added project name placeholders
+- `stubs/resources/views/livewire/admin/settings/show.blade.php` - Enhanced settings management
+- `stubs/routes/web/administration.php` - Added settings authorization middleware
+- `src/StartCommand.php` - Improved environment file setup
+- `stubs/app/Providers/AdminServiceProvider.php` - Added administration gates
+
+#### New Helper Functions
+
+- `update_env(string $key, mixed $value)` - Update single env variable
+- `update_env_multiple(array $data)` - Update multiple env variables
+
+### 📝 Documentation
+
+- 📝 Comprehensive documentation - reorganise the `docs/` based on context and priority.
+
+#### Code Examples
+
+All examples updated to use correct Livewire 3 named parameter syntax:
+
+  ```php
+  // ✅ Correct
+$this->dispatch('toast',
+    type: 'success',
+    message: 'Success!',
+    duration: 3000
+);
+
+// ❌ Old (incorrect)
+$this->dispatch('toast', [
+    'type' => 'success',
+    'message' => 'Success!'
+]);
+
+  ```
+### 💡 Migration Guide
+
+From Previous Version
+
+1. Toast Notifications: Update to use the new toast component: `$this->dispatch('toast', type: 'success', message: 'Saved!');`
+2. Settings: Settings now persist to .env file automatically. No database table needed.
+3. Branding: The app logo now uses `config('app.name')` automatically.
+
 ## Livewire Flux Integration & Development Tooling  - 2025-11-08
 
 ### 📋 Summary
@@ -12,6 +131,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 ```
 ### 🔗 Links
@@ -41,6 +161,7 @@ composer global require cleaniquecoders/kickoff
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
 
+
 ```
 **Key Features:**
 
@@ -66,13 +187,16 @@ bin/sandbox reset        # Delete sandbox and start clean
 #### 3. **Card Component Refactoring**
 
 - Introduced new `x-card` component structure
+  
 - Separated card into subcomponents:
+  
   - `x-card` (main wrapper)
   - `x-card.header` (header section)
   - `x-card.body` (body content)
   - `x-card.footer` (footer actions)
   
 - Updated views to use new component structure:
+  
   - index.blade.php
   - show.blade.php
   - show.blade.php
@@ -82,12 +206,15 @@ bin/sandbox reset        # Delete sandbox and start clean
 #### 4. **Icon Components Update**
 
 - Added 13 custom Flux icon components in icon:
+  
   - Lucide icon set (arrow-right-left, book-open-text, bug, chevrons-up-down, etc.)
   - System icons (settings, layout-dashboard, shield-check, log-out)
   - Navigation icons (layout-grid, folder-git-2, gauge)
   
 - Replaced `@pure` directive with `@blaze` for better Flux compatibility
+  
 - All icons follow consistent Lucide design patterns
+  
 
 #### 5. **Development Tooling**
 
@@ -136,6 +263,7 @@ kickoff start owner project
 # delete entire project
 # repeat
 
+
 ```
 **After (Automated):**
 
@@ -145,6 +273,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 ```
 **Testing the Sandbox:**
@@ -157,11 +286,13 @@ bin/sandbox run
 cd test-output/sandbox
 # create a database in mysql named `sandbox`
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 ```
 Run the sandbox app:
@@ -170,11 +301,13 @@ Run the sandbox app:
 npm run build
 php artisan serve
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 ```
 ### 📦 Dependencies
@@ -348,11 +481,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -367,11 +502,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
