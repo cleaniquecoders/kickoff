@@ -1,9 +1,39 @@
 <?php
 
 if (! function_exists('flash')) {
-    function flash(string $variant, string $message): void
+    function flash(?string $variant = null, ?string $message = null): mixed
     {
-        session()->flash('message', json_encode(flash_variant($variant)).'|'.$message);
+        if ($variant !== null && $message !== null) {
+            session()->flash('message', json_encode(flash_variant($variant)).'|'.$message);
+            return null;
+        }
+
+        return new class {
+            public function success(string $message): void
+            {
+                flash('success', $message);
+            }
+
+            public function info(string $message): void
+            {
+                flash('info', $message);
+            }
+
+            public function warning(string $message): void
+            {
+                flash('warning', $message);
+            }
+
+            public function danger(string $message): void
+            {
+                flash('danger', $message);
+            }
+
+            public function error(string $message): void
+            {
+                flash('error', $message);
+            }
+        };
     }
 }
 
