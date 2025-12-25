@@ -5,10 +5,12 @@ if (! function_exists('flash')) {
     {
         if ($variant !== null && $message !== null) {
             session()->flash('message', json_encode(flash_variant($variant)).'|'.$message);
+
             return null;
         }
 
-        return new class {
+        return new class
+        {
             public function success(string $message): void
             {
                 flash('success', $message);

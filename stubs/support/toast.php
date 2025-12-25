@@ -4,7 +4,6 @@ if (! function_exists('toast')) {
     /**
      * Dispatch a toast notification.
      *
-     * @param  string  $message
      * @param  string  $type  'success', 'error', 'warning', 'info'
      * @param  int  $duration  Duration in milliseconds
      */
