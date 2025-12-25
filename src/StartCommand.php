@@ -220,6 +220,7 @@ class StartCommand extends Command
                 'laravel/horizon',
                 'laravel/telescope',
                 'livewire/flux',
+                'livewire/volt',
                 'mallardduck/blade-lucide-icons',
                 'owen-it/laravel-auditing',
                 'predis/predis',
@@ -268,6 +269,8 @@ class StartCommand extends Command
                 runCommand("php artisan vendor:publish {$tag}", $verbose);
             }
         }, $output, $verbose);
+
+        runCommand("php artisan volt:install", $verbose);
 
         step('Install tippy.js', function () use ($verbose) {
             runCommand('npm install tippy.js', $verbose);
