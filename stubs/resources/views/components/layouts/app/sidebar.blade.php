@@ -123,6 +123,9 @@
 
         {{ $slot }}
 
+        {{-- Toast Notifications --}}
+        <x-toast />
+
         @fluxScripts
     </body>
 @else
@@ -138,6 +141,10 @@
                 </a>
             </div>
         </div>
+
+        {{-- Toast Notifications --}}
+        <x-toast />
+
         @fluxScripts
     </body>
 @endauth

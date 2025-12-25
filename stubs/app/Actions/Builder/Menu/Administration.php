@@ -30,7 +30,7 @@ class Administration extends Base
     protected function getMenuConfiguration(): array
     {
         return [
-            // fn () => $this->createRolesMenuItem(),
+            fn () => $this->createRolesMenuItem(),
             fn () => $this->createSettingsMenuItem(),
         ];
     }
