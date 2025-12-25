@@ -18,7 +18,7 @@ if (! function_exists('update_env')) {
         $formattedValue = is_bool($value)
             ? ($value ? 'true' : 'false')
             : (is_string($value) && str_contains($value, ' ')
-                ? '"' . $value . '"'
+                ? '"'.$value.'"'
                 : $value);
 
         // Check if key exists
