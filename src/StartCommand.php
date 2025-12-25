@@ -173,10 +173,19 @@ class StartCommand extends Command
     private function setupEnvironmentFile(OutputInterface $output, bool $verbose)
     {
         step('Update project environment file', function () {
-            copy($this->getProjectPath().'/.env.example', $this->getProjectPath().'/.env');
+            // Update placeholders in .env.example first
+            $envExampleFile = $this->getProjectPath().'/.env.example';
+            $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $envExampleFile);
+            $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $envExampleFile);
+
+            // Copy .env.example to .env
+            copy($envExampleFile, $this->getProjectPath().'/.env');
+
+            // Update .env with database name (snake_case)
             $envFile = $this->getProjectPath().'/.env';
             $content = file_get_contents($envFile);
-            $content = str_replace(['DB_DATABASE=kickoff'], ['DB_DATABASE='.$this->getDatabaseName()], $content);
+            $content = str_replace('DB_DATABASE=${PROJECT_NAME}', 'DB_DATABASE='.$this->getDatabaseName(), $content);
+            $content = str_replace('MINIO_BUCKET=${PROJECT_NAME}', 'MINIO_BUCKET='.$this->getDatabaseName(), $content);
             file_put_contents($envFile, $content);
         }, $output, $verbose);
     }
