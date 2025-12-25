@@ -186,7 +186,6 @@ See `bin/sandbox` for detailed usage and commands.
 - All scripts use the current directory name as the project name for dynamic configuration.
 - Scripts are made executable and can be run directly from the `bin/` directory.
 
-
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within AirBox, please send an e-mail to Nasrul Hazim via [nasrulhazim.m@gmail.com](mailto:nasrulhazim.m@gmail.com). All security vulnerabilities will be promptly addressed.

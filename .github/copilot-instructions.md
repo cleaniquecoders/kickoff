@@ -23,6 +23,7 @@ kickoff start <owner> <project-name> [<project-path>]
 ```
 
 The command executes these steps sequentially:
+
 1. Validates target is a Laravel project (checks for `artisan` file)
 2. Copies entire `stubs/` directory to project
 3. Modifies `composer.json` with custom scripts and autoload rules
@@ -81,6 +82,7 @@ Two placeholders are used throughout stubs:
 - `${OWNER}`: Replaced with owner argument
 
 These appear in:
+
 - `stubs/README.md`
 - `stubs/.env.example`
 - All `stubs/bin/*` scripts
@@ -92,11 +94,13 @@ These appear in:
 ### Test File: `tests/StartCommandTest.php`
 
 Uses PHPUnit with mocking to test:
+
 - Command configuration (arguments: owner, name, path)
 - Getter methods for project properties
 - Mock execution to verify workflow
 
 **Run Tests:**
+
 ```bash
 composer test          # Runs PHPUnit
 composer test-coverage # With coverage report
@@ -105,6 +109,7 @@ composer test-coverage # With coverage report
 ### Testing Approach
 
 Since this is a file-system heavy operation, tests focus on:
+
 1. Command configuration validation
 2. Method accessibility and return values
 3. Mock-based workflow verification
@@ -118,6 +123,7 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 ### Critical Stub Files
 
 **Configuration Files:**
+
 - `stubs/rector.php`: PHP 8.3, Laravel 11 level set
 - `stubs/pint.json`: Relaxed PHPDoc rules
 - `stubs/phpunit.xml`: Test environment settings
@@ -125,29 +131,34 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 - `stubs/docker-compose.yml`: MinIO, Elasticsearch, Redis services
 
 **Project Scripts** (`stubs/bin/`):
+
 - `install`: Creates database, updates .env, runs migrations
 - `deploy`: Git-based deployment script
 - `backup-app`, `backup-media`: Backup utilities
 - `build-fe-assets`, `reinstall-npm`, `update-dependencies`: Build tools
 
 **Custom Stubs** (`stubs/stubs/`):
+
 - `model.stub`: Extends `App\Models\Base` (not Eloquent Model)
 - `migration.create.stub`: UUID primary keys
 - `pest.stub`: Pest syntax for tests
 - `policy.stub`: Standard policy methods
 
 **Helper Functions** (`stubs/support/`):
+
 - Organized by domain: `user.php`, `flash.php`, `media.php`, `menu.php`, etc.
 - `helpers.php` uses `require_all_in(__DIR__.'/*.php')` pattern
 - All wrapped in `function_exists()` checks
 
 **Documentation Placeholders:**
+
 - `CHANGELOG.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`
 - `docs/` with deployment, development, and standards subdirectories
 
 ### Stubs vs Package Structure
 
 **IMPORTANT**: Don't confuse package structure with stubs:
+
 - Package `support/helpers.php`: CLI utilities (step, runCommand, copyRecursively)
 - Stubs `stubs/support/helpers.php`: Laravel application helpers (user, flash, media)
 
@@ -187,11 +198,13 @@ The command modifies target project's `composer.json` to add:
 ## Package Dependencies
 
 ### Required
+
 - `illuminate/filesystem`, `illuminate/support`: Laravel components for file operations
 - `symfony/console`, `symfony/process`: CLI framework
 - `symfony/polyfill-mbstring`: String handling
 
 ### Dev Dependencies
+
 - `larastan/larastan`: PHPStan + Laravel
 - `driftingly/rector-laravel`: Rector + Laravel rules
 - `laravel/pint`: Code formatting
@@ -338,6 +351,6 @@ See `stubs/.github/copilot-instructions.md` for full generated project conventio
 
 ---
 
-**Package Repository**: https://github.com/cleaniquecoders/kickoff
+**Package Repository**: <https://github.com/cleaniquecoders/kickoff>
 **Based On**: [Project Template](https://github.com/nasrulhazim/project-template)
 **Maintained By**: CleaniqueCoders (Nasrul Hazim)

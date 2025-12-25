@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(command -v:*)",
+      "Bash(markdownlint:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)"
+    ]
+  }
+}
