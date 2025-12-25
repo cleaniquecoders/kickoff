@@ -270,7 +270,7 @@ class StartCommand extends Command
             }
         }, $output, $verbose);
 
-        runCommand("php artisan volt:install", $verbose);
+        runCommand('php artisan volt:install', $verbose);
 
         step('Install tippy.js', function () use ($verbose) {
             runCommand('npm install tippy.js', $verbose);
