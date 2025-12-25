@@ -35,7 +35,21 @@ class AdminServiceProvider extends ServiceProvider
 
     private function defineGates()
     {
-        // Main access gates - for sidebar/menu authorization
+        $this->defineMainAccessGates();
+        $this->defineUserManagementGates();
+        $this->defineRoleManagementGates();
+        $this->defineAdministrationGates();
+        $this->defineSecurityGates();
+        $this->defineMonitoringGates();
+        $this->defineProfileGates();
+        $this->defineCompositeGates();
+    }
+
+    /**
+     * Define main access gates for sidebar/menu authorization.
+     */
+    private function defineMainAccessGates(): void
+    {
         Gate::define('access.admin-panel', function (User $user) {
             return $user->can('admin.view.panel');
         });
@@ -43,18 +57,54 @@ class AdminServiceProvider extends ServiceProvider
         Gate::define('access.dashboard', function (User $user) {
             return $user->can('dashboard.access.user') || $user->can('dashboard.access.admin');
         });
+    }
 
-        // User management gates
+    /**
+     * Define user management gates.
+     */
+    private function defineUserManagementGates(): void
+    {
         Gate::define('manage.users', function (User $user) {
             return $user->can('users.view.list');
         });
 
-        // Role management gates
+        Gate::define('impersonate.users', function (User $user) {
+            return $user->can('admin.impersonate.users');
+        });
+    }
+
+    /**
+     * Define role management gates.
+     */
+    private function defineRoleManagementGates(): void
+    {
         Gate::define('manage.roles', function (User $user) {
             return $user->can('roles.view.list');
         });
+    }
 
-        // Security gates
+    /**
+     * Define administration-related gates.
+     * These gates are used for administration menu items and features.
+     */
+    private function defineAdministrationGates(): void
+    {
+        // Root administration access gate
+        Gate::define('access.administration', function (User $user) {
+            return $user->can('manage.roles') || $user->can('manage.settings');
+        });
+
+        // Settings management
+        Gate::define('manage.settings', function (User $user) {
+            return $user->can('admin.manage.settings');
+        });
+    }
+
+    /**
+     * Define security-related gates.
+     */
+    private function defineSecurityGates(): void
+    {
         Gate::define('access.security', function (User $user) {
             return $user->can('security.manage.access-control') || $user->can('security.view.audit-logs');
         });
@@ -66,8 +116,13 @@ class AdminServiceProvider extends ServiceProvider
         Gate::define('view.audit-logs', function (User $user) {
             return $user->can('security.view.audit-logs');
         });
+    }
 
-        // Monitoring and tools gates
+    /**
+     * Define monitoring and tools gates.
+     */
+    private function defineMonitoringGates(): void
+    {
         Gate::define('access.telescope', function (User $user) {
             return $user->can('admin.access.telescope') && App::environment(['local', 'staging']);
         });
@@ -76,43 +131,7 @@ class AdminServiceProvider extends ServiceProvider
             return $user->can('admin.access.horizon');
         });
 
-        // Settings gates
-        Gate::define('manage.settings', function (User $user) {
-            return $user->can('admin.manage.settings');
-        });
-
-        // Impersonation gates
-        Gate::define('impersonate.users', function (User $user) {
-            return $user->can('admin.impersonate.users');
-        });
-
-        // Profile gates - for user self-service
-        Gate::define('access.profile', function (User $user) {
-            return $user->can('profile.view.own');
-        });
-
-        Gate::define('access.notifications', function (User $user) {
-            return $user->can('notifications.view.own');
-        });
-
-        // Composite gates for different access levels
-        Gate::define('access.superadmin', function (User $user) {
-            return $user->can('admin.view.panel') && $user->can('admin.manage.settings');
-        });
-
-        // Legacy gates for backward compatibility
-        Gate::define('viewUser', function (User $user) {
-            return $user->can('manage.users');
-        });
-
-        Gate::define('viewAudit', function (User $user) {
-            return $user->can('view.audit-logs');
-        });
-
-        Gate::define('viewAccessControl', function (User $user) {
-            return $user->can('manage.access-control');
-        });
-
+        // Gates required by Laravel packages (Telescope and Horizon)
         Gate::define('viewTelescope', function (User $user) {
             return $user->can('access.telescope');
         });
@@ -120,15 +139,32 @@ class AdminServiceProvider extends ServiceProvider
         Gate::define('viewHorizon', function (User $user) {
             return $user->can('access.horizon');
         });
+    }
 
-        Gate::define('admin-access', function (User $user) {
-            return $user->can('access.admin-panel');
+    /**
+     * Define profile and user self-service gates.
+     */
+    private function defineProfileGates(): void
+    {
+        Gate::define('access.profile', function (User $user) {
+            return $user->can('profile.view.own');
         });
 
-        Gate::define('superadmin-access', function (User $user) {
-            return $user->can('access.superadmin');
+        Gate::define('access.notifications', function (User $user) {
+            return $user->can('notifications.view.own');
         });
     }
+
+    /**
+     * Define composite gates for different access levels.
+     */
+    private function defineCompositeGates(): void
+    {
+        Gate::define('access.superadmin', function (User $user) {
+            return $user->can('admin.view.panel') && $user->can('admin.manage.settings');
+        });
+    }
+
 
     private function checkGates()
     {
@@ -146,6 +182,7 @@ class AdminServiceProvider extends ServiceProvider
         if (Gate::allows('access.admin-panel', [$user])) {
             Gate::check('manage.users', [$user]);
             Gate::check('manage.roles', [$user]);
+            Gate::check('access.administration', [$user]);
             Gate::check('access.security', [$user]);
             Gate::check('manage.settings', [$user]);
         }

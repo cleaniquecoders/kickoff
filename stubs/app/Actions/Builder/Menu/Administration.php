@@ -14,7 +14,7 @@ class Administration extends Base
     {
         $this->setHeadingLabel(__('Administration'))
             ->setHeadingIcon('settings')
-            ->setAuthorization(true);
+            ->setAuthorization(fn () => Gate::allows('access.administration'));
 
         $menuItems = $this->createAndProcessMenuItems($this->getMenuConfiguration());
         $this->setMenus($menuItems);
@@ -57,8 +57,8 @@ class Administration extends Base
         return (new MenuItem)
             ->setLabel(__('Settings'))
             ->setUrl(route('admin.settings.index'))
-            ->setVisible(fn () => true)
-            ->setTooltip(__('Manage roles'))
+            ->setVisible(fn () => Gate::allows('manage.settings'))
+            ->setTooltip(__('Manage settings'))
             ->setDescription(__('Configure system-wide settings'))
             ->setIcon('cog');
     }
