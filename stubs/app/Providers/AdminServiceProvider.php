@@ -165,7 +165,6 @@ class AdminServiceProvider extends ServiceProvider
         });
     }
 
-
     private function checkGates()
     {
         if (! Request::user()) {
