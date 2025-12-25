@@ -20,13 +20,15 @@ Route::middleware(['auth:sanctum', 'verified', 'can:access.admin-panel'])
             })->name('roles.show');
         });
 
-        // Settings
-        Route::get('settings', function () {
-            return view('admin.settings.index');
-        })->name('settings.index');
+        // Settings Management
+        Route::middleware(['can:manage.settings'])->group(function () {
+            Route::get('settings', function () {
+                return view('admin.settings.index');
+            })->name('settings.index');
 
-        Route::get('settings/{section}', function ($section) {
-            return view('admin.settings.show', compact('section'));
-        })->name('settings.show');
+            Route::get('settings/{section}', function ($section) {
+                return view('admin.settings.show', compact('section'));
+            })->name('settings.show');
+        });
 
     });

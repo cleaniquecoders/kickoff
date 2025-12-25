@@ -11,7 +11,6 @@ mount(function ($section) {
 });
 
 $loadSettings = function () {
-    // This is a placeholder - implement based on your settings storage
     $this->settings = [
         'general' => [
             'app_name' => config('app.name'),
@@ -19,20 +18,92 @@ $loadSettings = function () {
             'app_debug' => config('app.debug'),
         ],
         'email' => [
-            'mail_driver' => config('mail.default'),
+            'mail_mailer' => config('mail.default'),
+            'mail_host' => config('mail.mailers.smtp.host'),
+            'mail_port' => config('mail.mailers.smtp.port'),
+            'mail_username' => config('mail.mailers.smtp.username'),
+            'mail_password' => config('mail.mailers.smtp.password'),
+            'mail_encryption' => config('mail.mailers.smtp.encryption'),
             'mail_from_address' => config('mail.from.address'),
             'mail_from_name' => config('mail.from.name'),
         ],
         'notifications' => [
-            'enabled' => true,
-            'channels' => ['mail', 'database'],
+            'enabled' => env('NOTIFICATIONS_ENABLED', true),
+            'channels' => explode(',', env('NOTIFICATIONS_CHANNELS', 'mail,database')),
         ],
     ];
 };
 
 $saveSettings = function () {
-    // Implement save logic based on your requirements
-    flash()->success('Settings saved successfully.');
+    try {
+        // Validate based on section
+        if ($this->section === 'general') {
+            $this->validate([
+                'settings.general.app_name' => 'required|string|max:255',
+                'settings.general.app_env' => 'required|in:local,development,staging,production',
+            ]);
+
+            // Update .env file
+            update_env_multiple([
+                'APP_NAME' => $this->settings['general']['app_name'],
+                'APP_ENV' => $this->settings['general']['app_env'],
+                'APP_DEBUG' => $this->settings['general']['app_debug'] ?? false,
+            ]);
+
+        } elseif ($this->section === 'email') {
+            $this->validate([
+                'settings.email.mail_mailer' => 'required|in:smtp,sendmail,mailgun,ses,log',
+                'settings.email.mail_host' => 'nullable|string|max:255',
+                'settings.email.mail_port' => 'nullable|integer|min:1|max:65535',
+                'settings.email.mail_username' => 'nullable|string|max:255',
+                'settings.email.mail_encryption' => 'nullable|in:tls,ssl',
+                'settings.email.mail_from_address' => 'required|email',
+                'settings.email.mail_from_name' => 'required|string|max:255',
+            ]);
+
+            // Update .env file
+            update_env_multiple([
+                'MAIL_MAILER' => $this->settings['email']['mail_mailer'],
+                'MAIL_HOST' => $this->settings['email']['mail_host'] ?? '',
+                'MAIL_PORT' => $this->settings['email']['mail_port'] ?? 587,
+                'MAIL_USERNAME' => $this->settings['email']['mail_username'] ?? '',
+                'MAIL_PASSWORD' => $this->settings['email']['mail_password'] ?? '',
+                'MAIL_ENCRYPTION' => $this->settings['email']['mail_encryption'] ?? 'tls',
+                'MAIL_FROM_ADDRESS' => $this->settings['email']['mail_from_address'],
+                'MAIL_FROM_NAME' => $this->settings['email']['mail_from_name'],
+            ]);
+
+        } elseif ($this->section === 'notifications') {
+            // Update .env file
+            update_env_multiple([
+                'NOTIFICATIONS_ENABLED' => $this->settings['notifications']['enabled'] ?? false,
+                'NOTIFICATIONS_CHANNELS' => implode(',', $this->settings['notifications']['channels'] ?? []),
+            ]);
+        }
+
+        $this->dispatch('toast',
+            type: 'success',
+            message: ucfirst($this->section) . ' settings saved successfully!',
+            duration: 3000
+        );
+
+        // Reload settings to show updated values
+        $this->loadSettings();
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        $this->dispatch('toast',
+            type: 'error',
+            message: 'Please fix the validation errors.',
+            duration: 5000
+        );
+        throw $e;
+    } catch (\Exception $e) {
+        $this->dispatch('toast',
+            type: 'error',
+            message: 'Failed to save settings: ' . $e->getMessage(),
+            duration: 5000
+        );
+    }
 };
 
 ?>
@@ -89,36 +160,99 @@ $saveSettings = function () {
 
             @elseif($section === 'email')
                 <form wire:submit="saveSettings" class="space-y-6">
-                    <div>
-                        <flux:select
-                            label="Mail Driver"
-                            wire:model="settings.email.mail_driver"
-                        >
-                            <option value="smtp">SMTP</option>
-                            <option value="sendmail">Sendmail</option>
-                            <option value="mailgun">Mailgun</option>
-                            <option value="ses">Amazon SES</option>
-                        </flux:select>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <flux:select
+                                label="Mail Driver"
+                                wire:model="settings.email.mail_mailer"
+                            >
+                                <option value="smtp">SMTP</option>
+                                <option value="sendmail">Sendmail</option>
+                                <option value="mailgun">Mailgun</option>
+                                <option value="ses">Amazon SES</option>
+                                <option value="log">Log (Testing)</option>
+                            </flux:select>
+                        </div>
+
+                        <div>
+                            <flux:select
+                                label="Encryption"
+                                wire:model="settings.email.mail_encryption"
+                            >
+                                <option value="">None</option>
+                                <option value="tls">TLS</option>
+                                <option value="ssl">SSL</option>
+                            </flux:select>
+                        </div>
                     </div>
 
-                    <div>
-                        <flux:input
-                            label="From Address"
-                            type="email"
-                            wire:model="settings.email.mail_from_address"
-                            placeholder="noreply@example.com"
-                        />
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <flux:input
+                                label="Mail Host"
+                                wire:model="settings.email.mail_host"
+                                placeholder="smtp.gmail.com"
+                            />
+                            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">SMTP server address (MAIL_HOST)</p>
+                        </div>
+
+                        <div>
+                            <flux:input
+                                label="Mail Port"
+                                type="number"
+                                wire:model="settings.email.mail_port"
+                                placeholder="587"
+                            />
+                            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">SMTP port (MAIL_PORT)</p>
+                        </div>
                     </div>
 
-                    <div>
-                        <flux:input
-                            label="From Name"
-                            wire:model="settings.email.mail_from_name"
-                            placeholder="Application Name"
-                        />
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <flux:input
+                                label="Username"
+                                wire:model="settings.email.mail_username"
+                                placeholder="your-email@example.com"
+                            />
+                            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">SMTP username (MAIL_USERNAME)</p>
+                        </div>
+
+                        <div>
+                            <flux:input
+                                label="Password"
+                                type="password"
+                                wire:model="settings.email.mail_password"
+                                placeholder="••••••••"
+                            />
+                            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">SMTP password (MAIL_PASSWORD)</p>
+                        </div>
                     </div>
 
-                    <div class="flex justify-end gap-2">
+                    <div class="border-t border-zinc-200 dark:border-zinc-700 pt-6">
+                        <h3 class="text-sm font-medium text-zinc-900 dark:text-white mb-4">Sender Information</h3>
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div>
+                                <flux:input
+                                    label="From Address"
+                                    type="email"
+                                    wire:model="settings.email.mail_from_address"
+                                    placeholder="noreply@example.com"
+                                />
+                                <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Default sender email (MAIL_FROM_ADDRESS)</p>
+                            </div>
+
+                            <div>
+                                <flux:input
+                                    label="From Name"
+                                    wire:model="settings.email.mail_from_name"
+                                    placeholder="Application Name"
+                                />
+                                <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Default sender name (MAIL_FROM_NAME)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-2 border-t border-zinc-200 dark:border-zinc-700 pt-6">
                         <flux:button variant="ghost" :href="route('admin.settings.index')" wire:navigate>
                             Cancel
                         </flux:button>
