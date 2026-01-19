@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
@@ -84,14 +83,19 @@ class AdminServiceProvider extends ServiceProvider
     }
 
     /**
-     * Define administration-related gates.
-     * These gates are used for administration menu items and features.
+     * Define user management menu gates.
+     * Combines users and roles management.
      */
     private function defineAdministrationGates(): void
     {
-        // Root administration access gate
-        Gate::define('access.administration', function (User $user) {
-            return $user->can('manage.roles') || $user->can('manage.settings');
+        // User Management menu access gate (combines users + roles)
+        Gate::define('access.user-management', function (User $user) {
+            return $user->can('manage.users') || $user->can('manage.roles');
+        });
+
+        // Settings menu access gate
+        Gate::define('access.settings', function (User $user) {
+            return $user->can('manage.settings');
         });
 
         // Settings management
@@ -105,14 +109,6 @@ class AdminServiceProvider extends ServiceProvider
      */
     private function defineSecurityGates(): void
     {
-        Gate::define('access.security', function (User $user) {
-            return $user->can('security.manage.access-control') || $user->can('security.view.audit-logs');
-        });
-
-        Gate::define('manage.access-control', function (User $user) {
-            return Config::get('access-control.enabled') && $user->can('security.manage.access-control');
-        });
-
         Gate::define('view.audit-logs', function (User $user) {
             return $user->can('security.view.audit-logs');
         });
@@ -123,6 +119,11 @@ class AdminServiceProvider extends ServiceProvider
      */
     private function defineMonitoringGates(): void
     {
+        // Audit & Monitoring menu access gate
+        Gate::define('access.audit-monitoring', function (User $user) {
+            return $user->can('view.audit-logs') || $user->can('access.telescope') || $user->can('access.horizon');
+        });
+
         Gate::define('access.telescope', function (User $user) {
             return $user->can('admin.access.telescope') && App::environment(['local', 'staging']);
         });
@@ -181,8 +182,9 @@ class AdminServiceProvider extends ServiceProvider
         if (Gate::allows('access.admin-panel', [$user])) {
             Gate::check('manage.users', [$user]);
             Gate::check('manage.roles', [$user]);
-            Gate::check('access.administration', [$user]);
-            Gate::check('access.security', [$user]);
+            Gate::check('access.user-management', [$user]);
+            Gate::check('access.settings', [$user]);
+            Gate::check('access.audit-monitoring', [$user]);
             Gate::check('manage.settings', [$user]);
         }
 
