@@ -60,6 +60,11 @@ run() {
   # Run kickoff against the freshly created sandbox (use sandbox identifiers)
   echo "Running kickoff start for sandbox/sandbox ..." >&2
   php "$REPO_ROOT/bin/kickoff" start sandbox sandbox "$SANDBOX_DIR"
+
+  # Seed dummy notifications for the superadmin user
+  echo "Seeding dummy notifications for superadmin ..." >&2
+  (cd "$SANDBOX_DIR" && php artisan db:seed --class=NotificationSeeder)
+
   echo "Sandbox ready with kickoff applied: $SANDBOX_DIR" >&2
 }
 
