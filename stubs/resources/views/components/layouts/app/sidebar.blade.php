@@ -18,16 +18,12 @@
 
             <flux:navlist variant="outline">
                 <x-menu menu-builder="sidebar" />
-                <x-menu menu-builder="administration" />
-                <x-menu menu-builder="security" />
+                <x-menu menu-builder="user-management" />
+                <x-menu menu-builder="settings" />
+                <x-menu menu-builder="audit-monitoring" />
             </flux:navlist>
 
             <flux:spacer />
-
-            <flux:navlist variant="outline">
-                <x-menu menu-builder="sidebar-footer" />
-                <x-menu menu-builder="support" />
-            </flux:navlist>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">

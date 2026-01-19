@@ -2,11 +2,10 @@
 
 namespace App\Actions\Builder;
 
-use App\Actions\Builder\Menu\Administration;
-use App\Actions\Builder\Menu\Security;
+use App\Actions\Builder\Menu\AuditMonitoring;
+use App\Actions\Builder\Menu\Settings;
 use App\Actions\Builder\Menu\Sidebar;
-use App\Actions\Builder\Menu\SidebarFooter;
-use App\Actions\Builder\Menu\Support;
+use App\Actions\Builder\Menu\UserManagement;
 use App\Exceptions\ContractException;
 use CleaniqueCoders\Traitify\Contracts\Builder;
 use CleaniqueCoders\Traitify\Contracts\Menu as ContractsMenu;
@@ -21,11 +20,10 @@ class Menu
     public function build(string $builder): Builder|ContractsMenu
     {
         $class = match ($builder) {
-            'administration' => Administration::class,
-            'security' => Security::class,
             'sidebar' => Sidebar::class,
-            'sidebar-footer' => SidebarFooter::class,
-            'support' => Support::class,
+            'user-management' => UserManagement::class,
+            'settings' => Settings::class,
+            'audit-monitoring' => AuditMonitoring::class,
             default => Sidebar::class,
         };
 

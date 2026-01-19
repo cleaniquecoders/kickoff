@@ -5,16 +5,16 @@ namespace App\Actions\Builder\Menu;
 use App\Actions\Builder\MenuItem;
 use Illuminate\Support\Facades\Gate;
 
-class Security extends Base
+class UserManagement extends Base
 {
     /**
-     * Build the security menu items.
+     * Build the user management menu items.
      */
     public function build(): self
     {
-        $this->setHeadingLabel(__('Security'))
-            ->setHeadingIcon('shield')
-            ->setAuthorization('access.security');
+        $this->setHeadingLabel(__('User Management'))
+            ->setHeadingIcon('users')
+            ->setAuthorization('access.user-management');
 
         $menuItems = $this->createAndProcessMenuItems($this->getMenuConfiguration());
         $this->setMenus($menuItems);
@@ -23,7 +23,7 @@ class Security extends Base
     }
 
     /**
-     * Get menu configuration for security.
+     * Get menu configuration for user management.
      *
      * @return array<callable>
      */
@@ -31,7 +31,7 @@ class Security extends Base
     {
         return [
             fn () => $this->createUsersMenuItem(),
-            fn () => $this->createAuditTrailMenuItem(),
+            fn () => $this->createRolesMenuItem(),
         ];
     }
 
@@ -46,20 +46,20 @@ class Security extends Base
             ->setVisible(fn () => Gate::allows('manage.users'))
             ->setTooltip(__('Manage users'))
             ->setDescription(__('View and manage user accounts'))
-            ->setIcon('users');
+            ->setIcon('user');
     }
 
     /**
-     * Create the audit trail menu item.
+     * Create the roles menu item.
      */
-    private function createAuditTrailMenuItem(): MenuItem
+    private function createRolesMenuItem(): MenuItem
     {
         return (new MenuItem)
-            ->setLabel(__('Audit Trail'))
-            ->setUrl(route('security.audit-trail.index'))
-            ->setVisible(fn () => Gate::allows('view.audit-logs'))
-            ->setTooltip(__('View audit trails'))
-            ->setDescription(__('Audit logs for security and activity tracking'))
-            ->setIcon('clipboard-document-list');
+            ->setLabel(__('Roles'))
+            ->setUrl(route('admin.roles.index'))
+            ->setVisible(fn () => Gate::allows('manage.roles'))
+            ->setTooltip(__('Manage roles'))
+            ->setDescription(__('Define and manage user roles'))
+            ->setIcon('shield-check');
     }
 }
