@@ -30,23 +30,23 @@ class Security extends Base
     protected function getMenuConfiguration(): array
     {
         return [
-            // fn () => $this->createAccessControlMenuItem(),
-            // fn () => $this->createAuditTrailMenuItem(),
+            fn () => $this->createUsersMenuItem(),
+            fn () => $this->createAuditTrailMenuItem(),
         ];
     }
 
     /**
-     * Create the access control menu item.
+     * Create the users menu item.
      */
-    private function createAccessControlMenuItem(): MenuItem
+    private function createUsersMenuItem(): MenuItem
     {
         return (new MenuItem)
-            ->setLabel(__('Access Control'))
-            ->setUrl(route('security.access-control.index'))
-            ->setVisible(fn () => Gate::allows('manage.access-control'))
-            ->setTooltip(__('Manage access control'))
-            ->setDescription(__('Define and manage access control rules'))
-            ->setIcon('lock');
+            ->setLabel(__('Users'))
+            ->setUrl(route('security.users.index'))
+            ->setVisible(fn () => Gate::allows('manage.users'))
+            ->setTooltip(__('Manage users'))
+            ->setDescription(__('View and manage user accounts'))
+            ->setIcon('users');
     }
 
     /**
@@ -60,6 +60,6 @@ class Security extends Base
             ->setVisible(fn () => Gate::allows('view.audit-logs'))
             ->setTooltip(__('View audit trails'))
             ->setDescription(__('Audit logs for security and activity tracking'))
-            ->setIcon('scroll-text');
+            ->setIcon('clipboard-document-list');
     }
 }
