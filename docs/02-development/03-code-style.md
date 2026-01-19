@@ -321,9 +321,8 @@ Before committing:
 - [ ] Run `composer test` - verify tests pass
 - [ ] Test with `bin/sandbox run` - validate end-to-end
 
-## See Also
+## Next Steps
 
-- [Getting Started](./01-getting-started.md)
-- [Testing](./02-testing.md)
-- [Adding Features](./04-adding-features.md)
-- [Contributing Guidelines](../03-contributing/README.md)
+- [Adding Features](04-adding-features.md) - Learn to extend Kickoff
+- [Testing](02-testing.md) - Test your changes
+- [Contributing Guidelines](../03-contributing/README.md) - Submit your contributions

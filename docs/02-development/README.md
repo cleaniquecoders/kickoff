@@ -2,12 +2,28 @@
 
 This section contains information for developers working on the Kickoff package.
 
-## Contents
+## Overview
 
-1. [Getting Started](./01-getting-started.md) - Setup development environment
-2. [Testing](./02-testing.md) - Testing strategies and sandbox workflow
-3. [Code Style](./03-code-style.md) - Formatting and quality standards
-4. [Adding Features](./04-adding-features.md) - How to extend Kickoff
+This guide covers everything you need to know to develop and extend the Kickoff package, including
+setting up your environment, testing strategies, and code quality standards.
+
+## Table of Contents
+
+### [1. Getting Started](01-getting-started.md)
+
+Setup your development environment, install dependencies, and verify installation.
+
+### [2. Testing](02-testing.md)
+
+Testing strategies, PHPUnit usage, and sandbox workflow for integration testing.
+
+### [3. Code Style](03-code-style.md)
+
+Code formatting with Laravel Pint, static analysis with PHPStan, and style guidelines.
+
+### [4. Adding Features](04-adding-features.md)
+
+How to extend Kickoff: adding packages, stubs, placeholders, and setup steps.
 
 ## Quick Start
 

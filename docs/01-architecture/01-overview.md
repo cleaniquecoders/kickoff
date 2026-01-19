@@ -101,8 +101,8 @@ Do not confuse package helpers with stubs helpers - they serve different purpose
 - `laravel/pint`: Code formatting
 - `pestphp/pest`: Test runner
 
-## See Also
+## Next Steps
 
-- [Bootstrap Process](./02-bootstrap-process.md)
-- [Stubs System](./03-stubs-system.md)
-- [Helper Functions](./04-helper-functions.md)
+- [Bootstrap Process](02-bootstrap-process.md) - Learn how the kickoff command executes
+- [Stubs System](03-stubs-system.md) - Understand the template system
+- [Helper Functions](04-helper-functions.md) - Explore CLI utility functions

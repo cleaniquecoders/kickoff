@@ -186,8 +186,8 @@ The command validates at each step:
 - Package installation failure → Error displayed with details
 - Any step failure → ❌ indicator with message
 
-## See Also
+## Next Steps
 
-- [Overview](./01-overview.md)
-- [Stubs System](./03-stubs-system.md)
-- [Helper Functions](./04-helper-functions.md)
+- [Stubs System](03-stubs-system.md) - Learn about the template system
+- [Helper Functions](04-helper-functions.md) - Explore CLI utility functions
+- [Overview](01-overview.md) - Return to architecture overview

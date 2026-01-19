@@ -1,13 +1,25 @@
 # Contributing
 
-Thank you for considering contributing to Kickoff! This guide will help you
-understand our contribution process.
+Thank you for considering contributing to Kickoff! This guide will help you understand our contribution process.
 
-## Contents
+## Overview
 
-1. [Getting Started](./01-getting-started.md) - How to start contributing
-2. [Pull Request Process](./02-pull-request-process.md) - Submitting changes
-3. [Code Review](./03-code-review.md) - Review guidelines and expectations
+We welcome all contributions, whether they're bug fixes, new features, documentation improvements,
+or stubs enhancements. This section guides you through the entire contribution workflow.
+
+## Table of Contents
+
+### [1. Getting Started](01-getting-started.md)
+
+Fork, clone, and set up your development environment for contributing.
+
+### [2. Pull Request Process](02-pull-request-process.md)
+
+How to create, submit, and manage pull requests effectively.
+
+### [3. Code Review](03-code-review.md)
+
+What to expect during review and guidelines for reviewers.
 
 ## Quick Contribution Guide
 

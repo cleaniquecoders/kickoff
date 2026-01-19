@@ -224,23 +224,19 @@ git commit -m "docs: improve section-name documentation"
 git push origin docs/improve-section
 ```
 
-## Next Steps
-
-After pushing your changes:
-
-1. [Create a Pull Request](./02-pull-request-process.md)
-2. Wait for [Code Review](./03-code-review.md)
-3. Address feedback if needed
-4. Wait for merge
-
 ## Getting Help
 
 - **Questions**: Open a GitHub Discussion
 - **Bugs**: Create an issue with reproduction steps
 - **Feature Ideas**: Open an issue for discussion
 
-## See Also
+## Next Steps
 
-- [Pull Request Process](./02-pull-request-process.md)
-- [Code Review Guidelines](./03-code-review.md)
-- [Development Guide](../02-development/README.md)
+After pushing your changes:
+
+1. [Create a Pull Request](02-pull-request-process.md) - Submit your changes
+2. Wait for [Code Review](03-code-review.md) - Understand the review process
+3. Address feedback if needed
+4. Wait for merge
+
+See also: [Development Guide](../02-development/README.md) for environment setup

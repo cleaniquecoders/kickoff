@@ -325,8 +325,8 @@ git push origin your-branch-name --force
 - Tag maintainers if urgent
 - Check existing PRs for examples
 
-## See Also
+## Next Steps
 
-- [Getting Started](./01-getting-started.md)
-- [Code Review Guidelines](./03-code-review.md)
-- [Code Style](../02-development/03-code-style.md)
+- [Code Review Guidelines](03-code-review.md) - What to expect during review
+- [Getting Started](01-getting-started.md) - Return to contribution setup
+- [Code Style](../02-development/03-code-style.md) - Ensure code quality

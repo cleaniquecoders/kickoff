@@ -296,8 +296,8 @@ kickoff start owner name -vvv
 
 **Never confuse these** - they serve different codebases with different purposes.
 
-## See Also
+## Next Steps
 
-- [Bootstrap Process](./02-bootstrap-process.md)
-- [Stubs System](./03-stubs-system.md)
-- [Development Guide](../02-development/README.md)
+- [Bootstrap Process](02-bootstrap-process.md) - See helpers in action during bootstrap
+- [Adding Features](../02-development/04-adding-features.md) - How to add new helper functions
+- [Development Guide](../02-development/README.md) - Start developing for Kickoff

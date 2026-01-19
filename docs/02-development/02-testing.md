@@ -265,8 +265,8 @@ See `.github/workflows/run-tests.yml`:
   run: composer test
 ```
 
-## See Also
+## Next Steps
 
-- [Getting Started](./01-getting-started.md)
-- [Code Style](./03-code-style.md)
-- [Adding Features](./04-adding-features.md)
+- [Code Style](03-code-style.md) - Formatting and quality standards
+- [Adding Features](04-adding-features.md) - Extend Kickoff functionality
+- [Getting Started](01-getting-started.md) - Return to setup guide

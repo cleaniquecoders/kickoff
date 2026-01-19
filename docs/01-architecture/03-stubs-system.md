@@ -307,8 +307,8 @@ Do not confuse these - they serve different codebases.
    }, $output, $verbose);
    ```
 
-## See Also
+## Next Steps
 
-- [Overview](./01-overview.md)
-- [Bootstrap Process](./02-bootstrap-process.md)
-- [Development Guide](../02-development/README.md)
+- [Helper Functions](04-helper-functions.md) - Learn about CLI utility functions
+- [Bootstrap Process](02-bootstrap-process.md) - How stubs are copied and processed
+- [Adding Features](../02-development/04-adding-features.md) - How to add new stubs

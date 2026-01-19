@@ -329,8 +329,8 @@ Before merging:
 - ❌ Leave vague feedback
 - ❌ Delay reviews unnecessarily
 
-## See Also
+## Next Steps
 
-- [Getting Started](./01-getting-started.md)
-- [Pull Request Process](./02-pull-request-process.md)
-- [Code Style](../02-development/03-code-style.md)
+- [Pull Request Process](02-pull-request-process.md) - Return to PR workflow
+- [Getting Started](01-getting-started.md) - Contribution setup guide
+- [Code Style](../02-development/03-code-style.md) - Code formatting standards

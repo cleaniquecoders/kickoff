@@ -354,9 +354,9 @@ step('Setup optional feature', function () use ($verbose) {
 }, $output, $verbose);
 ```
 
-## See Also
+## Next Steps
 
-- [Architecture Overview](../01-architecture/README.md)
-- [Testing](./02-testing.md)
-- [Code Style](./03-code-style.md)
-- [Contributing Guidelines](../03-contributing/README.md)
+- [Testing](02-testing.md) - Test your new features
+- [Code Style](03-code-style.md) - Ensure code quality
+- [Contributing Guidelines](../03-contributing/README.md) - Submit your contribution
+- [Stubs System](../01-architecture/03-stubs-system.md) - Deep dive into stub architecture

@@ -185,12 +185,7 @@ composer update
 
 ## Next Steps
 
-- Read [Testing](./02-testing.md) for testing strategies
-- See [Code Style](./03-code-style.md) for formatting guidelines
-- Learn [Adding Features](./04-adding-features.md) to extend Kickoff
-
-## See Also
-
-- [Architecture Overview](../01-architecture/01-overview.md)
-- [Bootstrap Process](../01-architecture/02-bootstrap-process.md)
-- [Contributing Guidelines](../03-contributing/README.md)
+- [Testing](02-testing.md) - Testing strategies and sandbox workflow
+- [Code Style](03-code-style.md) - Formatting and quality guidelines
+- [Adding Features](04-adding-features.md) - Learn to extend Kickoff
+- [Architecture Overview](../01-architecture/01-overview.md) - Understand package structure
