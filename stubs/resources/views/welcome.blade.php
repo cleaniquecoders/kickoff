@@ -10,9 +10,7 @@
                 <div class="flex h-16 items-center justify-between">
                     {{-- Logo --}}
                     <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600">
-                            <x-lucide-rocket class="h-5 w-5 text-white" />
-                        </div>
+                        <x-kickoff-logo class="h-9 w-9" />
                         <span class="text-lg font-bold text-zinc-900 dark:text-white">{{ config('app.name') }}</span>
                     </a>
 
@@ -141,7 +139,7 @@
                         </div>
                         <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">{{ __('Livewire Powered') }}</h3>
                         <p class="mt-2 text-zinc-600 dark:text-zinc-400">
-                            {{ __('Interactive UI components built with Livewire 3 and Flux for a modern experience.') }}
+                            {{ __('Interactive UI components built with Livewire 4 and Flux for a modern experience.') }}
                         </p>
                     </div>
 
@@ -152,7 +150,7 @@
                         </div>
                         <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">{{ __('Media Management') }}</h3>
                         <p class="mt-2 text-zinc-600 dark:text-zinc-400">
-                            {{ __('Handle file uploads and media with Spatie Media Library, ready for S3 and cloud storage.') }}
+                            {{ __('File upload support with Spatie Media Library, ready for S3 and cloud storage. UI coming soon.') }}
                         </p>
                     </div>
 
@@ -191,9 +189,7 @@
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
                     <div class="flex items-center space-x-2">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-                            <x-lucide-rocket class="h-4 w-4 text-white" />
-                        </div>
+                        <x-kickoff-logo class="h-8 w-8" />
                         <span class="font-semibold text-zinc-900 dark:text-white">{{ config('app.name') }}</span>
                     </div>
                     <p class="text-sm text-zinc-500 dark:text-zinc-400">
