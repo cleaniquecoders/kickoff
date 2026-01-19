@@ -85,12 +85,12 @@
                 </x-card.header>
                 <x-card.body>
                     <div class="grid gap-3 sm:grid-cols-2">
-                        <flux:button variant="primary" :href="route('settings.profile')" wire:navigate class="justify-start">
+                        <flux:button variant="primary" :href="route('settings.profile.edit')" wire:navigate class="justify-start">
                             <x-lucide-user class="mr-2 h-4 w-4" />
                             {{ __('Edit Profile') }}
                         </flux:button>
 
-                        <flux:button variant="primary" :href="route('settings.password')" wire:navigate class="justify-start">
+                        <flux:button variant="primary" :href="route('settings.user-password.edit')" wire:navigate class="justify-start">
                             <x-lucide-lock class="mr-2 h-4 w-4" />
                             {{ __('Change Password') }}
                         </flux:button>
