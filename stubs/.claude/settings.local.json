@@ -5,9 +5,24 @@
       "Bash(markdownlint:*)",
       "Bash(tree:*)",
       "Bash(wc:*)",
-      "Bash(php artisan tinker:*)",
       "Bash(ls:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(php artisan:*)",
+      "Bash(php -v:*)",
+      "Bash(php -r:*)",
+      "Bash(composer:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(bin/*:*)",
+      "Bash(./bin/*:*)",
+      "Bash(vendor/bin/*:*)",
+      "Bash(./vendor/bin/*:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Skill(docs)"
     ]
   }
 }
