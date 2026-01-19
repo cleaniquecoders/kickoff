@@ -56,7 +56,7 @@ class Sidebar extends Base
         $label = __('Notifications');
 
         if ($unreadCount > 0) {
-            $label .= ' (' . $unreadCount . ')';
+            $label .= ' ('.$unreadCount.')';
         }
 
         return (new MenuItem)
