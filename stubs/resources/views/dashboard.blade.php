@@ -57,16 +57,16 @@
                 </x-card.body>
             </x-card>
 
-            {{-- Stat Card 4 --}}
+            {{-- Stat Card 4 - Notifications --}}
             <x-card>
                 <x-card.body>
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">{{ __('Audit Logs') }}</p>
-                            <p class="mt-1 text-2xl font-semibold text-zinc-900 dark:text-white">{{ \Spatie\Activitylog\Models\Activity::count() }}</p>
+                            <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">{{ __('Unread Notifications') }}</p>
+                            <p class="mt-1 text-2xl font-semibold text-zinc-900 dark:text-white">{{ auth()->user()->unreadNotifications()->count() }}</p>
                         </div>
                         <div class="rounded-full bg-amber-100 p-3 dark:bg-amber-900/50">
-                            <x-lucide-scroll-text class="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                            <x-lucide-bell class="h-6 w-6 text-amber-600 dark:text-amber-400" />
                         </div>
                     </div>
                 </x-card.body>
@@ -93,6 +93,11 @@
                         <flux:button variant="primary" :href="route('settings.user-password.edit')" wire:navigate class="justify-start">
                             <x-lucide-lock class="mr-2 h-4 w-4" />
                             {{ __('Change Password') }}
+                        </flux:button>
+
+                        <flux:button variant="primary" :href="route('notifications.index')" wire:navigate class="justify-start">
+                            <x-lucide-bell class="mr-2 h-4 w-4" />
+                            {{ __('View Notifications') }}
                         </flux:button>
 
                         @can('access.user-management')
@@ -166,6 +171,62 @@
                 @endcan
             </x-card>
         </div>
+
+        {{-- Recent Notifications --}}
+        <x-card>
+            <x-card.header>
+                <div class="flex items-center">
+                    <x-lucide-bell class="mr-2 h-5 w-5 text-brand-500" />
+                    <flux:heading size="lg">{{ __('Recent Notifications') }}</flux:heading>
+                </div>
+            </x-card.header>
+            <x-card.body :padding="false">
+                @php
+                    $notifications = auth()->user()->notifications()->latest()->take(5)->get();
+                @endphp
+
+                @if($notifications->isEmpty())
+                    <div class="px-6 py-8 text-center">
+                        <x-lucide-bell class="mx-auto h-12 w-12 text-zinc-400" />
+                        <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{{ __('No notifications yet') }}</p>
+                    </div>
+                @else
+                    <ul class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                        @foreach($notifications as $notification)
+                            <li class="flex items-center gap-4 px-6 py-3 {{ is_null($notification->read_at) ? 'bg-blue-50 dark:bg-blue-900/20' : '' }}">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-full {{ is_null($notification->read_at) ? 'bg-blue-100 dark:bg-blue-800' : 'bg-zinc-100 dark:bg-zinc-700' }} p-2">
+                                        <x-lucide-bell class="h-4 w-4 {{ is_null($notification->read_at) ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-600 dark:text-zinc-400' }}" />
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-sm font-medium text-zinc-900 dark:text-white">
+                                        {{ data_get($notification->data, 'title', class_basename($notification->type)) }}
+                                    </p>
+                                    @if ($message = data_get($notification->data, 'message'))
+                                        <p class="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                                            {{ $message }}
+                                        </p>
+                                    @endif
+                                    <p class="text-xs text-zinc-400 dark:text-zinc-500">
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </p>
+                                </div>
+                                @if(is_null($notification->read_at))
+                                    <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </x-card.body>
+            <x-card.footer>
+                <flux:button variant="ghost" :href="route('notifications.index')" wire:navigate>
+                    {{ __('View All Notifications') }}
+                    <x-lucide-arrow-right class="ml-2 h-4 w-4" />
+                </flux:button>
+            </x-card.footer>
+        </x-card>
 
         {{-- System Info --}}
         <x-card>

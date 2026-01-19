@@ -29,6 +29,7 @@ class Sidebar extends Base
     {
         return [
             fn () => $this->createDashboardMenuItem(),
+            fn () => $this->createNotificationsMenuItem(),
         ];
     }
 
@@ -43,6 +44,27 @@ class Sidebar extends Base
             ->setIcon('gauge')
             ->setDescription(__('Access to your dashboard.'))
             ->setTooltip(__('Dashboard'))
+            ->setVisible(true);
+    }
+
+    /**
+     * Create the notifications menu item.
+     */
+    private function createNotificationsMenuItem(): MenuItem
+    {
+        $unreadCount = Auth::check() ? Auth::user()->unreadNotifications()->count() : 0;
+        $label = __('Notifications');
+
+        if ($unreadCount > 0) {
+            $label .= ' (' . $unreadCount . ')';
+        }
+
+        return (new MenuItem)
+            ->setLabel($label)
+            ->setUrl(route('notifications.index'))
+            ->setIcon('bell')
+            ->setDescription(__('Manage your notifications'))
+            ->setTooltip(__('View all notifications'))
             ->setVisible(true);
     }
 }
