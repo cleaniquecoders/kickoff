@@ -1,5 +1,7 @@
 # Livewire Components
 
+> This project uses Livewire 4 with built-in single-file component support for building reactive components.
+
 ## Alert Component
 
 Using Alert component:
@@ -21,23 +23,7 @@ Using Confirm component:
 
 Both of the Alert & Confirm modal are using the Laravel Jetstream modal.
 
-## Datatable Actions
-
-Using Datatable Actions:
-
-```php
-public function columns(): array
-{
-    return [
-        Column::make('Name', 'name')
-            ->sortable(),
-        Column::make('Actions', 'uuid')
-            ->format(
-                fn ($value, $row, Column $column) => view('livewire.datatable-actions', ['form' => 'resource-form', 'value' => $value, 'row' => $row, 'column' => $column])
-            ),
-    ];
-}
-```
+For datatables, see the [Datatable documentation](05-datatable.md) for examples using native Livewire 4 with pagination, sorting, and filtering.
 
 ## Form Components
 
@@ -52,7 +38,7 @@ Then use the `InteractsWithLivewireForm` trait. All the properties defined below
 ```php
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use App\Actions\Sensor\CreateNewDevice;
 use App\Concerns\InteractsWithLivewireForm;
@@ -76,3 +62,41 @@ class DeviceForm extends Component
     ];
 }
 ```
+
+## Single-File Components
+
+Livewire 4 has built-in support for single-file components (no separate Volt package needed). Create single-file components in `resources/views/livewire/`:
+
+```php
+<?php
+
+use Livewire\Component;
+
+new class extends Component {
+    public string $name = '';
+
+    public function save(): void
+    {
+        $this->validate(['name' => 'required']);
+        // Save logic
+    }
+}; ?>
+
+<div>
+    <input wire:model="name" type="text" />
+    <button wire:click="save">Save</button>
+</div>
+```
+
+## Wire Directives
+
+Livewire 4 supports the following directives:
+
+- `wire:model` - Bind data (updates on blur/change)
+- `wire:model.live` - Real-time binding with immediate updates
+- `wire:model.blur` - Update on blur event
+- `wire:model.debounce.500ms` - Debounce updates
+- `wire:click` - Handle click events
+- `wire:submit` - Handle form submissions
+- `wire:loading` - Show/hide during requests
+- `wire:navigate` - Enhanced page navigation

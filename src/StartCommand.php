@@ -228,12 +228,12 @@ class StartCommand extends Command
                 'lab404/laravel-impersonate',
                 'laravel/horizon',
                 'laravel/telescope',
-                'livewire/flux',
-                'livewire/volt',
+                // Livewire 4 with compatible packages
+                'livewire/livewire:^4.0',
+                'livewire/flux',  // Compatible with both Livewire 3 & 4
                 'mallardduck/blade-lucide-icons',
                 'owen-it/laravel-auditing',
                 'predis/predis',
-                'rappasoft/laravel-livewire-tables',
                 'spatie/laravel-activitylog',
                 'spatie/laravel-medialibrary',
                 'spatie/laravel-permission',
@@ -253,10 +253,6 @@ class StartCommand extends Command
         step('Publishing package configs & migrations', function () use ($verbose) {
             $tags = [
                 '--provider="OwenIt\\Auditing\\AuditingServiceProvider"',
-                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-config',
-                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-public',
-                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-translations',
-                '--provider="Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider" --tag=livewire-tables-views',
                 '--provider="Spatie\\Activitylog\\ActivitylogServiceProvider"',
                 '--provider="Spatie\\LaravelSettings\\LaravelSettingsServiceProvider"',
                 '--tag=authentication-log-config',
@@ -279,10 +275,8 @@ class StartCommand extends Command
             }
         }, $output, $verbose);
 
-        runCommand('php artisan volt:install', $verbose);
-
-        step('Install tippy.js', function () use ($verbose) {
-            runCommand('npm install tippy.js', $verbose);
+        step('Install npm packages', function () use ($verbose) {
+            runCommand('npm install lodash axios tippy.js', $verbose);
         }, $output, $verbose);
     }
 

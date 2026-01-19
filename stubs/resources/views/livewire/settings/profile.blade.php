@@ -1,10 +1,12 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
-use Livewire\Volt\Component;
+use Livewire\Attributes\Computed;
+use Livewire\Component;
 
 new class extends Component {
     public string $name = '';
@@ -17,6 +19,24 @@ new class extends Component {
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+    }
+
+    /**
+     * Determine if the user has an unverified email address.
+     */
+    #[Computed]
+    public function hasUnverifiedEmail(): bool
+    {
+        return Auth::user() instanceof MustVerifyEmail && ! Auth::user()->hasVerifiedEmail();
+    }
+
+    /**
+     * Determine if the delete user form should be shown.
+     */
+    #[Computed]
+    public function showDeleteUser(): bool
+    {
+        return ! (Auth::user() instanceof MustVerifyEmail) || Auth::user()->hasVerifiedEmail();
     }
 
     /**
@@ -79,7 +99,7 @@ new class extends Component {
             <div>
                 <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
 
-                @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
+                @if ($this->hasUnverifiedEmail)
                     <div>
                         <flux:text class="mt-4">
                             {{ __('Your email address is unverified.') }}
@@ -111,6 +131,8 @@ new class extends Component {
             </div>
         </form>
 
-        <livewire:settings.delete-user-form />
+        @if ($this->showDeleteUser)
+            <livewire:settings.delete-user-form />
+        @endif
     </x-settings.layout>
 </section>

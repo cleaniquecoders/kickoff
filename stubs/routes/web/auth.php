@@ -2,16 +2,24 @@
 
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
-use Livewire\Volt\Volt;
 
-Route::middleware(['auth'])->prefix('settings')->as('settings.')->group(function () {
+// Settings routes for authenticated users (no email verification required for profile)
+Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
-    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
-    Volt::route('settings/password', 'settings.password')->name('user-password.edit');
-    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Route::livewire('settings/profile', 'settings.profile')
+        ->name('settings.profile.edit');
+});
 
-    Volt::route('settings/two-factor', 'settings.two-factor')
+// Settings routes for verified users only
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::livewire('settings/password', 'settings.password')
+        ->name('settings.user-password.edit');
+
+    Route::livewire('settings/appearance', 'settings.appearance')
+        ->name('settings.appearance.edit');
+
+    Route::livewire('settings/two-factor', 'settings.two-factor')
         ->middleware(
             when(
                 Features::canManageTwoFactorAuthentication()
@@ -20,5 +28,5 @@ Route::middleware(['auth'])->prefix('settings')->as('settings.')->group(function
                 [],
             ),
         )
-        ->name('two-factor.show');
+        ->name('settings.two-factor.show');
 });

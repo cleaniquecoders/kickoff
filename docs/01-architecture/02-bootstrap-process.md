@@ -100,11 +100,12 @@ Installs required Composer packages:
 - `lab404/laravel-impersonate`
 - `laravel/horizon`
 - `laravel/telescope`
+- `livewire/livewire` (v4)
 - `livewire/flux`
+- `livewire/volt`
 - `mallardduck/blade-lucide-icons`
 - `owen-it/laravel-auditing`
 - `predis/predis`
-- `rappasoft/laravel-livewire-tables`
 - `spatie/laravel-activitylog`
 - `spatie/laravel-medialibrary`
 - `spatie/laravel-permission`

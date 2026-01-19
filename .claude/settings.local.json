@@ -6,7 +6,11 @@
       "Bash(tree:*)",
       "Bash(wc:*)",
       "Bash(php artisan tinker:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(composer test:*)",
+      "Bash(composer analyse:*)",
+      "Bash(composer lint:*)"
     ]
   }
 }
