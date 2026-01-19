@@ -1,15 +1,3 @@
-<?php
-
-use App\Models\Role;
-
-use function Livewire\Volt\{with, usesPagination};
-
-usesPagination();
-
-with(fn() => ['roles' => Role::paginate(10)]);
-
-?>
-
 <div>
     <div class="flex justify-end mb-4">
         {{ $roles->links() }}
