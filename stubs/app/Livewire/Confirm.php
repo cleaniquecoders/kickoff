@@ -2,17 +2,14 @@
 
 namespace App\Livewire;
 
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Confirm extends Component
 {
-    public $displayingModal = false;
+    public bool $displayingModal = false;
 
-    protected $listeners = [
-        'displayConfirmation' => 'display',
-    ];
-
-    public $state = [
+    public array $state = [
         'title' => '',
         'message' => '',
         'return' => [
@@ -21,7 +18,8 @@ class Confirm extends Component
         ],
     ];
 
-    public function display($title, $message, $component, $listener, ...$params)
+    #[On('displayConfirmation')]
+    public function display(string $title, string $message, string $component, string $listener, mixed ...$params): void
     {
         $this->state['title'] = $title;
         $this->state['message'] = $message;
@@ -34,7 +32,7 @@ class Confirm extends Component
         $this->displayingModal = true;
     }
 
-    public function confirm()
+    public function confirm(): void
     {
         $this->dispatch(
             $this->state['return']['listener'],
@@ -44,7 +42,7 @@ class Confirm extends Component
         $this->displayingModal = false;
     }
 
-    public function cancel()
+    public function cancel(): void
     {
         $this->state = [
             'title' => '',

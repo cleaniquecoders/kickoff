@@ -10,7 +10,8 @@
       "Bash(grep:*)",
       "Bash(composer test:*)",
       "Bash(composer analyse:*)",
-      "Bash(composer lint:*)"
+      "Bash(composer lint:*)",
+      "Bash(find:*)"
     ]
   }
 }

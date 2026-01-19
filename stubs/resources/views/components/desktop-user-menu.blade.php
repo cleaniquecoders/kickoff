@@ -19,12 +19,9 @@
         </div>
         <flux:menu.separator />
         <flux:menu.radio.group>
-            <flux:menu.item :href="route('settings.profile.edit')" icon="user-circle" wire:navigate>{{ __('Profile') }}</flux:menu.item>
-            <flux:menu.item :href="route('settings.user-password.edit')" icon="lock-closed" wire:navigate>{{ __('Password') }}</flux:menu.item>
-            <flux:menu.item :href="route('settings.appearance.edit')" icon="sun" wire:navigate>{{ __('Appearance') }}</flux:menu.item>
-        </flux:menu.radio.group>
-        <flux:menu.separator />
-        <flux:menu.radio.group>
+            <flux:menu.item :href="route('settings.profile.edit')" icon="cog" wire:navigate>
+                {{ __('Settings') }}
+            </flux:menu.item>
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <flux:menu.item

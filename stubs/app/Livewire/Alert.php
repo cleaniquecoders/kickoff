@@ -2,22 +2,20 @@
 
 namespace App\Livewire;
 
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Alert extends Component
 {
-    public $displayingModal = false;
+    public bool $displayingModal = false;
 
-    public $state = [
+    public array $state = [
         'title' => '',
         'message' => '',
     ];
 
-    protected $listeners = [
-        'displayAlert' => 'display',
-    ];
-
-    public function display($title, $message)
+    #[On('displayAlert')]
+    public function display(string $title, string $message): void
     {
         $this->state['title'] = $title;
         $this->state['message'] = $message;
