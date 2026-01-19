@@ -25,11 +25,6 @@
 
             <flux:spacer />
 
-            <!-- Desktop Notification Bell -->
-            <div class="hidden lg:block mb-4">
-                <livewire:notifications.bell />
-            </div>
-
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
                 <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
@@ -44,9 +39,6 @@
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <flux:spacer />
-
-            {{-- Mobile Notification Bell --}}
-            <livewire:notifications.bell />
 
             {{-- Mobile User Menu --}}
             <flux:dropdown position="top" align="end">

@@ -91,7 +91,7 @@
                                     </td>
                                     <td class="px-3 py-4 text-sm text-zinc-700 dark:text-zinc-300">
                                         <div class="font-medium text-zinc-900 dark:text-white">
-                                            {{ data_get($notification->data, 'title', class_basename($notification->type)) }}
+                                            {{ data_get($notification->data, 'subject', class_basename($notification->type)) }}
                                         </div>
                                         @if ($message = data_get($notification->data, 'message'))
                                             <div class="mt-1 text-zinc-500 dark:text-zinc-400">

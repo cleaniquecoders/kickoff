@@ -27,7 +27,7 @@
                     <div class="flex items-center gap-2">
                         <span class="h-2 w-2 rounded-full bg-blue-500"></span>
                         <span class="font-medium text-zinc-900 dark:text-white">
-                            {{ data_get($notification->data, 'title', class_basename($notification->type)) }}
+                            {{ data_get($notification->data, 'subject', class_basename($notification->type)) }}
                         </span>
                     </div>
                     @if ($message = data_get($notification->data, 'message'))
