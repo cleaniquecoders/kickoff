@@ -9,6 +9,15 @@ Kickoff is a Symfony Console application distributed as a global Composer packag
 Laravel projects with opinionated conventions, packages, and project structure. It automates the setup
 of development tools, testing frameworks, deployment scripts, and standardized project architecture.
 
+![Landing Page](../assets/landing-hero.png)
+
+## What You Get
+
+Projects bootstrapped with Kickoff include a complete admin dashboard, role-based permissions, activity
+logging, and more - all pre-configured and ready to use.
+
+![Dashboard](../assets/dashboard.png)
+
 ## Documentation Structure
 
 ### [01. Architecture](01-architecture/README.md)

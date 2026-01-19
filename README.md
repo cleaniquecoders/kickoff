@@ -4,6 +4,8 @@
 
 This package bootstraps a **new Laravel project** with all the essential tools, configs, and workflows you need for a modern and maintainable setup.
 
+![Landing Page](assets/landing-hero.png)
+
 ## 🎯 Target Setup
 
 Kickoff is designed for Laravel projects with this starter configuration:
@@ -74,6 +76,8 @@ kickoff start johndoe blog
 
 ## ✨ Features
 
+![Features Overview](assets/landing-features.png)
+
 - 📦 Installs required Laravel packages:
   - [spatie/laravel-permission](https://spatie.be/docs/laravel-permission)
   - [spatie/laravel-medialibrary](https://spatie.be/docs/laravel-medialibrary)
@@ -123,6 +127,26 @@ kickoff start johndoe blog
 
 - 🛠️ Infrastructure Templates:
   - Sets up `.config/` with Nginx and Supervisor templates
+
+## 📸 Screenshots
+
+### Dashboard
+
+The generated project includes a fully-featured admin dashboard with user statistics, quick actions, and system information.
+
+![Dashboard](assets/dashboard.png)
+
+### Role & Permissions Management
+
+Manage roles with granular permissions using Spatie Laravel Permission.
+
+![Role Permissions](assets/role-permissions.png)
+
+### Settings Management
+
+Configure application settings through an intuitive admin interface.
+
+![Email Settings](assets/settings-email.png)
 
 ## 🧪 Development & Testing
 
