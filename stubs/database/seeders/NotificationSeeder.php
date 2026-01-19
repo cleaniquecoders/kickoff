@@ -58,7 +58,7 @@ class NotificationSeeder extends Seeder
             [
                 'subject' => 'Profile Completion Reminder',
                 'message' => 'Your profile is 80% complete. Add your profile photo to finish setting up your account.',
-                'url' => route('settings.profile'),
+                'url' => route('settings.profile.edit'),
             ],
             [
                 'subject' => 'New Feature: Notifications',
