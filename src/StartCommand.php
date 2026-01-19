@@ -269,6 +269,7 @@ class StartCommand extends Command
                 '--tag=permission-migrations',
                 '--tag=sanctum-config',
                 '--tag=telescope-migrations',
+                '--tag=livewire:config',
             ];
             foreach ($tags as $tag) {
                 runCommand("php artisan vendor:publish {$tag}", $verbose);
@@ -286,6 +287,7 @@ class StartCommand extends Command
             runCommand('bin/install', $verbose);
             runCommand('npm run build', $verbose);
             runCommand('php artisan key:generate', $verbose);
+            runCommand('php artisan make:notifications-table', $verbose);
             runCommand('php artisan reload:db', $verbose);
         }, $output, $verbose);
     }
