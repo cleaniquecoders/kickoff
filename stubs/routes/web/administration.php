@@ -7,7 +7,7 @@ Route::middleware(['auth:sanctum', 'verified', 'can:access.admin-panel'])
     ->prefix('admin')
     ->group(function () {
 
-        Route::view('/', 'administration.index')->name('index');
+        Route::view('/', 'admin.index')->name('index');
 
         // Roles Management
         Route::middleware(['can:manage.roles'])->group(function () {
