@@ -2,6 +2,243 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.5.0 - 2026-01-19
+
+### Release Notes - v1.5.0
+
+**Release Date:** January 20, 2026
+
+#### Overview
+
+Version 1.5.0 is a major release that introduces a complete UI/UX overhaul with new dashboard, welcome page, security management features, notifications system, and improved navigation. This release also includes Livewire 4 upgrade and comprehensive documentation improvements.
+
+
+---
+
+#### New Features
+
+##### Dashboard Redesign
+
+- **Stats Overview Cards**: Display Total Users, Active Roles, Permissions, and Unread Notifications with visual icons
+- **Quick Actions Panel**: One-click access to Edit Profile, Change Password, View Notifications, and Settings
+- **Recent Activity Section**: Shows recent audit logs for quick monitoring
+- **Personalized Welcome Message**: Greets user by name with contextual information
+
+##### Landing Page (Welcome)
+
+- **Modern Hero Section**: Clean design with "Powered by Kickoff" badge
+- **Responsive Navigation**: Fixed navbar with authentication-aware links
+- **Features Showcase**: Highlights Livewire 4, TailwindCSS v4, Laravel 12 stack
+- **Call-to-Action**: "Get Started" button for new user registration
+
+##### Notifications System
+
+- **Bell Component** (`App\Livewire\Notifications\Bell`):
+  
+  - Header notification icon with unread count badge (99+ for large counts)
+  - Dropdown showing 5 most recent unread notifications
+  - Quick mark-as-read from dropdown
+  - "View All Notifications" link
+  
+- **Notifications Management Page** (`App\Livewire\Notifications\Index`):
+  
+  - Full-page notification center at `/notifications`
+  - Filter by: All, Unread, Read
+  - Sortable by date (asc/desc)
+  - Pagination (15 per page)
+  - Bulk "Mark All as Read" action
+  - Individual actions: Mark read/unread, Delete with confirmation
+  - Visual highlighting for unread notifications
+  - URL state persistence for filters and sorting
+  
+- **NotificationSeeder**: Seeds 5 sample notifications for superadmin user
+  
+
+##### Security & User Management
+
+- **User Management** (`/security/users`):
+  
+  - User listing with roles display
+  - Stats: Total Users, Active Today, With Roles, New This Month
+  - User detail view with role assignment via `UserRoles` Livewire component
+  
+- **Role & Permission Management**:
+  
+  - `RolePermissions` Livewire component for toggling permissions per role
+  - Module-based permission grouping with bulk toggle
+  - Toast notifications for all actions
+  - Authorization checks on all operations
+  
+- **Audit Trail** (`/security/audit-trail`):
+  
+  - Activity log viewer with pagination
+  - Stats: Total Logs, Created, Updated, Deleted counts
+  - Detailed audit view showing old/new values
+  - User attribution for each action
+  
+
+##### Menu System Refactoring
+
+- **New Structure**:
+  
+  - `Sidebar.php` - Dashboard and Notifications menu items
+  - `UserManagement.php` - User management menu (renamed from Administration)
+  - `AuditMonitoring.php` - Audit trail menu (renamed from Support)
+  - `Settings.php` - Settings menu items
+  
+- **Removed**:
+  
+  - `Security.php` (AccessControl removed)
+  - `SidebarFooter.php` (consolidated)
+  
+
+##### Layout Improvements
+
+- **Sidebar**: Improved structure with dynamic user authentication elements
+- **Header**: New desktop user menu component
+- **Auth Layouts**: Added card, simple, and split layout variants
+- **Partials**: New `head.blade.php` and `settings-heading.blade.php`
+
+##### Logo & Branding
+
+- **Kickoff Logo Component** (`x-kickoff-logo`): Rocket icon with gradient
+- **App Logo Updates**: Uses Kickoff branding with project name
+- **App Logo Icon**: Compact icon variant
+
+
+---
+
+#### Improvements
+
+##### Livewire 4 Upgrade
+
+- Updated all Livewire components to version 4 syntax
+- Enhanced settings routes for Livewire 4 compatibility
+- Updated profile settings component
+
+##### Documentation
+
+- **CLAUDE.md Added**: Comprehensive project guidance for Claude Code AI
+  
+  - Model conventions (extend `App\Models\Base`)
+  - Database conventions (UUID primary keys)
+  - Enum patterns with `InteractsWithEnum`
+  - Authorization patterns with Spatie Permission
+  - Helper functions reference
+  - Testing patterns with Pest
+  - Livewire patterns (alerts, confirmations)
+  - DO's and DON'Ts checklist
+  
+- **Documentation Structure Updates**:
+  
+  - Added "Next Steps" navigation sections
+  - Improved architecture overview
+  - Enhanced development guides
+  - Better contributing guidelines
+  
+
+##### Installation Process
+
+- Added Livewire configuration during installation
+- Added notifications table migration setup
+
+##### Code Quality
+
+- PHP Linting with Pint applied across codebase
+- Improved code readability and maintainability
+
+
+---
+
+#### Bug Fixes
+
+- Fixed URL for profile completion reminder in NotificationSeeder
+- Fixed settings routes for profile and password in dashboard
+
+
+---
+
+#### Refactoring
+
+- Renamed notification data key from `title` to `subject` for consistency
+- Removed obsolete `VoltServiceProvider`
+- Removed `AccessControlController` (replaced with Livewire components)
+- Consolidated gate definitions for user management and auditing
+- Refactored admin views structure (`administration` → `admin`)
+
+
+---
+
+#### Files Changed
+
+##### New Files (Key)
+
+- `stubs/CLAUDE.md`
+- `stubs/app/Livewire/Actions/Logout.php`
+- `stubs/app/Livewire/Admin/Roles/Index.php`
+- `stubs/app/Livewire/Admin/Roles/Show.php`
+- `stubs/app/Livewire/Admin/Settings/Show.php`
+- `stubs/app/Livewire/Notifications/Bell.php`
+- `stubs/app/Livewire/Notifications/Index.php`
+- `stubs/app/Livewire/Security/RolePermissions.php`
+- `stubs/app/Livewire/Security/UserRoles.php`
+- `stubs/app/Actions/Builder/Menu/Settings.php`
+- `stubs/app/Actions/Builder/Menu/Sidebar.php`
+- `stubs/database/seeders/NotificationSeeder.php`
+- `stubs/resources/views/welcome.blade.php`
+- `stubs/resources/views/dashboard.blade.php`
+- `stubs/resources/views/notifications/index.blade.php`
+- `stubs/resources/views/security/users/index.blade.php`
+- `stubs/resources/views/security/users/show.blade.php`
+- `stubs/resources/views/security/audit-trail/index.blade.php`
+- `stubs/resources/views/security/audit-trail/show.blade.php`
+- `stubs/resources/views/components/kickoff-logo.blade.php`
+- `stubs/resources/views/components/user-menu.blade.php`
+- `stubs/resources/views/components/desktop-user-menu.blade.php`
+- `stubs/routes/web/notifications.php`
+
+##### Removed Files
+
+- `stubs/app/Actions/Builder/Menu/Security.php`
+- `stubs/app/Actions/Builder/Menu/SidebarFooter.php`
+- `stubs/app/Http/Controllers/Security/AccessControlController.php`
+- `stubs/app/Providers/VoltServiceProvider.php`
+- `stubs/routes/web/security.php`
+
+##### Assets Added
+
+- `assets/dashboard.png`
+- `assets/landing-features.png`
+- `assets/landing-hero.png`
+- `assets/role-permissions.png`
+- `assets/settings-email.png`
+
+
+---
+
+#### Statistics
+
+- **97 files changed**
+- **+3,281 lines added**
+- **-769 lines removed**
+
+
+---
+
+#### Upgrade Notes
+
+Projects generated with Kickoff v1.5.0 will automatically include all new features. For existing projects upgrading from v1.4.x:
+
+1. **Menu System**: Update menu builders to new structure
+2. **Notifications**: Run `php artisan notifications:table && php artisan migrate`
+3. **Livewire**: Update components to Livewire 4 syntax
+4. **Routes**: Update security routes to new structure
+
+
+---
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.4.2...1.5.0
+
 ## 1.4.2 - 2025-12-25
 
 **Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.4.1...1.4.2
@@ -111,16 +348,17 @@ All examples updated to use correct Livewire 3 named parameter syntax:
   ```php
   // ✅ Correct
 $this->dispatch('toast',
-  type: 'success',
-  message: 'Success!',
-  duration: 3000
+type: 'success',
+message: 'Success!',
+duration: 3000
 );
 
 // ❌ Old (incorrect)
 $this->dispatch('toast', [
-  'type' => 'success',
-  'message' => 'Success!'
+'type' => 'success',
+'message' => 'Success!'
 ]);
+
 
 
   ```
@@ -142,6 +380,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -172,6 +411,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -278,6 +518,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -287,6 +528,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -303,11 +545,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -320,11 +564,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -502,11 +748,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -525,11 +773,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
