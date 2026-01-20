@@ -2,6 +2,81 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## Added Media Manager Integration - 2026-01-20
+
+### Release Notes: v1.5.1
+
+#### What's New
+
+##### Media Manager Integration
+
+This release adds full integration with the [`cleaniquecoders/media-manager`](https://github.com/cleaniquecoders/media-manager) package, providing a comprehensive media library management system with custom Flux UI components.
+
+<img width="2048" height="646" alt="Media Manager Browser" src="https://github.com/user-attachments/assets/5f7d6a50-2bb5-43fc-b347-c32fbfd7c14e" />
+#### Features
+
+##### Media Management Module
+
+- **Sidebar Navigation:** New "Media" section in sidebar with "Media Library" menu item
+- **Custom Routes:** Dedicated `/media-manager` route with proper authentication and authorization
+- **Access Control:** New permissions for media management (`media.access.management`, `media.upload.files`, `media.delete.files`)
+
+##### Custom Flux-Styled Views
+
+- **Media Browser:** Full-featured media browsing interface with grid and list views
+- **Sidebar Filters:** Search, collection filter, type filter, and date range filters
+- **Bulk Actions:** Select multiple items for bulk deletion
+- **Preview Panel:** Flyout modal for previewing media details (images, videos, audio, PDFs, documents)
+- **Empty States:** Polished empty state designs for both initial state and filtered results
+
+##### UI Components Used
+
+- Flux: `heading`, `button`, `button.group`, `input`, `select`, `modal`, `checkbox`, `badge`, `icon`, `callout`
+- Tailwind CSS for card-like containers (replacing non-existent `flux:card`)
+- Standard HTML tables for list view
+
+#### Files Added
+
+| File | Description |
+|------|-------------|
+| `stubs/app/Actions/Builder/Menu/MediaManagement.php` | Media menu builder |
+| `stubs/routes/web/media.php` | Media manager routes |
+| `stubs/resources/views/vendor/media-manager/browser.blade.php` | Main wrapper view |
+| `stubs/resources/views/vendor/media-manager/livewire/media-browser.blade.php` | Livewire component view |
+| `stubs/resources/views/vendor/media-manager/partials/grid-item.blade.php` | Grid item partial |
+| `stubs/resources/views/vendor/media-manager/partials/list-item.blade.php` | List item partial |
+| `stubs/resources/views/vendor/media-manager/partials/preview-panel.blade.php` | Preview modal partial |
+
+#### Files Modified
+
+| File | Changes |
+|------|---------|
+| `stubs/app/Actions/Builder/Menu.php` | Added MediaManagement import and match case |
+| `stubs/resources/views/components/layouts/app/sidebar.blade.php` | Added media-management menu |
+| `stubs/config/access-control.php` | Added media permissions and administrator role_scope |
+| `stubs/app/Providers/AdminServiceProvider.php` | Added media management gates |
+
+#### Dependencies
+
+- Requires `cleaniquecoders/media-manager` ^1.0.1 (Livewire 4 compatible)
+
+#### Upgrade Notes
+
+After updating to v1.5.1, run:
+
+```bash
+php artisan reload:db
+
+```
+This will seed the new media permissions for your roles.
+
+#### Verification
+
+1. Log in as superadmin
+2. Verify "Media" section appears in sidebar
+3. Click "Media Library" to access `/media-manager`
+4. Test grid/list view toggle, filters, and preview functionality
+
 ## 1.5.0 - 2026-01-19
 
 ### Release Notes - v1.5.0
@@ -361,6 +436,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -380,6 +456,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -411,6 +488,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -519,6 +597,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -528,6 +607,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -546,11 +626,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -565,11 +647,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -749,11 +833,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -774,11 +860,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
