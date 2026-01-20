@@ -236,6 +236,7 @@ class StartCommand extends Command
                 'predis/predis',
                 'spatie/laravel-activitylog',
                 'spatie/laravel-medialibrary',
+                'cleaniquecoders/media-manager',
                 'spatie/laravel-permission',
                 'spatie/laravel-settings',
                 'yadahan/laravel-authentication-log',
@@ -251,7 +252,7 @@ class StartCommand extends Command
         }, $output, $verbose);
 
         step('Publishing package configs & migrations', function () use ($verbose) {
-            $tags = [
+            $options = [
                 '--provider="OwenIt\\Auditing\\AuditingServiceProvider"',
                 '--provider="Spatie\\Activitylog\\ActivitylogServiceProvider"',
                 '--provider="Spatie\\LaravelSettings\\LaravelSettingsServiceProvider"',
@@ -270,9 +271,11 @@ class StartCommand extends Command
                 '--tag=sanctum-config',
                 '--tag=telescope-migrations',
                 '--tag=livewire:config',
+                '--tag=media-manager-config',
+                '--tag=media-manager-views',
             ];
-            foreach ($tags as $tag) {
-                runCommand("php artisan vendor:publish {$tag}", $verbose);
+            foreach ($options as $option) {
+                runCommand("php artisan vendor:publish {$option}", $verbose);
             }
         }, $output, $verbose);
 

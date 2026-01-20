@@ -19,6 +19,7 @@
             <flux:navlist variant="outline">
                 <x-menu menu-builder="sidebar" />
                 <x-menu menu-builder="user-management" />
+                <x-menu menu-builder="media-management" />
                 <x-menu menu-builder="settings" />
                 <x-menu menu-builder="audit-monitoring" />
             </flux:navlist>

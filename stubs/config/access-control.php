@@ -56,6 +56,12 @@ return [
             'view.audit-logs' => 'View Audit Logs',
         ],
 
+        'media' => [
+            'access.management' => 'Access Media Management',
+            'upload.files' => 'Upload Media Files',
+            'delete.files' => 'Delete Media Files',
+        ],
+
         'profile' => [
             'view.own' => 'View Own Profile',
             'update.own' => 'Update Own Profile',
@@ -107,6 +113,11 @@ return [
             // Security
             'security.manage.access-control',
             'security.view.audit-logs',
+
+            // Media Management
+            'media.access.management',
+            'media.upload.files',
+            'media.delete.files',
 
             // Dashboard
             'dashboard.access.admin',

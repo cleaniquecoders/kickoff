@@ -3,6 +3,7 @@
 namespace App\Actions\Builder;
 
 use App\Actions\Builder\Menu\AuditMonitoring;
+use App\Actions\Builder\Menu\MediaManagement;
 use App\Actions\Builder\Menu\Settings;
 use App\Actions\Builder\Menu\Sidebar;
 use App\Actions\Builder\Menu\UserManagement;
@@ -22,6 +23,7 @@ class Menu
         $class = match ($builder) {
             'sidebar' => Sidebar::class,
             'user-management' => UserManagement::class,
+            'media-management' => MediaManagement::class,
             'settings' => Settings::class,
             'audit-monitoring' => AuditMonitoring::class,
             default => Sidebar::class,

@@ -12,7 +12,8 @@
       "Bash(composer analyse:*)",
       "Bash(composer lint:*)",
       "Bash(find:*)",
-      "Skill(docs)"
+      "Skill(docs)",
+      "Bash(php artisan:*)"
     ]
   }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CleaniqueCoders\MediaManager\Concerns\HasMediaManager;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithMeta;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithResourceRoute;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithSearchable;
@@ -20,6 +21,7 @@ class Base extends Model implements AuditableContract, HasMedia
 {
     use AuditableTrait;
     use HasFactory;
+    use HasMediaManager;
     use InteractsWithMedia;
     use InteractsWithMeta;
     use InteractsWithResourceRoute;

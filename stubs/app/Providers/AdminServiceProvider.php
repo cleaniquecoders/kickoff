@@ -40,6 +40,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->defineAdministrationGates();
         $this->defineSecurityGates();
         $this->defineMonitoringGates();
+        $this->defineMediaManagementGates();
         $this->defineProfileGates();
         $this->defineCompositeGates();
     }
@@ -143,6 +144,20 @@ class AdminServiceProvider extends ServiceProvider
     }
 
     /**
+     * Define media management gates.
+     */
+    private function defineMediaManagementGates(): void
+    {
+        Gate::define('access.media-management', function (User $user) {
+            return $user->can('manage.media');
+        });
+
+        Gate::define('manage.media', function (User $user) {
+            return $user->can('media.access.management');
+        });
+    }
+
+    /**
      * Define profile and user self-service gates.
      */
     private function defineProfileGates(): void
@@ -183,6 +198,7 @@ class AdminServiceProvider extends ServiceProvider
             Gate::check('manage.users', [$user]);
             Gate::check('manage.roles', [$user]);
             Gate::check('access.user-management', [$user]);
+            Gate::check('access.media-management', [$user]);
             Gate::check('access.settings', [$user]);
             Gate::check('access.audit-monitoring', [$user]);
             Gate::check('manage.settings', [$user]);
