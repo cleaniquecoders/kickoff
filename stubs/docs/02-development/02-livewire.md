@@ -65,7 +65,7 @@ class DeviceForm extends Component
 
 ## Single-File Components
 
-Livewire 4 has built-in support for single-file components (no separate Volt package needed). Create single-file components in `resources/views/livewire/`:
+Livewire 4 has built-in support for single-file components. Create single-file components in `resources/views/livewire/`:
 
 ```php
 <?php

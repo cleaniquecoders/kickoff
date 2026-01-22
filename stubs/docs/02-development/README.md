@@ -78,7 +78,7 @@ vendor/bin/pest --coverage
 
 ### Livewire
 
-- Use Volt for simple components
+- Use single-file components for simple components
 - Store in `resources/views/livewire/`
 - Follow naming: `user-profile.blade.php`, `CreatePost.php`
 

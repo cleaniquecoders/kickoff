@@ -13,27 +13,28 @@ A reusable toast notification component for displaying success, error, warning, 
 
 ## Usage
 
-### In Livewire Components (Volt)
+### In Single-File Livewire Components
 
 ```php
 <?php
 
-use function Livewire\Volt\{state};
+use Livewire\Component;
 
-state(['data' => []]);
+new class extends Component {
+    public array $data = [];
 
-$save = function () {
-    // Your save logic here...
+    public function save(): void
+    {
+        // Your save logic here...
 
-    // Dispatch toast notification
-    $this->dispatch('toast',
-        type: 'success',
-        message: 'Data saved successfully!',
-        duration: 3000 // Optional, defaults to 3000ms
-    );
-};
-
-?>
+        // Dispatch toast notification
+        $this->dispatch('toast',
+            type: 'success',
+            message: 'Data saved successfully!',
+            duration: 3000 // Optional, defaults to 3000ms
+        );
+    }
+}; ?>
 
 <div>
     <button wire:click="save">Save</button>

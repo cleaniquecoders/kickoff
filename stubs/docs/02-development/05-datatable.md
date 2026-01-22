@@ -10,13 +10,19 @@ Create a single-file component in `resources/views/livewire/`:
 <?php
 
 use App\Models\Role;
-use function Livewire\Volt\{with, usesPagination};
+use Livewire\Component;
+use Livewire\WithPagination;
 
-usesPagination();
+new class extends Component {
+    use WithPagination;
 
-with(fn() => ['roles' => Role::paginate(10)]);
-
-?>
+    public function render()
+    {
+        return view('livewire.roles-table', [
+            'roles' => Role::paginate(10),
+        ]);
+    }
+}; ?>
 
 <div>
     <div class="flex justify-end mb-4">
@@ -64,22 +70,26 @@ with(fn() => ['roles' => Role::paginate(10)]);
 <?php
 
 use App\Models\User;
-use function Livewire\Volt\{state, computed, usesPagination};
+use Livewire\Attributes\Computed;
+use Livewire\Component;
+use Livewire\WithPagination;
 
-usesPagination();
+new class extends Component {
+    use WithPagination;
 
-state(['search' => '']);
+    public string $search = '';
 
-$users = computed(function () {
-    return User::query()
-        ->when($this->search, fn($query) =>
-            $query->where('name', 'like', "%{$this->search}%")
-                  ->orWhere('email', 'like', "%{$this->search}%")
-        )
-        ->paginate(10);
-});
-
-?>
+    #[Computed]
+    public function users()
+    {
+        return User::query()
+            ->when($this->search, fn($query) =>
+                $query->where('name', 'like', "%{$this->search}%")
+                      ->orWhere('email', 'like', "%{$this->search}%")
+            )
+            ->paginate(10);
+    }
+}; ?>
 
 <div>
     <div class="mb-4">
@@ -106,31 +116,34 @@ $users = computed(function () {
 <?php
 
 use App\Models\Product;
-use function Livewire\Volt\{state, computed, usesPagination};
+use Livewire\Attributes\Computed;
+use Livewire\Component;
+use Livewire\WithPagination;
 
-usesPagination();
+new class extends Component {
+    use WithPagination;
 
-state([
-    'sortField' => 'created_at',
-    'sortDirection' => 'desc',
-]);
+    public string $sortField = 'created_at';
+    public string $sortDirection = 'desc';
 
-$products = computed(function () {
-    return Product::query()
-        ->orderBy($this->sortField, $this->sortDirection)
-        ->paginate(10);
-});
-
-$sortBy = function ($field) {
-    if ($this->sortField === $field) {
-        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-        $this->sortField = $field;
-        $this->sortDirection = 'asc';
+    #[Computed]
+    public function products()
+    {
+        return Product::query()
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
     }
-};
 
-?>
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+}; ?>
 
 <div>
     <table>
@@ -172,21 +185,28 @@ $sortBy = function ($field) {
 <?php
 
 use App\Models\User;
-use function Livewire\Volt\{state, computed, usesPagination};
+use Livewire\Attributes\Computed;
+use Livewire\Component;
+use Livewire\WithPagination;
 
-usesPagination();
+new class extends Component {
+    use WithPagination;
 
-state(['selected' => []]);
+    public array $selected = [];
 
-$users = computed(fn() => User::paginate(10));
+    #[Computed]
+    public function users()
+    {
+        return User::paginate(10);
+    }
 
-$deleteSelected = function () {
-    User::whereIn('id', $this->selected)->delete();
-    $this->selected = [];
-    $this->dispatch('toast', type: 'success', message: 'Users deleted successfully');
-};
-
-?>
+    public function deleteSelected(): void
+    {
+        User::whereIn('id', $this->selected)->delete();
+        $this->selected = [];
+        $this->dispatch('toast', type: 'success', message: 'Users deleted successfully');
+    }
+}; ?>
 
 <div>
     @if(count($selected) > 0)

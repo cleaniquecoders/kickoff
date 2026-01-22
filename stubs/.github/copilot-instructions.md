@@ -37,9 +37,9 @@ This project is built using the **CleaniqueCoders Kickoff** template, which prov
 
 ### Livewire Components
 
-- Use **Livewire 4** syntax with Volt single-file component support
+- Use **Livewire 4** syntax with built-in single-file component support
 - Component communication via `$this->dispatch()->to('component-name')`
-- Single-file components use `Livewire\Component` (not `Livewire\Volt\Component`)
+- Single-file components use anonymous class extending `Livewire\Component`
 - Available custom Livewire components:
   - `Alert`: Modal alerts with title and message
   - `Confirm`: Confirmation dialogs with callbacks
