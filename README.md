@@ -26,40 +26,63 @@ The complete setup is based on [Project Template](https://github.com/nasrulhazim
 
 ## 📥 Usage
 
-### Quick Start
+### Quick Start (Automatic Project Creation)
+
+Kickoff can now automatically create a new Laravel project if one doesn't exist:
 
 ```bash
 # 1. Install globally
 composer global require cleaniquecoders/kickoff
 
-# 2. Create Laravel project with the recommended setup
-laravel new my-project --git --livewire --pest --npm --livewire-class-components
-cd my-project
+# 2. Ensure Laravel installer is available
+composer global require laravel/installer
 
-# 3. Bootstrap with kickoff
+# 3. Create and bootstrap in one command
 kickoff start <owner> <project-name>
 ```
 
 **Complete Example:**
 
 ```bash
-# Create project with full stack
-laravel new blog --git --livewire --pest --npm --livewire-class-components
-cd blog
-
-# Apply kickoff configuration
+# Creates ./blog directory with a fresh Laravel project, then applies kickoff
 kickoff start johndoe blog
+cd blog
+```
+
+This automatically runs:
+
+```bash
+laravel new blog --git --livewire --pest --npm --livewire-class-components --no-interaction
+```
+
+### Usage with Existing Project
+
+If you already have a Laravel project:
+
+```bash
+cd my-existing-project
+kickoff start johndoe my-project .
+```
+
+Or specify the path:
+
+```bash
+kickoff start johndoe blog /path/to/existing/laravel
 ```
 
 ### Options
 
 - `<owner>` - Your name or organization (required)
 - `<project-name>` - Project name (required)
-- `<project-path>` - Project directory (optional, defaults to current directory)
+- `<project-path>` - Project directory (optional, defaults to `./<project-name>`)
 
 ### What Happens
 
 ```bash
+📦 Creating new Laravel project blog...
+
+⏳ Creating Laravel project with Livewire, Pest, and Git... ✅
+
 🎉 Let's kickoff your johndoe/blog now!
 
 ⏳ Copy application stubs... ✅
@@ -72,7 +95,7 @@ kickoff start johndoe blog
 🎉 Project setup completed successfully!
 ```
 
-> ⚠️ **Warning**: Only run on fresh Laravel projects. Existing projects will be overwritten.
+> ⚠️ **Warning**: Only run on fresh Laravel projects. Existing project files will be overwritten.
 
 ## ✨ Features
 

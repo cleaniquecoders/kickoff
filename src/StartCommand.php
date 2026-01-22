@@ -54,19 +54,17 @@ class StartCommand extends Command
         $this->projectPath = $projectPath = $input->getArgument('path');
 
         if (empty($projectPath)) {
-            $this->projectPath = $projectPath = getcwd();
+            // If no path provided, create project in current directory with project name as subdirectory
+            $this->projectPath = $projectPath = getcwd().'/'.$projectName;
         }
 
-        if (! file_exists($projectPath)) {
-            $output->writeln("<error>$projectPath does not exist!</error>");
+        // Check if we need to create a new Laravel project
+        $needsCreation = ! file_exists($projectPath) || ! file_exists($projectPath.'/composer.json') || ! file_exists($projectPath.'/artisan');
 
-            return Command::FAILURE;
-        }
-
-        if (! file_exists($projectPath.'/composer.json')) {
-            $output->writeln("<error>$projectPath/composer.json does not exist! Invalid Laravel project.</error>");
-
-            return Command::FAILURE;
+        if ($needsCreation) {
+            if (! $this->createLaravelProject($output, $projectPath, $projectName, $verbose)) {
+                return Command::FAILURE;
+            }
         }
 
         $this->validateProject($output);
@@ -96,6 +94,41 @@ class StartCommand extends Command
             $output->writeln("<error>Missing required file: $filePath. Not a valid Laravel project.</error>");
             exit(Command::FAILURE);
         }
+    }
+
+    private function createLaravelProject(OutputInterface $output, string $projectPath, string $projectName, bool $verbose): bool
+    {
+        // Check if laravel installer is available
+        exec('command -v laravel 2>/dev/null', $laravelOutput, $laravelReturnCode);
+        if ($laravelReturnCode !== 0) {
+            $output->writeln("<error>Missing 'laravel' installer. Install with: composer global require laravel/installer</error>");
+
+            return false;
+        }
+
+        // Get parent directory and ensure it exists
+        $parentDir = dirname($projectPath);
+        if (! file_exists($parentDir)) {
+            $output->writeln("<error>Parent directory does not exist: $parentDir</error>");
+
+            return false;
+        }
+
+        $output->writeln("\n📦 Creating new Laravel project <info>$projectName</info>...\n");
+
+        // Use same arguments as bin/sandbox: --git --livewire --pest --npm --livewire-class-components --no-interaction
+        $command = sprintf(
+            'cd %s && laravel new %s --git --livewire --pest --npm --livewire-class-components --no-interaction',
+            escapeshellarg($parentDir),
+            escapeshellarg($projectName)
+        );
+
+        step('Creating Laravel project with Livewire, Pest, and Git', function () use ($command, $verbose) {
+            runCommand($command, $verbose);
+        }, $output, $verbose);
+
+        // Verify the project was created successfully
+        return file_exists($projectPath.'/artisan');
     }
 
     private function copyStubs(OutputInterface $output, bool $verbose)

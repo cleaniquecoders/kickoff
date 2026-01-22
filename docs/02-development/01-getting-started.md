@@ -7,7 +7,7 @@ This guide will help you set up your development environment for working on Kick
 - PHP 8.3 or higher
 - Composer
 - Git
-- Laravel installer (for sandbox testing)
+- Laravel installer (required for auto-project creation and sandbox testing)
 
 ## Installation
 
@@ -29,13 +29,16 @@ This installs:
 - Production dependencies (Symfony, Laravel components)
 - Development dependencies (PHPStan, Rector, Pint, Pest)
 
-### 3. Install Laravel Installer (for testing)
+### 3. Install Laravel Installer
 
 ```bash
 composer global require laravel/installer
 ```
 
-Required for sandbox testing workflow.
+Required for:
+
+- Auto-creating Laravel projects with `kickoff start`
+- Sandbox testing workflow
 
 ## Project Structure
 
@@ -155,13 +158,21 @@ Should show custom commands and packages installed by kickoff.
 
 ### Laravel Installer Not Found
 
-**Error**: `Missing 'laravel' installer`
+**Error**: `Missing 'laravel' installer. Install with: composer global require laravel/installer`
 
 **Solution**:
 
 ```bash
 composer global require laravel/installer
 ```
+
+Ensure the Composer global bin directory is in your PATH.
+
+### Parent Directory Does Not Exist
+
+**Error**: `Parent directory does not exist: /path/to/parent`
+
+**Solution**: Create the parent directory first or specify a valid path.
 
 ### Permission Errors
 

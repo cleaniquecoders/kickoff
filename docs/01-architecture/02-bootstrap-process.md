@@ -10,29 +10,57 @@ kickoff start <owner> <project-name> [<project-path>]
 
 - `owner`: Project owner name (required)
 - `project-name`: Name of the project (required)
-- `project-path`: Target directory (optional, defaults to current directory)
+- `project-path`: Target directory (optional, defaults to `./<project-name>`)
 
 ## Execution Flow
 
-### 1. Argument Validation
+### 1. Argument Processing
 
-The command validates and sets up arguments:
+The command processes and validates arguments:
 
 ```php
 $this->projectOwner = $input->getArgument('owner');
 $this->projectName = $input->getArgument('name');
-$this->projectPath = $input->getArgument('path') ?? getcwd();
+$this->projectPath = $input->getArgument('path');
+
+// If no path provided, use current directory + project name
+if (empty($projectPath)) {
+    $this->projectPath = getcwd() . '/' . $projectName;
+}
 ```
 
-### 2. Laravel Project Validation
+### 2. Laravel Project Detection and Auto-Creation
 
-Checks if target is a valid Laravel project:
+The command checks if a Laravel project needs to be created:
 
-- Verifies directory exists
-- Checks for `composer.json`
-- Validates `artisan` file exists
+```php
+$needsCreation = !file_exists($projectPath)
+    || !file_exists($projectPath . '/composer.json')
+    || !file_exists($projectPath . '/artisan');
+```
 
-If validation fails, the command exits with an error.
+**If project doesn't exist**, kickoff automatically creates a new Laravel project:
+
+```bash
+laravel new <name> --git --livewire --pest --npm \
+    --livewire-class-components --no-interaction
+```
+
+This uses the same configuration as `bin/sandbox` and includes:
+
+- Git repository initialization
+- Livewire for reactive components
+- Pest for testing
+- NPM for asset management
+- Livewire class-based components
+
+**Requirements for auto-creation**:
+
+- Laravel installer must be globally installed
+- Parent directory must exist
+
+**If project already exists**, kickoff validates it's a proper Laravel project and
+continues with the bootstrap process.
 
 ### 3. Copy Stubs
 
@@ -155,6 +183,9 @@ php artisan reload:db    # Reload database with seeds
 Each step shows progress using the `step()` helper:
 
 ```text
+📦 Creating new Laravel project my-app...
+
+⏳ Creating Laravel project with Livewire, Pest, and Git... ✅
 ⏳ Copy application stubs... ✅
 ⏳ Update composer.json... ✅
 ⏳ Installing required packages... ✅
@@ -181,8 +212,9 @@ Verbose mode shows:
 
 The command validates at each step:
 
-- Invalid path → Command fails before starting
-- Missing Laravel files → Early exit with error
+- Missing Laravel installer → Error with installation instructions
+- Parent directory doesn't exist → Error before project creation
+- Laravel project creation failure → Exits with error
 - Package installation failure → Error displayed with details
 - Any step failure → ❌ indicator with message
 
