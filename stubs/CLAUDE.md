@@ -249,6 +249,34 @@ Before committing:
 - **livewire/flux**: UI components
 - **mallardduck/blade-lucide-icons**: Icons via `@svg('lucide-icon-name')`
 
+## Docker Services
+
+The project includes a `docker-compose.yml` with the following services:
+
+| Service     | Port(s)        | Description              |
+| ----------- | -------------- | ------------------------ |
+| MySQL       | 3306           | Database server          |
+| Redis       | 6379           | Cache & session store    |
+| Mailpit     | 1025, 8025     | Mail testing (SMTP + UI) |
+| Meilisearch | 7700           | Full-text search engine  |
+| MinIO       | 9000, 9001     | S3-compatible storage    |
+
+```bash
+# Start all services
+docker compose up -d
+
+# Stop all services
+docker compose down
+
+# View logs
+docker compose logs -f
+```
+
+Access points:
+- **Mailpit UI**: http://localhost:8025
+- **MinIO Console**: http://localhost:9001 (minioadmin/minioadmin)
+- **Meilisearch**: http://localhost:7700
+
 ## Environment Variables
 
 Key variables in `.env`:
@@ -262,6 +290,13 @@ SUPERADMIN_PASSWORD=password
 # Features
 ACCESS_CONTROL_ENABLED=true
 TELESCOPE_ENABLED=true
+
+# Docker Services
+DB_ROOT_PASSWORD=root
+MAILPIT_UI_PORT=8025
+MEILI_MASTER_KEY=masterKey
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
 ```
 
 ## Quick Reference

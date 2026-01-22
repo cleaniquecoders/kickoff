@@ -1104,10 +1104,11 @@ All stubs extend Base model and follow project conventions automatically.
 
 ### Docker Compose Services
 
+- **MySQL**: Database server (port 3306)
+- **Redis**: Cache and session store (port 6379)
+- **Mailpit**: Mail testing - SMTP (1025), UI (8025)
+- **Meilisearch**: Full-text search engine (port 7700)
 - **MinIO**: S3-compatible storage (ports 9000, 9001)
-- **Elasticsearch**: Search engine (port 9200)
-- **Kibana**: Elasticsearch UI (port 5601)
-- **Redis**: Cache and queue backend
 
 ### Deployment Script
 

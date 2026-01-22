@@ -172,7 +172,7 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 - `stubs/pint.json`: Relaxed PHPDoc rules
 - `stubs/phpunit.xml`: Test environment settings
 - `stubs/tailwind.config.js`: TailwindCSS v4 configuration
-- `stubs/docker-compose.yml`: MinIO, Elasticsearch, Redis services
+- `stubs/docker-compose.yml`: MySQL, Redis, Mailpit, Meilisearch, MinIO services
 
 **Project Scripts** (`stubs/bin/`):
 
@@ -279,7 +279,7 @@ Projects created with `kickoff start` receive:
 **Infrastructure**:
 
 - GitHub Actions for lint, test, PHPStan, Rector
-- Docker Compose for MinIO, Redis, Elasticsearch
+- Docker Compose for MySQL, Redis, Mailpit, Meilisearch, MinIO
 - Deployment scripts in `bin/`
 - Architecture tests using Pest Arch
 
