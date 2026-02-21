@@ -71,7 +71,7 @@ function putFile(string $path, string $content): void
 function gitCommit(string $message, bool $verbose = false): void
 {
     runCommand('git add -A', $verbose);
-    runCommand('git commit -m "' . addslashes($message) . '"', $verbose);
+    runCommand('git commit -m "'.addslashes($message).'"', $verbose);
 }
 
 /**
