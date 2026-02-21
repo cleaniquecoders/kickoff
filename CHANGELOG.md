@@ -2,6 +2,12 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## Added git commit for each steps - 2026-02-21
+
+- Added `gitCommit()` helper in support/helpers.php
+- Git commit after each step + `restoreGitIgnoreFiles()` in `src/StartCommand.php`
+- `stubs/todo.md` template (with `.gitignore` negation so it's tracked in the kickoff package)
+
 ## Remove Theme Toggle - 2026-02-20
 
 **Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.5.4...1.5.5
@@ -31,7 +37,6 @@ This release adds full integration with the [`cleaniquecoders/media-manager`](ht
 - **Custom Routes:** Dedicated `/media-manager` route with proper authentication and authorization
 - **Access Control:** New permissions for media management (`media.access.management`, `media.upload.files`, `media.delete.files`)
 ##### Custom Flux-Styled Views
-
 - **Media Browser:** Full-featured media browsing interface with grid and list views
 - **Sidebar Filters:** Search, collection filter, type filter, and date range filters
 - **Bulk Actions:** Select multiple items for bulk deletion
@@ -75,6 +80,7 @@ After updating to v1.5.1, run:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -452,6 +458,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -471,6 +478,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -506,6 +514,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -622,6 +631,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -631,6 +641,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -657,11 +668,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -684,11 +697,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -876,11 +891,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -909,11 +926,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
