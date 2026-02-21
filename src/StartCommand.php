@@ -72,16 +72,23 @@ class StartCommand extends Command
         $output->writeln("\n🎉 Let's kickoff your <info>$projectOwner/$projectName</info> now!\n");
 
         $this->copyStubs($output, $verbose);
+        gitCommit('Copy application stubs', $verbose);
 
         $this->setupComposer($output, $verbose);
+        gitCommit('Update composer.json configuration', $verbose);
 
         $this->setupProjectName($output, $verbose);
+        gitCommit('Update project name placeholders', $verbose);
 
         $this->setupEnvironmentFile($output, $verbose);
+        gitCommit('Setup environment file', $verbose);
 
         $this->installPackages($output, $verbose);
+        gitCommit('Install packages and dependencies', $verbose);
 
         $this->runTasks($output, $verbose);
+        $this->restoreGitIgnoreFiles($output, $verbose);
+        gitCommit('Build application and run tasks', $verbose);
 
         $output->writeln("\n🎉 Project setup completed successfully!\n");
 
@@ -325,6 +332,30 @@ class StartCommand extends Command
             runCommand('php artisan key:generate', $verbose);
             runCommand('php artisan make:notifications-table', $verbose);
             runCommand('php artisan reload:db', $verbose);
+        }, $output, $verbose);
+    }
+
+    private function restoreGitIgnoreFiles(OutputInterface $output, bool $verbose)
+    {
+        step('Restore .gitignore files from stubs', function () use ($verbose, $output) {
+            $stubsDir = __DIR__.'/../stubs';
+            $projectPath = $this->getProjectPath();
+
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($stubsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($iterator as $item) {
+                if ($item->isFile() && $item->getFilename() === '.gitignore') {
+                    $targetPath = $projectPath.DIRECTORY_SEPARATOR.$iterator->getSubPathName();
+                    ensureDir(dirname($targetPath));
+                    copy($item->getPathname(), $targetPath);
+                    if ($verbose && $output) {
+                        $output->writeln("<info>Restored:</info> $targetPath");
+                    }
+                }
+            }
         }, $output, $verbose);
     }
 }

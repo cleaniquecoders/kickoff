@@ -66,6 +66,15 @@ function putFile(string $path, string $content): void
 }
 
 /**
+ * Git add all changes and commit with a message.
+ */
+function gitCommit(string $message, bool $verbose = false): void
+{
+    runCommand('git add -A', $verbose);
+    runCommand('git commit -m "' . addslashes($message) . '"', $verbose);
+}
+
+/**
  * Recursively copy a source directory to a destination using iterators with verbosity.
  */
 function copyRecursively(string $src, string $dst, bool $verbose = false, ?OutputInterface $output = null): void
