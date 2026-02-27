@@ -311,3 +311,40 @@ php artisan make:test ProductTest --pest
 bin/deploy -b main                       # Deploy specific branch
 bin/backup-app                           # Backup application
 ```
+
+---
+
+## Claude Self-Update Practice — CRITICAL
+
+This file is a **living document**. Claude must update `CLAUDE.md` whenever:
+
+1. **User corrects a mistake** — e.g., "jangan guna MySQL, kita pakai PostgreSQL"
+2. **User expresses a preference** — e.g., "aku tak suka pattern ni, guna cara lain"
+3. **A better pattern is discovered** during implementation
+4. **A gotcha or edge case is found** that could cause future mistakes
+
+### How to Update
+
+When a correction or preference is identified:
+
+1. Apply the fix to the current task
+2. Immediately update the relevant section in `CLAUDE.md` to reflect the new rule
+3. If it's a DO/DON'T, add it to the **DO / DON'T** section
+4. If it's architectural, update the relevant architecture section
+5. If it's a new gotcha, add it under the relevant section with a `> **Gotcha:**` callout
+
+### Format for Gotchas
+
+```markdown
+> **Gotcha:** PostgreSQL `uuid-ossp` extension must be enabled before using
+> `DB::raw('uuid_generate_v4()')`. Prefer letting Laravel handle UUID generation
+> from PHP side via `InteractsWithUuid` trait instead.
+```
+
+### What NOT to Record
+
+- One-off task-specific decisions that don't affect future work
+- Things already covered by Laravel or package documentation
+- Preferences that are already obvious from existing conventions
+
+> **Rule**: When in doubt — record it. A slightly redundant note is better than repeating a mistake.
