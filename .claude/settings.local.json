@@ -15,7 +15,8 @@
       "Skill(docs)",
       "Bash(php artisan:*)",
       "Bash(git:*)",
-      "Bash(read f:*)"
+      "Bash(read f:*)",
+      "Bash(python3:*)"
     ]
   }
 }
