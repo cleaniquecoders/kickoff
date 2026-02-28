@@ -112,6 +112,36 @@ $this->authorize('update', $product);
 
 Default roles: `superadmin`, `administrator`, `user`
 
+### Application Settings (Spatie Laravel Settings)
+
+Application-level settings are stored in the **database** via `spatie/laravel-settings` — NOT in `.env`.
+
+**Settings classes** in `app/Settings/`:
+- `GeneralSettings` — `site_name`
+- `MailSettings` — `from_address`, `from_name`
+- `NotificationSettings` — `enabled`, `channels`
+
+**How it works**: `AppServiceProvider::boot()` reads from DB and overrides `config()` values, so all existing `config('app.name')`, `config('mail.from.*')`, `config('notification.*')` calls automatically use DB values.
+
+```php
+// Reading (via config — already overridden at runtime)
+config('app.name');
+
+// Reading (via Settings class directly)
+app(GeneralSettings::class)->site_name;
+
+// Writing
+$settings = app(GeneralSettings::class);
+$settings->site_name = 'New Name';
+$settings->save();
+```
+
+**Admin UI**: Managed at Admin > Settings (site name, mail from, notifications).
+
+**What stays in .env**: Infrastructure settings (`APP_ENV`, `APP_DEBUG`, SMTP credentials, DB, Redis).
+
+> **Gotcha:** Never write to `.env` at runtime. Use Spatie Settings for any value that admins should be able to change from the UI.
+
 ### Helper Functions
 
 Located in `support/` directory, auto-loaded via Composer:
@@ -216,6 +246,8 @@ class MyComponent extends Component
 - Use `dd()`, `dump()` in production code
 - Use raw SQL queries - use Eloquent
 - Use PHPUnit syntax - use Pest
+- Write to `.env` at runtime - use Spatie Settings for admin-configurable values
+- Expose `APP_ENV`, `APP_DEBUG`, or SMTP credentials in admin UI
 
 ## Code Quality Checklist
 
@@ -233,6 +265,7 @@ Before committing:
 ### Core
 
 - **spatie/laravel-permission**: Roles and permissions
+- **spatie/laravel-settings**: Application settings stored in database
 - **spatie/laravel-medialibrary**: File/media management
 - **owen-it/laravel-auditing**: Audit trail
 - **cleaniquecoders/traitify**: Common traits and contracts

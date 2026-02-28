@@ -1013,6 +1013,7 @@ ContractException::throwIf(
 ### Core Packages
 
 - **spatie/laravel-permission**: Role and permission management
+- **spatie/laravel-settings**: Application settings stored in database
 - **spatie/laravel-medialibrary**: Media/file management
 - **owen-it/laravel-auditing**: Model auditing trail
 - **laravel/telescope**: Debugging and monitoring
@@ -1037,6 +1038,107 @@ ContractException::throwIf(
 
 - **blade-ui-kit/blade-icons**: Blade icon components
 - **mallardduck/blade-lucide-icons**: Lucide icon set
+
+---
+
+## ⚙️ Application Settings (Spatie Laravel Settings)
+
+Application-level settings are managed via **Spatie Laravel Settings** and stored in the database — NOT in `.env`.
+
+### Settings Classes
+
+Located in `app/Settings/`:
+
+| Class | Group | Properties | Purpose |
+|-------|-------|------------|---------|
+| `GeneralSettings` | `general` | `site_name` | Application display name |
+| `MailSettings` | `mail` | `from_address`, `from_name` | Default email sender |
+| `NotificationSettings` | `notification` | `enabled`, `channels` | Notification toggle & delivery channels |
+
+### How It Works
+
+1. **Settings are stored in the database** via `settings` table (managed by `spatie/laravel-settings`)
+2. **`AppServiceProvider::boot()`** reads settings from DB and overrides `config()` values at runtime
+3. All existing `config('app.name')`, `config('mail.from.*')`, `config('notification.*')` calls **automatically use DB values**
+4. Falls back to `.env` defaults if the settings table doesn't exist yet (fresh install)
+
+### Reading Settings
+
+```php
+// Via config (recommended for views and helpers — already overridden by AppServiceProvider)
+config('app.name');
+config('mail.from.address');
+config('notification.enabled');
+
+// Via Settings class directly (for explicit reads)
+use App\Settings\GeneralSettings;
+app(GeneralSettings::class)->site_name;
+```
+
+### Writing Settings
+
+```php
+use App\Settings\GeneralSettings;
+
+$settings = app(GeneralSettings::class);
+$settings->site_name = 'New Name';
+$settings->save();
+```
+
+### Admin UI
+
+Settings are managed via **Admin > Settings** (`/admin/settings`):
+- **General**: Site Name
+- **Email**: From Address, From Name
+- **Notifications**: Enable/Disable, Channel selection (mail, database, slack)
+
+### Settings Migrations
+
+Located in `database/settings/`. Run with:
+```bash
+php artisan migrate
+```
+
+### What Stays in .env
+
+Infrastructure/deployment settings that should NOT be changed at runtime:
+- `APP_ENV`, `APP_DEBUG` — deployment-level
+- `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_ENCRYPTION` — SMTP credentials
+- `DB_*`, `REDIS_*`, `CACHE_*` — infrastructure
+
+### Creating New Settings
+
+1. Create class in `app/Settings/`:
+```php
+use Spatie\LaravelSettings\Settings;
+
+class BillingSettings extends Settings
+{
+    public string $currency;
+    public string $tax_rate;
+
+    public static function group(): string
+    {
+        return 'billing';
+    }
+}
+```
+
+2. Create migration in `database/settings/`:
+```php
+use Spatie\LaravelSettings\Migrations\SettingsMigration;
+
+return new class extends SettingsMigration
+{
+    public function up(): void
+    {
+        $this->migrator->add('billing.currency', 'MYR');
+        $this->migrator->add('billing.tax_rate', '0.06');
+    }
+};
+```
+
+3. Optionally override config in `AppServiceProvider::applyDatabaseSettings()` if other code reads via `config()`
 
 ---
 
@@ -1168,6 +1270,8 @@ bin/deploy  # Automatically finds and deploys latest Git tag
 8. ❌ **Don't** hardcode permissions - use `config/access-control.php`
 9. ❌ **Don't** forget to run migrations after publishing package configs
 10. ❌ **Don't** skip code quality tools - run Pint, PHPStan, and Rector regularly
+11. ❌ **Don't** write to `.env` at runtime - use Spatie Settings for admin-configurable values
+12. ❌ **Don't** expose `APP_ENV`, `APP_DEBUG`, or SMTP credentials in admin UI
 
 ---
 
