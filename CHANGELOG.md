@@ -2,6 +2,35 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.7.0 - 2026-02-28
+
+### What's Changed
+
+#### Migrate Settings UI from .env to Spatie Settings
+
+Replaced runtime `.env` file writes with **Spatie Laravel Settings** for the admin Settings UI.
+
+**Why:**
+
+- `.env` should not be modified at runtime — it's a deployment-time config
+- Eliminates race conditions from concurrent `.env` writes
+- No more `config:clear` needed after saving settings
+- Removes dangerous APP_ENV/APP_DEBUG toggles from the UI
+
+**Changes:**
+
+- Added `GeneralSettings`, `MailSettings`, `NotificationSettings` classes with settings migrations
+- Settings UI now only exposes application-level settings:
+  - **General**: Site Name
+  - **Email**: From Address, From Name
+  - **Notifications**: Enabled toggle, Channel selection
+  
+- Removed environment select, debug mode toggle, and SMTP credential fields from UI
+- Deleted `env.php` helper (`update_env` / `update_env_multiple` no longer needed)
+- Simplified notification config to static defaults (overridden at runtime by Spatie Settings)
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.6.0...1.7.0
+
 ## 1.6.0 - 2026-02-28
 
 ### What's Changed
@@ -67,7 +96,6 @@ This release adds full integration with the [`cleaniquecoders/media-manager`](ht
 - Flux: `heading`, `button`, `button.group`, `input`, `select`, `modal`, `checkbox`, `badge`, `icon`, `callout`
 - Tailwind CSS for card-like containers (replacing non-existent `flux:card`)
 - Standard HTML tables for list view
-
 #### Files Added
 
 | File | Description |
@@ -99,6 +127,7 @@ After updating to v1.5.1, run:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -482,6 +511,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -501,6 +531,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -539,6 +570,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -661,6 +693,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -670,6 +703,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -702,11 +736,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -735,11 +771,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -933,11 +971,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -972,11 +1012,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
