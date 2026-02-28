@@ -14,7 +14,8 @@
       "Bash(find:*)",
       "Skill(docs)",
       "Bash(php artisan:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(read f:*)"
     ]
   }
 }
