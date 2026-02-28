@@ -6,7 +6,7 @@ namespace App\Concerns;
 
 trait InteractsWithLivewireConfirm
 {
-    public function confirm(string $title, string $message, string $component, string $listener, ...$params)
+    public function confirm(string $title, string $message, string $component, string $listener, mixed ...$params): void
     {
         $this->dispatch(
             'displayConfirmation',

@@ -16,12 +16,7 @@ interface AuthorizedMenuBuilder
      */
     public function isAuthorized(): bool;
 
-    /**
-     * Set the authorization requirement for the menu.
-     *
-     * @param  callable|string|bool  $authorization  Gate name, callable, or boolean
-     */
-    public function setAuthorization($authorization): self;
+    public function setAuthorization(callable|string|bool $authorization): self;
 
     /**
      * Get the authorization string for use in Blade directives.

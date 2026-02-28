@@ -10,18 +10,8 @@ use Illuminate\Support\Facades\Mail;
 
 class TestSendMail extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:test-send-mail {email} {--queue=sync : Type of queue. Default is sync.}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Send test email to given ';
 
     /**

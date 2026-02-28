@@ -67,11 +67,12 @@ return [
             'driver' => 's3',
             'key' => env('MINIO_KEY'),
             'secret' => env('MINIO_SECRET'),
-            'region' => env('MINIO_REGION', 'my-west-container'),
+            'region' => env('MINIO_REGION', 'us-east-1'),
             'bucket' => env('MINIO_BUCKET'),
             'url' => env('MINIO_URL', 'http://localhost:9000'),
             'endpoint' => env('MINIO_ENDPOINT', 'http://localhost:9000'),
             'use_path_style_endpoint' => true,
+            'throw' => false,
         ],
 
     ],

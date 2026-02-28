@@ -9,18 +9,8 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class GenerateUnitTestCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'test:generate';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Generate tests from routes';
 
     /**

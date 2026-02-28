@@ -15,7 +15,7 @@ use CleaniqueCoders\Traitify\Contracts\Menu as ContractsMenu;
 
 class Menu
 {
-    public static function make()
+    public static function make(): self
     {
         return new self;
     }
@@ -31,14 +31,11 @@ class Menu
             default => Sidebar::class,
         };
 
-        /**
-         * @var \CleaniqueCoders\Traitify\Contracts\Builder|\CleaniqueCoders\Traitify\Contracts\Menu
-         */
-        $builder = new $class;
+        $instance = new $class;
 
-        ContractException::throwUnless(! $builder instanceof Builder, 'missingContract', $class, Builder::class);
-        ContractException::throwUnless(! $builder instanceof ContractsMenu, 'missingContract', $class, Builder::class);
+        ContractException::throwUnless(! $instance instanceof Builder, 'missingContract', $class, Builder::class);
+        ContractException::throwUnless(! $instance instanceof ContractsMenu, 'missingContract', $class, ContractsMenu::class);
 
-        return $builder->build();
+        return $instance->build();
     }
 }

@@ -22,7 +22,7 @@ class RolePermissions extends Component
     }
 
     #[Computed]
-    public function permissions()
+    public function permissions(): \Illuminate\Support\Collection
     {
         return Permission::where('is_enabled', true)->get()->groupBy('module');
     }
@@ -72,7 +72,7 @@ class RolePermissions extends Component
         }
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.security.role-permissions');
     }

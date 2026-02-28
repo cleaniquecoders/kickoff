@@ -57,7 +57,7 @@ class Confirm extends Component
         $this->displayingModal = false;
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.confirm');
     }

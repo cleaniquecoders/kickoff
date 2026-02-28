@@ -8,20 +8,10 @@ use Illuminate\Console\Command;
 
 class AllCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'reload:all
                                 {--m|demo : Seed demo data}
                                 {--d|dev : Seed development data}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Reload all caches and database.';
 
     /**

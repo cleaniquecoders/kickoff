@@ -8,18 +8,8 @@ use Illuminate\Console\Command;
 
 class PrepareCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'seed:prepare';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Preparing Application to Run';
 
     /**

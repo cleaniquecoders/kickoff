@@ -12,7 +12,7 @@ class Index extends Component
 {
     use WithPagination;
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.admin.roles.index', [
             'roles' => Role::paginate(10),

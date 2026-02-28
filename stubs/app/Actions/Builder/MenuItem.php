@@ -122,17 +122,8 @@ class MenuItem implements Builder
         return $this;
     }
 
-    /**
-     * Set the visibility for the menu item.
-     *
-     * @param  callable|bool  $visible
-     */
-    public function setVisible($visible): self
+    public function setVisible(callable|bool $visible): self
     {
-        if (! is_bool($visible) && ! is_callable($visible)) {
-            throw new InvalidArgumentException('The visible property must be a boolean or a callable.');
-        }
-
         $this->visible = $visible;
 
         return $this;

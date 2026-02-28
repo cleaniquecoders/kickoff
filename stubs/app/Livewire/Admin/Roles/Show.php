@@ -22,7 +22,7 @@ class Show extends Component
     }
 
     #[Computed]
-    public function permissions()
+    public function permissions(): \Illuminate\Support\Collection
     {
         return Permission::where('is_enabled', true)
             ->orderBy('module')
@@ -44,7 +44,7 @@ class Show extends Component
         );
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.admin.roles.show');
     }

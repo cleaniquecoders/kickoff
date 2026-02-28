@@ -32,7 +32,7 @@ class Bell extends Component
         return Auth::user()->unreadNotifications()->take(5)->get();
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.notifications.bell');
     }

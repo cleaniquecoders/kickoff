@@ -104,24 +104,14 @@ abstract class Base implements AuthorizedMenuBuilder, Builder, HeadingMenuBuilde
         return $this->headingIcon;
     }
 
-    /**
-     * Set the authorization requirement for the menu.
-     *
-     * @param  callable|string|bool  $authorization  Gate name, callable, or boolean
-     */
-    public function setAuthorization($authorization): self
+    public function setAuthorization(callable|string|bool $authorization): self
     {
         $this->authorization = $authorization;
 
         return $this;
     }
 
-    /**
-     * Get the authorization requirement for the menu.
-     *
-     * @return callable|string|bool|null
-     */
-    public function getAuthorization()
+    public function getAuthorization(): callable|string|bool|null
     {
         return $this->authorization;
     }

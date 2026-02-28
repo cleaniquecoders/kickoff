@@ -80,7 +80,7 @@ class Index extends Component
         return Auth::user()->notifications()->count();
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         $query = Auth::user()->notifications();
 

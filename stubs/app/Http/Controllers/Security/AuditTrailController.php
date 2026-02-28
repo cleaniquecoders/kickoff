@@ -12,7 +12,7 @@ class AuditTrailController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\View\View
     {
         $this->authorize('viewAny', config('audit.implementation'));
 
@@ -21,10 +21,7 @@ class AuditTrailController extends Controller
         return view('security.audit-trail.index', compact('sub'));
     }
 
-    /**
-     * Handle the incoming request.
-     */
-    public function show(Request $request, string $uuid)
+    public function show(Request $request, string $uuid): \Illuminate\View\View
     {
         $audit = config('audit.implementation')::whereUuid($uuid)->firstOrFail();
 

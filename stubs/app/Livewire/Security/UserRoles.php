@@ -22,7 +22,7 @@ class UserRoles extends Component
     }
 
     #[Computed]
-    public function roles()
+    public function roles(): \Illuminate\Database\Eloquent\Collection
     {
         return Role::whereNotIn('name', ['Superadmin', 'User'])
             ->where('is_enabled', true)
@@ -46,7 +46,7 @@ class UserRoles extends Component
         }
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.security.user-roles');
     }

@@ -9,18 +9,8 @@ use Illuminate\Support\Facades\File;
 
 class ClearMediaCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'reload:media';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Clear all media files';
 
     /**

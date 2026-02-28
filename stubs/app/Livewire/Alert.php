@@ -25,7 +25,7 @@ class Alert extends Component
         $this->displayingModal = true;
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.alert');
     }

@@ -2,7 +2,7 @@
 
 return [
     /*
-     * By default notificatio is disabled
+     * By default notification is enabled.
      */
     'enabled' => env('NOTIFICATION_ENABLED', true),
 

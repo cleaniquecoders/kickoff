@@ -11,25 +11,10 @@ class HelperCommand extends GeneratorCommand
 {
     use CreatesMatchingTest;
 
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
     protected $name = 'make:helper';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Create a new helper';
 
-    /**
-     * The type of class being generated.
-     *
-     * @var string
-     */
     protected $type = 'Helper';
 
     /**

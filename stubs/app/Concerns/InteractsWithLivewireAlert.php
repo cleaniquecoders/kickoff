@@ -6,7 +6,7 @@ namespace App\Concerns;
 
 trait InteractsWithLivewireAlert
 {
-    public function alert(string $title, string $message)
+    public function alert(string $title, string $message): void
     {
         $this->dispatch(
             'displayAlert', $title, $message

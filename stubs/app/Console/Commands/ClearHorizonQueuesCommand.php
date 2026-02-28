@@ -8,18 +8,8 @@ use Illuminate\Console\Command;
 
 class ClearHorizonQueuesCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'horizon:clear-all-queues';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Clear all queues under horizon';
 
     /**
