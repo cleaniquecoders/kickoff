@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Settings;
 
-use Illuminate\Support\Facades\Artisan;
+use App\Settings\GeneralSettings;
+use App\Settings\MailSettings;
+use App\Settings\NotificationSettings;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
@@ -24,25 +26,21 @@ class Show extends Component
 
     public function loadSettings(): void
     {
+        $generalSettings = app(GeneralSettings::class);
+        $mailSettings = app(MailSettings::class);
+        $notificationSettings = app(NotificationSettings::class);
+
         $this->settings = [
             'general' => [
-                'app_name' => config('app.name'),
-                'app_env' => config('app.env'),
-                'app_debug' => config('app.debug'),
+                'site_name' => $generalSettings->site_name,
             ],
             'email' => [
-                'mail_mailer' => config('mail.default'),
-                'mail_host' => config('mail.mailers.smtp.host'),
-                'mail_port' => config('mail.mailers.smtp.port'),
-                'mail_username' => config('mail.mailers.smtp.username'),
-                'mail_password' => config('mail.mailers.smtp.password'),
-                'mail_encryption' => config('mail.mailers.smtp.encryption'),
-                'mail_from_address' => config('mail.from.address'),
-                'mail_from_name' => config('mail.from.name'),
+                'from_address' => $mailSettings->from_address,
+                'from_name' => $mailSettings->from_name,
             ],
             'notifications' => [
-                'enabled' => config('notification.enabled', true),
-                'channels' => config('notification.default', ['mail', 'database']),
+                'enabled' => $notificationSettings->enabled,
+                'channels' => $notificationSettings->channels,
             ],
         ];
     }
@@ -54,46 +52,30 @@ class Show extends Component
         try {
             if ($this->section === 'general') {
                 $this->validate([
-                    'settings.general.app_name' => 'required|string|max:255',
-                    'settings.general.app_env' => 'required|in:local,development,staging,production',
+                    'settings.general.site_name' => 'required|string|max:255',
                 ]);
 
-                update_env_multiple([
-                    'APP_NAME' => $this->settings['general']['app_name'],
-                    'APP_ENV' => $this->settings['general']['app_env'],
-                    'APP_DEBUG' => $this->settings['general']['app_debug'] ?? false,
-                ]);
+                $settings = app(GeneralSettings::class);
+                $settings->site_name = $this->settings['general']['site_name'];
+                $settings->save();
 
             } elseif ($this->section === 'email') {
                 $this->validate([
-                    'settings.email.mail_mailer' => 'required|in:smtp,sendmail,mailgun,ses,log',
-                    'settings.email.mail_host' => 'nullable|string|max:255',
-                    'settings.email.mail_port' => 'nullable|integer|min:1|max:65535',
-                    'settings.email.mail_username' => 'nullable|string|max:255',
-                    'settings.email.mail_encryption' => 'nullable|in:tls,ssl',
-                    'settings.email.mail_from_address' => 'required|email',
-                    'settings.email.mail_from_name' => 'required|string|max:255',
+                    'settings.email.from_address' => 'required|email',
+                    'settings.email.from_name' => 'required|string|max:255',
                 ]);
 
-                update_env_multiple([
-                    'MAIL_MAILER' => $this->settings['email']['mail_mailer'],
-                    'MAIL_HOST' => $this->settings['email']['mail_host'] ?? '',
-                    'MAIL_PORT' => $this->settings['email']['mail_port'] ?? 587,
-                    'MAIL_USERNAME' => $this->settings['email']['mail_username'] ?? '',
-                    'MAIL_PASSWORD' => $this->settings['email']['mail_password'] ?? '',
-                    'MAIL_ENCRYPTION' => $this->settings['email']['mail_encryption'] ?? 'tls',
-                    'MAIL_FROM_ADDRESS' => $this->settings['email']['mail_from_address'],
-                    'MAIL_FROM_NAME' => $this->settings['email']['mail_from_name'],
-                ]);
+                $settings = app(MailSettings::class);
+                $settings->from_address = $this->settings['email']['from_address'];
+                $settings->from_name = $this->settings['email']['from_name'];
+                $settings->save();
 
             } elseif ($this->section === 'notifications') {
-                update_env_multiple([
-                    'NOTIFICATIONS_ENABLED' => $this->settings['notifications']['enabled'] ?? false,
-                    'NOTIFICATIONS_CHANNELS' => implode(',', $this->settings['notifications']['channels'] ?? []),
-                ]);
+                $settings = app(NotificationSettings::class);
+                $settings->enabled = $this->settings['notifications']['enabled'] ?? false;
+                $settings->channels = $this->settings['notifications']['channels'] ?? [];
+                $settings->save();
             }
-
-            Artisan::call('config:clear');
 
             $this->dispatch('toast',
                 type: 'success',

@@ -12,7 +12,7 @@
                 </x-card.header>
                 <x-card.body>
                     <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                        General application settings
+                        Manage your site name and general application settings.
                     </p>
                 </x-card.body>
                 <x-card.footer>
@@ -31,7 +31,7 @@
                 </x-card.header>
                 <x-card.body>
                     <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                        Email configuration and templates
+                        Configure the default sender address and name for outgoing emails.
                     </p>
                 </x-card.body>
                 <x-card.footer>
@@ -50,7 +50,7 @@
                 </x-card.header>
                 <x-card.body>
                     <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                        Notification preferences
+                        Enable or disable notifications and choose delivery channels.
                     </p>
                 </x-card.body>
                 <x-card.footer>

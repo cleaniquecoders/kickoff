@@ -3,14 +3,13 @@
 return [
     /*
      * By default notification is enabled.
+     * Overridden at runtime by NotificationSettings.
      */
-    'enabled' => env('NOTIFICATION_ENABLED', true),
+    'enabled' => true,
 
     /*
      * Default notification drivers.
-     *
-     * Possible setup in .env:
-     * DEFAULT_NOTIFICATION_DRIVERS=database,mail,nexmo,sms
+     * Overridden at runtime by NotificationSettings.
      */
-    'default' => explode(',', env('NOTIFICATION_DEFAULT_DRIVERS', 'database')),
+    'default' => ['database'],
 ];
