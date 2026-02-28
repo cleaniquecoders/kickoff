@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Mail\DefaultMail;
@@ -25,7 +27,7 @@ class TestSendMail extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $mail = (new DefaultMail('Test E-mail', 'Hello World'));
         $email = $this->argument('email');
@@ -36,5 +38,7 @@ class TestSendMail extends Command
         }
 
         Mail::to($email, $name)->send($mail);
+
+        return self::SUCCESS;
     }
 }

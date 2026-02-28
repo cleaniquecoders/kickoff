@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Eloquent\Builder;
 
 if (! function_exists('dumpSql')) {
-    function dumpSql(Builder $builder)
+    function dumpSql(Builder $builder): string
     {
         return array_reduce($builder->getBindings(), function ($sql, $binding) {
             return preg_replace('/\?/', is_numeric($binding) ? $binding : "'".$binding."'", $sql, 1);

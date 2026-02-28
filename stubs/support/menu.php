@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Actions\Builder\Menu as Action;
 use CleaniqueCoders\Traitify\Contracts\Builder;
 use CleaniqueCoders\Traitify\Contracts\Menu;

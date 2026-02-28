@@ -1,13 +1,15 @@
 <?php
 
-// use App\Contracts\Api;
+declare(strict_types=1);
 
 use CleaniqueCoders\Traitify\Contracts\Api;
 
 if (! function_exists('api_exception')) {
-    function api_exception(Throwable $th)
+    function api_exception(Throwable $th): \Illuminate\Http\JsonResponse
     {
-        $code = $th->getCode() == 0 ? 500 : $th->getCode();
+        $code = (is_int($th->getCode()) && $th->getCode() >= 100 && $th->getCode() <= 599)
+            ? $th->getCode()
+            : 500;
 
         $data = [
             'message' => $th->getMessage(),
@@ -22,7 +24,7 @@ if (! function_exists('api_exception')) {
 }
 
 if (! function_exists('api_response')) {
-    function api_response(Api $api)
+    function api_response(Api $api): \Illuminate\Http\JsonResponse
     {
         return response()->json(
             $api->getApiResponse(request()),
@@ -32,7 +34,7 @@ if (! function_exists('api_response')) {
 }
 
 if (! function_exists('api_accept_header')) {
-    function api_accept_header()
+    function api_accept_header(): string
     {
         $config = config('api');
 

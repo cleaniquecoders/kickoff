@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('require_all_in')) {
     /**
      * Require all files in the given path.

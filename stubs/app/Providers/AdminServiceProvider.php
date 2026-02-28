@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 
 class AdminServiceProvider extends ServiceProvider
@@ -26,10 +27,9 @@ class AdminServiceProvider extends ServiceProvider
         $this->authorize();
     }
 
-    protected function authorize()
+    protected function authorize(): void
     {
         $this->defineGates();
-        $this->checkGates();
     }
 
     private function defineGates()
@@ -179,33 +179,5 @@ class AdminServiceProvider extends ServiceProvider
         Gate::define('access.superadmin', function (User $user) {
             return $user->can('admin.view.panel') && $user->can('admin.manage.settings');
         });
-    }
-
-    private function checkGates()
-    {
-        if (! Request::user()) {
-            return;
-        }
-
-        $user = Request::user();
-
-        // Check main access gates
-        Gate::check('access.dashboard', [$user]);
-        Gate::check('access.admin-panel', [$user]);
-
-        // Check specific gates if user has admin access
-        if (Gate::allows('access.admin-panel', [$user])) {
-            Gate::check('manage.users', [$user]);
-            Gate::check('manage.roles', [$user]);
-            Gate::check('access.user-management', [$user]);
-            Gate::check('access.media-management', [$user]);
-            Gate::check('access.settings', [$user]);
-            Gate::check('access.audit-monitoring', [$user]);
-            Gate::check('manage.settings', [$user]);
-        }
-
-        // Check user self-service gates
-        Gate::check('access.profile', [$user]);
-        Gate::check('access.notifications', [$user]);
     }
 }

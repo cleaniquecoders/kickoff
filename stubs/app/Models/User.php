@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use CleaniqueCoders\Traitify\Concerns\InteractsWithResourceRoute;
@@ -33,20 +35,10 @@ class User extends Authenticatable implements AuditableContract, HasMedia, MustV
     use Notifiable;
     use SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name', 'email', 'password', 'uuid', 'deleted_at',
+        'name', 'email', 'password', 'uuid',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -57,21 +49,16 @@ class User extends Authenticatable implements AuditableContract, HasMedia, MustV
         return config('impersonate.enabled');
     }
 
-    public function canBeImpersonated()
+    public function canBeImpersonated(): bool
     {
         return ! $this->hasRole('superadmin');
     }
 
-    public function hasNotifications()
+    public function hasNotifications(): bool
     {
         return $this->notifications()->unread()->exists();
     }
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [

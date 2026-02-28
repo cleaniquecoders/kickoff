@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands\Reload;
 
 use Illuminate\Console\Command;
@@ -21,14 +23,6 @@ class AllCommand extends Command
      * @var string
      */
     protected $description = 'Reload all caches and database.';
-
-    /**
-     * Create a new command instance.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.

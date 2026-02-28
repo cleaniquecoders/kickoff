@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Exceptions\ThrowException;
 
 if (! function_exists('uuid2id')) {

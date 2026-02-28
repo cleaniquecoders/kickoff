@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Builder;
 
 use CleaniqueCoders\Traitify\Contracts\Builder;
@@ -185,7 +187,7 @@ class MenuItem implements Builder
         $this->output = [
             'label' => $this->label,
             'url' => $this->url,
-            'active' => $this->url == request()->url(),
+            'active' => $this->url === request()->url(),
             'target' => $this->target,
             'attributes' => $this->attributes,
             'icon' => $this->icon,

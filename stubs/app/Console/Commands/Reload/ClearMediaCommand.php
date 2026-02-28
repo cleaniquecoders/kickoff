@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands\Reload;
 
 use Illuminate\Console\Command;
@@ -24,10 +26,10 @@ class ClearMediaCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         if (app()->isProduction()) {
-            return;
+            return self::SUCCESS;
         }
 
         foreach ([
@@ -39,9 +41,11 @@ class ClearMediaCommand extends Command
         }
 
         $this->components->info('Media storage successfully cleared.');
+
+        return self::SUCCESS;
     }
 
-    private function delete($directory)
+    private function delete(string $directory): void
     {
         if (File::exists($directory)) {
             // Get all files and directories inside, except .gitignore

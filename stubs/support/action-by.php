@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('get_action_by_user')) {
-    function get_action_by_user()
+    function get_action_by_user(): array
     {
         if (app()->runningInConsole()) {
             return [

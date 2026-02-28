@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('is_valid_json')) {
     /**
      * Validate given JSON is valid.

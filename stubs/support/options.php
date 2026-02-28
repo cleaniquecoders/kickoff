@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // use Illuminate\Support\Facades\Cache;
 
 use Illuminate\Support\Collection;
@@ -21,7 +23,7 @@ if (! function_exists('to_options')) {
 use Illuminate\Support\Facades\Cache;
 
 if (! function_exists('role_options')) {
-    function role_options()
+    function role_options(): array
     {
         return Cache::remember('role_options', 30, function () {
             return collect(config('access-matrix.roles'))
@@ -33,7 +35,7 @@ if (! function_exists('role_options')) {
 }
 
 if (! function_exists('audit_type_options')) {
-    function audit_type_options()
+    function audit_type_options(): array
     {
         return Cache::remember('audit_type_options', 30, function () {
             $models = [];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Builder\Menu;
 
 use App\Actions\Builder\MenuItem;

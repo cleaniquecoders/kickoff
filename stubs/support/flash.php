@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('flash')) {
     function flash(?string $variant = null, ?string $message = null): mixed
     {
@@ -43,7 +45,7 @@ if (! function_exists('flash_variant')) {
     /**
      * Get Flash classes on variant.
      *
-     * @return array <string, string>
+     * @return array{border: string, bg: string, text: string}
      */
     function flash_variant(string $variant): array
     {

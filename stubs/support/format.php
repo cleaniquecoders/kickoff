@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('money_format')) {
     /**
      * Format given money given in string.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -14,7 +16,7 @@ class ExtractLangText extends Command
     protected $description = 'Extract all text within the __() helper and output to the /lang/{locale}.json file or a custom path';
 
     // Execute the command
-    public function handle()
+    public function handle(): int
     {
         // Get the locale and optional output path from the command arguments
         $locale = $this->argument('locale');
@@ -27,9 +29,11 @@ class ExtractLangText extends Command
 
         $outputFile = $path."/$locale.json";
 
-        if (file_exists($outputFile) && ! $this->confirm("$outputFile already exists. Are you sure want to overwrite it?")) {
-            return;
-        } else {
+        if (file_exists($outputFile)) {
+            if (! $this->confirm("$outputFile already exists. Are you sure want to overwrite it?")) {
+                return self::SUCCESS;
+            }
+
             unlink($outputFile);
             $this->components->info("$outputFile removed.");
         }
@@ -68,5 +72,7 @@ class ExtractLangText extends Command
         file_put_contents($outputFile, json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
         $this->components->info("Translations extracted successfully and saved to $outputFile");
+
+        return self::SUCCESS;
     }
 }

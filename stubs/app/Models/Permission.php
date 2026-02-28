@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
@@ -12,9 +14,6 @@ class Permission extends \Spatie\Permission\Models\Permission implements Auditab
     use AuditingTrait;
     use InteractsWithUuid;
 
-    /**
-     * Additional attributes for the permission model.
-     */
     protected $fillable = [
         'name',
         'display_name',
@@ -25,10 +24,6 @@ class Permission extends \Spatie\Permission\Models\Permission implements Auditab
         'is_enabled',
     ];
 
-    /**
-     * Get the display name attribute.
-     * Uses display_name if set, otherwise formats the name.
-     */
     protected function displayName(): Attribute
     {
         return Attribute::make(

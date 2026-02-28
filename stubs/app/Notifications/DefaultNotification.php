@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -10,55 +12,24 @@ class DefaultNotification extends Notification
 {
     use Queueable;
 
-    /**
-     * Subject of the notification.
-     *
-     * @var string
-     */
-    private $subject;
-
-    /**
-     * Message of the notification.
-     *
-     * @var string
-     */
-    private $message;
-
-    /**
-     * URL of the notification.
-     *
-     * @var string|null
-     */
-    private $url;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct(string $subject, string $message, ?string $url = null)
-    {
-        $this->subject = $subject;
-        $this->message = $message;
-        $this->url = $url;
-    }
+    public function __construct(
+        private readonly string $subject,
+        private readonly string $message,
+        private readonly ?string $url = null,
+    ) {}
 
     /**
      * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
      */
-    public function via($notifiable): array
+    public function via(mixed $notifiable): array
     {
         return notification_drivers();
     }
 
     /**
      * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject($this->getSubject())
@@ -67,41 +38,27 @@ class DefaultNotification extends Notification
 
     /**
      * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
      */
-    public function toArray($notifiable): array
+    public function toArray(mixed $notifiable): array
     {
         return $this->getData();
     }
 
-    /**
-     * Get the subject of the notification.
-     */
     public function getSubject(): string
     {
         return $this->subject;
     }
 
-    /**
-     * Get the message of the notification.
-     */
     public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * Get the URL of the notification.
-     */
     public function getUrl(): ?string
     {
         return $this->url;
     }
 
-    /**
-     * An array of data of the notification.
-     */
     public function getData(): array
     {
         return [

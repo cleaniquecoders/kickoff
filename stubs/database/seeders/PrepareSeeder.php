@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\User;
@@ -16,7 +18,7 @@ class PrepareSeeder extends Seeder
         $this->createSuperUser();
     }
 
-    private function createSuperUser()
+    private function createSuperUser(): void
     {
         $user = User::create(config('seeder.users.superadmin'));
         $user->assignRole('superadmin');

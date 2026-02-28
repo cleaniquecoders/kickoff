@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('str_abbrv')) {
     function str_abbrv(string $value, int $max_characters = 4): string
     {

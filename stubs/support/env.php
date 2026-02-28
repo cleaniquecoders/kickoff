@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('update_env')) {
     /**
      * Update environment variable in .env file.
@@ -22,7 +24,7 @@ if (! function_exists('update_env')) {
                 : $value);
 
         // Check if key exists
-        $pattern = "/^{$key}=.*/m";
+        $pattern = '/^'.preg_quote($key, '/').'\s*=.*/m';
 
         if (preg_match($pattern, $envContent)) {
             // Update existing key

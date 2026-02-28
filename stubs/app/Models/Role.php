@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
@@ -12,9 +14,6 @@ class Role extends \Spatie\Permission\Models\Role implements Auditable
     use AuditingTrait;
     use InteractsWithUuid;
 
-    /**
-     * Additional attributes for the role model.
-     */
     protected $fillable = [
         'name',
         'display_name',
@@ -22,10 +21,6 @@ class Role extends \Spatie\Permission\Models\Role implements Auditable
         'guard_name',
     ];
 
-    /**
-     * Get the display name attribute.
-     * Uses display_name if set, otherwise formats the name.
-     */
     protected function displayName(): Attribute
     {
         return Attribute::make(

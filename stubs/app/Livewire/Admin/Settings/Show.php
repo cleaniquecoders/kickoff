@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Admin\Settings;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
@@ -13,6 +16,8 @@ class Show extends Component
 
     public function mount(string $section): void
     {
+        $this->authorize('manage.settings');
+
         $this->section = $section;
         $this->loadSettings();
     }
@@ -36,14 +41,16 @@ class Show extends Component
                 'mail_from_name' => config('mail.from.name'),
             ],
             'notifications' => [
-                'enabled' => env('NOTIFICATIONS_ENABLED', true),
-                'channels' => explode(',', env('NOTIFICATIONS_CHANNELS', 'mail,database')),
+                'enabled' => config('notification.enabled', true),
+                'channels' => config('notification.default', ['mail', 'database']),
             ],
         ];
     }
 
     public function saveSettings(): void
     {
+        $this->authorize('manage.settings');
+
         try {
             if ($this->section === 'general') {
                 $this->validate([
@@ -86,6 +93,8 @@ class Show extends Component
                 ]);
             }
 
+            Artisan::call('config:clear');
+
             $this->dispatch('toast',
                 type: 'success',
                 message: ucfirst($this->section).' settings saved successfully!',
@@ -110,7 +119,7 @@ class Show extends Component
         }
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.admin.settings.show');
     }
