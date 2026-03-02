@@ -312,9 +312,9 @@ public function events(): HasMany
 }
 
 // BelongsToMany - plural
-public function teams(): BelongsToMany
+public function tags(): BelongsToMany
 {
-    return $this->belongsToMany(Team::class, 'event_team')
+    return $this->belongsToMany(Tag::class, 'event_tag')
         ->withTimestamps();
 }
 ```
