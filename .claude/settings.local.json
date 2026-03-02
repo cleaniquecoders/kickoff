@@ -15,7 +15,9 @@
       "Skill(docs)",
       "Bash(php artisan:*)",
       "Bash(git:*)",
-      "Bash(gh release:*)"
+      "Bash(gh release:*)",
+      "Bash(laravel new:*)",
+      "Bash(bash:*)"
     ]
   }
 }
