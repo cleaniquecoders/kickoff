@@ -2,6 +2,19 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.8.0 - 2026-03-02
+
+### What's Changed
+
+#### Cleanup & Fixes
+
+- **Remove unused team feature** — Removed `team_foreign_key`, `teams`, `team_resolver` config from Spatie Permission; removed team tables, relationships, and indexes from database instructions; replaced `Team::class` BelongsToMany example with `Tag::class`
+- **Remove legacy/unused layout files** — Deleted `layouts/app/sidebar.blade.php` (legacy duplicate), `layouts/app/header.blade.php` and `components/layouts/app/header.blade.php` (unused header variants)
+- **Fix layout namespace resolution** — Changed `layouts/app.blade.php` from `<x-layouts::app.sidebar>` to `<x-layouts.app.sidebar>` so it resolves to the custom component sidebar instead of the Laravel starter kit default. Fixes `Route [profile.edit] not defined` error.
+- **Rewrite sidebar documentation** — Updated `docs/02-development/09-sidebar.md` to match actual menu builder classes (`Sidebar`, `UserManagement`, `MediaManagement`, `Settings`, `AuditMonitoring`) — old docs referenced non-existent classes
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.7.0...1.8.0
+
 ## 1.7.0 - 2026-02-28
 
 ### What's Changed
