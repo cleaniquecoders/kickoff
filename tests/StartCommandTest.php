@@ -42,6 +42,10 @@ class StartCommandTest extends TestCase
         $this->assertTrue($definition->getArgument('owner')->isRequired());
         $this->assertTrue($definition->getArgument('name')->isRequired());
         $this->assertFalse($definition->getArgument('path')->isRequired());
+
+        $this->assertTrue($definition->hasOption('dry-run'));
+        $this->assertTrue($definition->hasOption('skip-packages'));
+        $this->assertTrue($definition->hasOption('skip-npm'));
     }
 
     public function test_get_project_name_and_path()

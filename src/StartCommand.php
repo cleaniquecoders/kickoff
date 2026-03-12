@@ -6,6 +6,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'start')]
@@ -27,7 +28,10 @@ class StartCommand extends Command
             ->setDescription('Kickoff a new Laravel project setup')
             ->addArgument('owner', InputArgument::REQUIRED, 'The project owner.')
             ->addArgument('name', InputArgument::REQUIRED, 'The project name.')
-            ->addArgument('path', InputArgument::OPTIONAL, 'The project path.');
+            ->addArgument('path', InputArgument::OPTIONAL, 'The project path.')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Preview what would be done without making changes.')
+            ->addOption('skip-packages', null, InputOption::VALUE_NONE, 'Skip Composer and NPM package installation.')
+            ->addOption('skip-npm', null, InputOption::VALUE_NONE, 'Skip NPM package installation only.');
     }
 
     public function getProjectName(): string
@@ -48,6 +52,9 @@ class StartCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $verbose = $output->isVerbose() || $output->isVeryVerbose() || $output->isDebug();
+        $dryRun = $input->getOption('dry-run');
+        $skipPackages = $input->getOption('skip-packages');
+        $skipNpm = $input->getOption('skip-npm');
 
         $this->projectOwner = $projectOwner = $input->getArgument('owner');
         $this->projectName = $projectName = $input->getArgument('name');
@@ -56,6 +63,10 @@ class StartCommand extends Command
         if (empty($projectPath)) {
             // If no path provided, create project in current directory with project name as subdirectory
             $this->projectPath = $projectPath = getcwd().'/'.$projectName;
+        }
+
+        if ($dryRun) {
+            return $this->dryRun($output, $projectOwner, $projectName, $projectPath, $skipPackages, $skipNpm);
         }
 
         // Check if we need to create a new Laravel project
@@ -85,14 +96,49 @@ class StartCommand extends Command
         $this->setupEnvironmentFile($output, $verbose);
         gitCommit('Setup environment file', $verbose);
 
-        $this->installPackages($output, $verbose);
-        gitCommit('Install packages and dependencies', $verbose);
+        if (! $skipPackages) {
+            $this->installPackages($output, $verbose, $skipNpm);
+            gitCommit('Install packages and dependencies', $verbose);
+        } else {
+            $output->writeln("\n⏭️  Skipping package installation (--skip-packages)\n");
+        }
 
         $this->runTasks($output, $verbose);
         $this->restoreGitIgnoreFiles($output, $verbose);
         gitCommit('Build application and run tasks', $verbose);
 
         $output->writeln("\n🎉 Project setup completed successfully!\n");
+
+        return Command::SUCCESS;
+    }
+
+    private function dryRun(OutputInterface $output, string $owner, string $name, string $path, bool $skipPackages, bool $skipNpm): int
+    {
+        $output->writeln("\n<info>🔍 Dry run — no changes will be made</info>\n");
+        $output->writeln("  Owner:   <comment>$owner</comment>");
+        $output->writeln("  Project: <comment>$name</comment>");
+        $output->writeln("  Path:    <comment>$path</comment>");
+        $output->writeln("  DB name: <comment>{$this->getDatabaseName()}</comment>");
+        $output->writeln('');
+
+        $exists = file_exists($path) && file_exists($path.'/artisan');
+        $output->writeln('  Steps:');
+        if (! $exists) {
+            $output->writeln('    1. Create new Laravel project (laravel new)');
+        }
+        $output->writeln('    '.($exists ? '1' : '2').'. Copy stubs to project');
+        $output->writeln('    '.($exists ? '2' : '3').'. Update composer.json (scripts, autoload)');
+        $output->writeln('    '.($exists ? '3' : '4').'. Replace placeholders (${PROJECT_NAME}, ${OWNER})');
+        $output->writeln('    '.($exists ? '4' : '5').'. Setup .env file');
+        if (! $skipPackages) {
+            $output->writeln('    '.($exists ? '5' : '6').'. Install Composer packages (18 require, 5 require-dev)');
+            $output->writeln('    '.($exists ? '6' : '7').'. Publish vendor configs & migrations');
+            if (! $skipNpm) {
+                $output->writeln('    '.($exists ? '7' : '8').'. Install NPM packages (lodash, axios, tippy.js)');
+            }
+        }
+        $output->writeln('    Run build tasks (migrations, assets, key generation)');
+        $output->writeln('');
 
         return Command::SUCCESS;
     }
@@ -257,7 +303,7 @@ class StartCommand extends Command
         }
     }
 
-    private function installPackages(OutputInterface $output, bool $verbose)
+    private function installPackages(OutputInterface $output, bool $verbose, bool $skipNpm = false)
     {
         step('Changing to project directory', function () {
             chdir($this->getProjectPath());
@@ -324,9 +370,13 @@ class StartCommand extends Command
             }
         }, $output, $verbose);
 
-        step('Install npm packages', function () use ($verbose) {
-            runCommand('npm install lodash axios tippy.js', $verbose);
-        }, $output, $verbose);
+        if (! $skipNpm) {
+            step('Install npm packages', function () use ($verbose) {
+                runCommand('npm install lodash axios tippy.js', $verbose);
+            }, $output, $verbose);
+        } else {
+            $output->writeln('⏭️  Skipping NPM package installation (--skip-npm)');
+        }
     }
 
     private function runTasks(OutputInterface $output, bool $verbose)
