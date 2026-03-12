@@ -25,13 +25,20 @@ function step(string $message, callable $callback, OutputInterface $output, bool
 
 /**
  * Run script with optional verbosity.
+ *
+ * @throws RuntimeException if the command exits with a non-zero status
  */
-function runCommand(string $cmd, bool $verbose = false)
+function runCommand(string $cmd, bool $verbose = false): void
 {
     if ($verbose) {
-        passthru($cmd);
+        passthru($cmd, $exitCode);
     } else {
-        shell_exec("$cmd > /dev/null 2>&1");
+        exec("$cmd 2>&1", $output, $exitCode);
+    }
+
+    if ($exitCode !== 0) {
+        $errorOutput = $verbose ? '' : implode("\n", $output ?? []);
+        throw new RuntimeException("Command failed (exit code $exitCode): $cmd".($errorOutput ? "\n$errorOutput" : ''));
     }
 }
 
