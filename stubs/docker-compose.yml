@@ -1,15 +1,13 @@
-version: "3.7"
-
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.4
     container_name: mysql
     ports:
       - "${DB_PORT:-3306}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
-      MYSQL_DATABASE: ${DB_DATABASE:-ace}
-      MYSQL_USER: ${DB_USERNAME:-ace}
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
       MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
       - mysql-data:/var/lib/mysql
@@ -44,10 +42,8 @@ services:
 
   meilisearch:
     container_name: meilisearch
-    image: getmeili/meilisearch:v0.25.2
+    image: getmeili/meilisearch:v1.12
     environment:
-      - http_proxy
-      - https_proxy
       - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-masterKey}
       - MEILI_NO_ANALYTICS=${MEILI_NO_ANALYTICS:-true}
       - MEILI_ENV=${MEILI_ENV:-development}
@@ -55,14 +51,12 @@ services:
       - MEILI_DB_PATH=${MEILI_DB_PATH:-/data.ms}
     ports:
       - ${MEILI_PORT:-7700}:7700
-    networks:
-      - meilisearch
     volumes:
-      - ./data.ms:/data.ms
+      - meilisearch-data:/data.ms
     restart: unless-stopped
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2023-01-20T02-05-44Z
+    image: quay.io/minio/minio:latest
     container_name: minio
     command: server /data --console-address ":9001"
     ports:
@@ -85,9 +79,7 @@ volumes:
     driver: local
   redis-data:
     driver: local
+  meilisearch-data:
+    driver: local
   minio-data:
     driver: local
-
-networks:
-  meilisearch:
-    driver: bridge
