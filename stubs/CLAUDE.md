@@ -66,7 +66,8 @@ The Base model provides:
 
 ### Database Conventions
 
-- **Primary keys**: Always UUID (`$table->uuid('id')->primary()`)
+- **Primary keys**: Dual-key pattern — auto-increment `id` (internal primary key) + `uuid` column (public identifier, indexed)
+- **External references**: Always use UUID, never expose integer `id`
 - **Soft deletes**: Use for all user-facing models
 - **Column naming**: snake_case
 
