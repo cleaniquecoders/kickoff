@@ -486,7 +486,7 @@ class ProductForm extends Form
 // Livewire Component (Simplified)
 class ProductFormComponent extends Component
 {
-    use InteractsWithLivewireAlert;
+    // Toast notifications via $this->dispatch('toast', type: 'success', message: '...')
 
     public ProductForm $form;
 

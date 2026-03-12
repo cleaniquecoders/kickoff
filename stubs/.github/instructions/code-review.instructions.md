@@ -225,7 +225,7 @@ foreach ($products as $product) {
 // ✅ GOOD: Proper Livewire component
 class ProductForm extends Component
 {
-    use InteractsWithLivewireAlert;
+    // Toast: $this->dispatch('toast', type: 'success', message: '...')
 
     public ProductForm $form;
 

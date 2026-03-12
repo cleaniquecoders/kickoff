@@ -132,7 +132,7 @@ Use Livewire 3 syntax with form objects:
 ```php
 class {ComponentName} extends Component
 {
-    use InteractsWithLivewireAlert;
+    // Toast: $this->dispatch('toast', type: 'success', message: '...')
 
     public {ModelName}Form $form;
 

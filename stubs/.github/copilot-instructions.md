@@ -42,18 +42,16 @@ This project is built using the **CleaniqueCoders Kickoff** template, which prov
 - Single-file components use anonymous class extending `Livewire\Component`
 - Available custom Livewire components:
   - `Alert`: Modal alerts with title and message
-  - `Confirm`: Confirmation dialogs with callbacks
+  - `Confirm`: Confirmation dialogs with Flux UI modals
 - Wire directives: `wire:model.live`, `wire:model.blur`, `wire:loading`, `wire:navigate`
 
-**Example Livewire Alert:**
+**Example Toast Notification:**
 
 ```php
-// In a Livewire component, use the InteractsWithLivewireAlert trait
-use App\Concerns\InteractsWithLivewireAlert;
-
+// In a Livewire component, dispatch a toast event
 public function someMethod()
 {
-    $this->alert('Success', 'Operation completed successfully!');
+    $this->dispatch('toast', type: 'success', message: 'Operation completed successfully!');
 }
 ```
 
@@ -314,24 +312,22 @@ Additional helpers available for:
 
 ### Traits for Livewire Components
 
-**InteractsWithLivewireAlert:**
+**Toast Notifications (preferred for feedback messages):**
 
 ```php
-use App\Concerns\InteractsWithLivewireAlert;
-
 class MyComponent extends Component
 {
-    use InteractsWithLivewireAlert;
-
     public function save()
     {
         // ... save logic
-        $this->alert('Success', 'Item saved successfully!');
+        $this->dispatch('toast', type: 'success', message: 'Item saved successfully!');
     }
 }
 ```
 
-**InteractsWithLivewireConfirm:**
+Toast types: `success`, `error`, `warning`, `info`. The `<x-toast />` component is already included in the sidebar layout.
+
+**InteractsWithLivewireConfirm (for confirmation dialogs):**
 
 ```php
 use App\Concerns\InteractsWithLivewireConfirm;

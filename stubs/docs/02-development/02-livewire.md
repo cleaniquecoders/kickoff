@@ -2,26 +2,32 @@
 
 > This project uses Livewire 4 with built-in single-file component support for building reactive components.
 
-## Alert Component
+## Toast Notifications
 
-Using Alert component:
+Use toast notifications for user feedback messages:
 
 ```php
-$this->dispatch('alert', 'displayAlert',  __('Connection'), __('Connection succesfully deleted'));
+// In a Livewire component
+$this->dispatch('toast', type: 'success', message: 'Operation completed successfully!');
 ```
+
+Toast types: `success`, `error`, `warning`, `info`. The `<x-toast />` component is included in the sidebar layout.
 
 ## Confirm Component
 
-Using Confirm component:
+Use the `InteractsWithLivewireConfirm` trait for confirmation dialogs (uses Flux UI modal):
 
 ```php
-<div class="cursor-pointer" class="bg-red-500"
-    wire:click="$dispatch('confirm', 'displayConfirmation', 'Delete Connection', 'Are you sure?', 'connection-form', 'destroyConnection', '{{ $uuid }}')">
-    {{ __('Remove') }}
-</div>
-```
+use App\Concerns\InteractsWithLivewireConfirm;
 
-Both of the Alert & Confirm modal are using the Laravel Jetstream modal.
+$this->confirm(
+    'Delete Connection',
+    'Are you sure?',
+    'connection-form',
+    'destroyConnection',
+    $uuid
+);
+```
 
 For datatables, see the [Datatable documentation](05-datatable.md) for examples using native Livewire 4 with pagination, sorting, and filtering.
 

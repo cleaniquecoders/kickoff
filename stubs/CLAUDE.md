@@ -191,7 +191,7 @@ already enforce `app/Contracts/` contains only interfaces and `app/Concerns/` co
 ```text
 app/
 ├── Actions/        # Single-purpose action classes (Builder/Menu already included)
-├── Concerns/       # Traits (InteractsWithLivewireAlert, InteractsWithLivewireConfirm, etc.)
+├── Concerns/       # Traits (InteractsWithLivewireConfirm, HasMedia, etc.)
 ├── Console/        # Artisan commands (24+ included: seeders, cache, code generation)
 ├── Contracts/      # Interfaces (HeadingMenuBuilder, AuthorizedMenuBuilder)
 ├── Enums/          # Status/type enums
@@ -283,10 +283,10 @@ From Alpine.js directly:
 <button @click="$dispatch('toast', { type: 'info', message: 'Hello from Alpine!' })">
 ```
 
-> **Gotcha:** `InteractsWithLivewireAlert` dispatches `displayAlert` to a `<livewire:alert>`
-> modal component. For simple feedback messages, prefer `$this->dispatch('toast', ...)` which
-> uses the `<x-toast />` component already in the sidebar layout. Reserve `InteractsWithLivewireAlert`
-> only for modal-style alerts that require user acknowledgement.
+> **Gotcha:** For user feedback messages, use `$this->dispatch('toast', type: 'success', message: '...')`
+> which renders via the `<x-toast />` component already in the sidebar layout. Toast types:
+> `success`, `error`, `warning`, `info`. Do NOT create custom alert modal components for simple
+> feedback — toast notifications are the standard pattern.
 
 ### Confirmations
 

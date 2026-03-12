@@ -1,23 +1,12 @@
 <div>
-    <x-dialog-modal wire:model.live="displayingModal">
-        <x-slot name="title">
-            {{ $state['title'] }}
-        </x-slot>
-
-        <x-slot name="content">
-            <p>
-                {{ $state['message'] }}
-            </p>
-        </x-slot>
-
-        <x-slot name="footer">
-            <x-secondary-button wire:click="cancel" wire:loading.attr="disabled">
-                {{ __('NO') }}
-            </x-secondary-button>
-
-            <x-button class="ml-3" wire:click="confirm" wire:loading.attr="disabled">
-                {{ __('Yes') }}
-            </x-button>
-        </x-slot>
-    </x-dialog-modal>
+    <flux:modal wire:model="displayingModal" class="max-w-md">
+        <div class="space-y-4">
+            <flux:heading size="lg">{{ $state['title'] }}</flux:heading>
+            <flux:text>{{ $state['message'] }}</flux:text>
+        </div>
+        <div class="flex justify-end gap-3 mt-6">
+            <flux:button variant="ghost" wire:click="cancel">{{ __('Cancel') }}</flux:button>
+            <flux:button variant="danger" wire:click="confirm">{{ __('Confirm') }}</flux:button>
+        </div>
+    </flux:modal>
 </div>
