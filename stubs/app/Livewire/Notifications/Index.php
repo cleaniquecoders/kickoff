@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Notifications;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -80,7 +81,7 @@ class Index extends Component
         return Auth::user()->notifications()->count();
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         $query = Auth::user()->notifications();
 

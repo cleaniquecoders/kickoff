@@ -6,13 +6,14 @@ namespace App\Http\Controllers\Security;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AuditTrailController extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function index(Request $request): \Illuminate\View\View
+    public function index(Request $request): View
     {
         $this->authorize('viewAny', config('audit.implementation'));
 
@@ -21,7 +22,7 @@ class AuditTrailController extends Controller
         return view('security.audit-trail.index', compact('sub'));
     }
 
-    public function show(Request $request, string $uuid): \Illuminate\View\View
+    public function show(Request $request, string $uuid): View
     {
         $audit = config('audit.implementation')::whereUuid($uuid)->firstOrFail();
 

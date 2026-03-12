@@ -13,7 +13,7 @@ if (! function_exists('sort_json_by_key')) {
 
         // Check for JSON decoding errors
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException('Error decoding JSON: '.json_last_error_msg());
+            throw new RuntimeException('Error decoding JSON: '.json_last_error_msg());
         }
 
         // Sort the array by keys
@@ -24,7 +24,7 @@ if (! function_exists('sort_json_by_key')) {
 
         // Check for JSON encoding errors
         if ($sortedJsonData === false) {
-            throw new \RuntimeException('Error encoding sorted data: '.json_last_error_msg());
+            throw new RuntimeException('Error encoding sorted data: '.json_last_error_msg());
         }
 
         // If the input was a file path, save the sorted JSON back to the file

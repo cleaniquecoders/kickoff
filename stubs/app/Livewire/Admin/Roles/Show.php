@@ -6,6 +6,8 @@ namespace App\Livewire\Admin\Roles;
 
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -22,7 +24,7 @@ class Show extends Component
     }
 
     #[Computed]
-    public function permissions(): \Illuminate\Support\Collection
+    public function permissions(): Collection
     {
         return Permission::where('is_enabled', true)
             ->orderBy('module')
@@ -44,7 +46,7 @@ class Show extends Component
         );
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.admin.roles.show');
     }

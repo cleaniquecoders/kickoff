@@ -2,13 +2,14 @@
 
 namespace Laravel\Installer\Console\Tests;
 
+use CleaniqueCoders\Kickoff\Console\StartCommand;
 use PHPUnit\Framework\TestCase;
 
 class StartCommandTest extends TestCase
 {
     public function test_it_can_kickoff_project()
     {
-        $command = $this->getMockBuilder(\CleaniqueCoders\Kickoff\Console\StartCommand::class)
+        $command = $this->getMockBuilder(StartCommand::class)
             ->onlyMethods(['execute', 'getProjectName', 'getProjectPath', 'getProjectOwner'])
             ->getMock();
 
@@ -31,7 +32,7 @@ class StartCommandTest extends TestCase
 
     public function test_configure_sets_arguments()
     {
-        $command = new \CleaniqueCoders\Kickoff\Console\StartCommand;
+        $command = new StartCommand;
         $definition = $command->getDefinition();
 
         $this->assertTrue($definition->hasArgument('owner'));
@@ -41,7 +42,7 @@ class StartCommandTest extends TestCase
 
     public function test_get_project_name_and_path()
     {
-        $command = new \CleaniqueCoders\Kickoff\Console\StartCommand;
+        $command = new StartCommand;
         $reflection = new \ReflectionClass($command);
 
         $ownerProp = $reflection->getProperty('projectOwner');

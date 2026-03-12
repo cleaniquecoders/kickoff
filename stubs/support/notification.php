@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\User;
 use App\Notifications\DefaultNotification;
 
 if (! function_exists('notification_drivers')) {
@@ -30,7 +31,7 @@ if (! function_exists('notify')) {
     /**
      * Notify to targeted user with simple message.
      */
-    function notify(App\Models\User $user, string $subject, string $message, ?string $url = null): void
+    function notify(User $user, string $subject, string $message, ?string $url = null): void
     {
         $user->notify(
             (new DefaultNotification($subject, $message, $url))

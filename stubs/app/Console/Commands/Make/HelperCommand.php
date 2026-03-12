@@ -6,6 +6,7 @@ namespace App\Console\Commands\Make;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 
 class HelperCommand extends GeneratorCommand
 {
@@ -33,7 +34,7 @@ class HelperCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = \Illuminate\Support\Str::replaceFirst($this->rootNamespace(), '', $name);
+        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
         return base_path('/support/'.str_replace('\\', '/', $name).'.php');
     }

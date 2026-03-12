@@ -6,6 +6,8 @@ namespace App\Livewire\Security;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -22,7 +24,7 @@ class UserRoles extends Component
     }
 
     #[Computed]
-    public function roles(): \Illuminate\Database\Eloquent\Collection
+    public function roles(): Collection
     {
         return Role::whereNotIn('name', ['Superadmin', 'User'])
             ->where('is_enabled', true)
@@ -46,7 +48,7 @@ class UserRoles extends Component
         }
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.security.user-roles');
     }

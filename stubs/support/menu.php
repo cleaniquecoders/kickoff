@@ -11,7 +11,7 @@ if (! function_exists('menu')) {
      * Menu helper to build menus based on type.
      *
      * @param  string  $builder  See app/Actions/Builder/Menu.php for the available menue.
-     * @return \CleaniqueCoders\Traitify\Contracts\Builder
+     * @return Builder
      */
     function menu(string $builder): Builder|Menu
     {

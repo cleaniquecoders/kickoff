@@ -1,10 +1,17 @@
 <?php
 
+use App\Providers\AdminServiceProvider;
+use App\Providers\AppServiceProvider;
+use App\Providers\EventServiceProvider;
+use App\Providers\FortifyServiceProvider;
+use App\Providers\HorizonServiceProvider;
+use App\Providers\TelescopeServiceProvider;
+
 return [
-    App\Providers\AdminServiceProvider::class,
-    App\Providers\AppServiceProvider::class,
-    App\Providers\EventServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
-    App\Providers\HorizonServiceProvider::class,
-    App\Providers\TelescopeServiceProvider::class,
+    AdminServiceProvider::class,
+    AppServiceProvider::class,
+    EventServiceProvider::class,
+    FortifyServiceProvider::class,
+    HorizonServiceProvider::class,
+    TelescopeServiceProvider::class,
 ];

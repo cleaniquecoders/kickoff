@@ -1,5 +1,7 @@
 <?php
 
+use CleaniqueCoders\Kickoff\Console\Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +13,7 @@
 |
 */
 
-pest()->extend(\CleaniqueCoders\Kickoff\Console\Tests\TestCase::class)->in('Feature');
+pest()->extend(TestCase::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

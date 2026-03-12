@@ -11,7 +11,7 @@ function step(string $message, callable $callback, OutputInterface $output, bool
         if ($verbose) {
             $output->writeln("<info>Step '$message' completed successfully.</info>");
         }
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         $output->writeln(' ❌');
         $output->writeln("<error>{$e->getMessage()}</error>");
         if ($verbose && $e->getTraceAsString()) {
@@ -47,7 +47,7 @@ function runCommand(string $cmd, bool $verbose = false): void
  */
 function installPackages(array $require, array $requireDev, string $path, bool $verbose = false): void
 {
-    $workingDir = "--working-dir=".escapeshellarg($path);
+    $workingDir = '--working-dir='.escapeshellarg($path);
     $lockFile = $path.'/composer.lock';
 
     if ($require) {

@@ -6,6 +6,8 @@ namespace App\Livewire\Security;
 
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -22,7 +24,7 @@ class RolePermissions extends Component
     }
 
     #[Computed]
-    public function permissions(): \Illuminate\Support\Collection
+    public function permissions(): Collection
     {
         return Permission::where('is_enabled', true)->get()->groupBy('module');
     }
@@ -72,7 +74,7 @@ class RolePermissions extends Component
         }
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.security.role-permissions');
     }

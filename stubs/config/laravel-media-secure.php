@@ -1,17 +1,19 @@
 <?php
 
 use CleaniqueCoders\LaravelMediaSecure\Http\Controllers\MediaController;
+use CleaniqueCoders\LaravelMediaSecure\Policies\MediaPolicy;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 return [
     /**
      * Spatie's Model Class Name
      */
-    'model' => \Spatie\MediaLibrary\MediaCollections\Models\Media::class,
+    'model' => Media::class,
 
     /**
      * Spatie's Model Media Policy
      */
-    'policy' => \CleaniqueCoders\LaravelMediaSecure\Policies\MediaPolicy::class,
+    'policy' => MediaPolicy::class,
 
     /**
      * Controller to manage access to the media.

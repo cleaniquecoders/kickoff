@@ -6,6 +6,7 @@ namespace App\Livewire\Notifications;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -32,7 +33,7 @@ class Bell extends Component
         return Auth::user()->unreadNotifications()->take(5)->get();
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.notifications.bell');
     }

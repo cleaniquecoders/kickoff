@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 use CleaniqueCoders\Traitify\Contracts\Api;
+use Illuminate\Http\JsonResponse;
 
 if (! function_exists('api_exception')) {
-    function api_exception(Throwable $th): \Illuminate\Http\JsonResponse
+    function api_exception(Throwable $th): JsonResponse
     {
         $code = (is_int($th->getCode()) && $th->getCode() >= 100 && $th->getCode() <= 599)
             ? $th->getCode()
@@ -24,7 +25,7 @@ if (! function_exists('api_exception')) {
 }
 
 if (! function_exists('api_response')) {
-    function api_response(Api $api): \Illuminate\Http\JsonResponse
+    function api_response(Api $api): JsonResponse
     {
         return response()->json(
             $api->getApiResponse(request()),
