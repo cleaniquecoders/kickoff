@@ -303,3 +303,19 @@ Projects created with `kickoff start` receive:
 
 See `stubs/CLAUDE.md` for the complete generated project conventions (primary source of truth),
 and `stubs/.github/copilot-instructions.md` for GitHub Copilot-specific guidance.
+
+## Workflow Conventions
+
+### Issue Tracking
+
+All bugs, features, and improvements **must** have a GitHub issue created before work begins.
+Use `gh issue create` to create issues with appropriate labels and descriptions.
+Reference issues in commit messages and PRs.
+
+### Labels
+
+- `bug`: Something broken or inconsistent
+- `enhancement`: New feature or improvement
+- `documentation`: Documentation gaps or corrections
+- `stubs`: Issues specific to the generated project template
+- `package`: Issues specific to the kickoff CLI tool itself
