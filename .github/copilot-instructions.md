@@ -140,7 +140,7 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 **Custom Stubs** (`stubs/stubs/`):
 
 - `model.stub`: Extends `App\Models\Base` (not Eloquent Model)
-- `migration.create.stub`: UUID primary keys
+- `migration.create.stub`: Dual-key pattern (auto-increment `id` + `uuid` column)
 - `pest.stub`: Pest syntax for tests
 - `policy.stub`: Standard policy methods
 
@@ -338,7 +338,7 @@ $command = $this->getMockBuilder(StartCommand::class)
 When users run `kickoff start`, their Laravel project receives:
 
 - **15+ Spatie/Laravel packages** (permission, media, auditing, etc.)
-- **Custom Base model** with UUIDs, auditing, media support
+- **Custom Base model** with dual-key pattern (id + uuid), auditing, media support
 - **Helper functions** organized by domain in `support/`
 - **GitHub Actions** for lint, test, PHPStan, Rector
 - **Docker Compose** for MinIO, Redis, Elasticsearch

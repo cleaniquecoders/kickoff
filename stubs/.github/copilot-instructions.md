@@ -96,7 +96,7 @@ public function deleteItem($id)
 
 The Base model includes:
 
-- ✅ **UUID primary keys** (InteractsWithUuid)
+- ✅ **Dual int+UUID keys** (InteractsWithUuid) — auto-increment `id` for internal DB joins, `uuid` column for public-facing identifiers
 - ✅ **Auditing** (OwenIt\Auditing)
 - ✅ **Media attachments** (Spatie Media Library)
 - ✅ **Meta data** (InteractsWithMeta)
@@ -136,7 +136,7 @@ $product->getFirstMediaUrl('products', 'thumb'); // 130x130 thumbnail
 
 ### Database Conventions
 
-- ✅ Use **UUID primary keys** (not auto-increment)
+- ✅ Use **dual int+UUID keys** — auto-increment `id` for internal DB joins, `uuid` column indexed for public-facing identifiers (URLs, APIs)
 - ✅ Use **snake_case** for column names
 - ✅ Use **soft deletes** where appropriate
 - ✅ Use custom migration stub: `php artisan make:migration CreateProductsTable`
@@ -458,11 +458,11 @@ it('calculates discounted price correctly', function () {
     expect($product->discounted_price)->toBe(90.0);
 });
 
-it('has uuid as primary key', function () {
+it('has uuid column', function () {
     $product = Product::factory()->create();
 
-    expect($product->getKeyName())->toBe('uuid');
     expect($product->uuid)->toBeString();
+    expect($product->id)->toBeInt();
 });
 
 it('uses soft deletes', function () {
@@ -953,7 +953,7 @@ ContractException::throwIf(
 ### Models
 
 - ✅ **Always** extend `App\Models\Base`
-- ✅ Use **UUIDs** for primary keys
+- ✅ Use **dual int+UUID keys** — auto-increment `id` for internal joins, `uuid` for public identifiers
 - ✅ Enable **soft deletes** for user-facing data
 - ✅ Implement **media conversions** when using media
 - ✅ Keep models **thin** - move logic to Actions or Services
@@ -1257,7 +1257,7 @@ bin/deploy  # Automatically finds and deploys latest Git tag
 ## ⚠️ Common Pitfalls to Avoid
 
 1. ❌ **Don't** extend `Illuminate\Database\Eloquent\Model` - use `App\Models\Base`
-2. ❌ **Don't** use auto-increment IDs - UUIDs are the standard
+2. ❌ **Don't** expose auto-increment `id` in URLs or APIs — use the `uuid` column for all public-facing identifiers
 3. ❌ **Don't** forget to authorize actions in controllers/Livewire
 4. ❌ **Don't** bypass policies - always use `$this->authorize()`
 5. ❌ **Don't** use `url()` helper - use named routes and `route()` instead
@@ -1282,7 +1282,7 @@ When generating code for this project:
 5. **Policies**: Implement all 7 standard methods (viewAny, view, create, update, delete, restore, forceDelete)
 6. **Livewire**: Use traits for alerts and confirmations
 7. **Helpers**: Create in `support/` directory with domain-specific organization
-8. **Migrations**: Use UUID primary keys, timestamps, and soft deletes where appropriate
+8. **Migrations**: Use dual int+UUID keys (`$table->id()` + `$table->uuid('uuid')->index()`), timestamps, and soft deletes where appropriate
 9. **Views**: Use TailwindCSS utilities and Blade components
 10. **JavaScript**: Minimal - prefer Livewire + Alpine.js over heavy JavaScript
 

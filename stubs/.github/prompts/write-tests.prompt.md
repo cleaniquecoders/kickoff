@@ -276,10 +276,10 @@ describe('Product Model', function () {
         expect($product)->toBeInstanceOf(App\Models\Base::class);
     });
 
-    it('uses UUID as primary key', function () {
+    it('uses dual-key pattern with auto-increment id and uuid', function () {
         $product = Product::factory()->create();
 
-        expect($product->getKeyName())->toBe('uuid');
+        expect($product->id)->toBeInt();
         expect($product->uuid)->toBeString();
         expect($product->uuid)->toHaveLength(36);
     });

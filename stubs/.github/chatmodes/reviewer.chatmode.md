@@ -181,8 +181,8 @@ class Product extends App\Models\Base
 
 // 📝 REVIEW COMMENT:
 // All models should extend App\Models\Base instead of the raw Eloquent Model.
-// This ensures consistent UUID primary keys, auditing, media capabilities,
-// and other project standards. Remove the manual UUID setup code.
+// This ensures the dual-key pattern (auto-increment id + uuid column),
+// auditing, media capabilities, and other project standards.
 ```
 
 ### Query Performance

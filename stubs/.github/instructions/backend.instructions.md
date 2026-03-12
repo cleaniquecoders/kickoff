@@ -44,7 +44,7 @@ class YourModel extends Base
 ```
 
 **Base model includes:**
-- `InteractsWithUuid` - UUID primary keys (no auto-increment IDs)
+- `InteractsWithUuid` - Dual-key pattern: auto-increment `id` for internal DB relations + `uuid` column for public-facing identifiers
 - `InteractsWithMedia` - Spatie Media Library integration
 - `InteractsWithMeta` - JSON metadata storage
 - `InteractsWithUser` - User tracking (created_by, updated_by)
@@ -187,7 +187,8 @@ protected $casts = [
 
 ```php
 Schema::create('resources', function (Blueprint $table) {
-    $table->uuid('id')->primary();
+    $table->id();
+    $table->uuid('uuid')->index();
     $table->enum('status', ['draft', 'active', 'inactive'])
         ->default('draft');
 });
@@ -233,15 +234,16 @@ public function active(): static
 
 ## Database Standards
 
-### UUID Primary Keys
+### Dual-Key Pattern (Auto-Increment ID + UUID)
 
-**ALL models use UUID (never auto-increment):**
+**ALL models use a dual-key pattern: auto-increment `id` for internal DB relations + `uuid` column for public-facing identifiers:**
 
 ```php
 // Migration
 Schema::create('your_table', function (Blueprint $table) {
-    $table->uuid('id')->primary(); // NOT $table->id()
-    $table->foreignUuid('organization_id')->constrained();
+    $table->id();                   // Auto-increment int PK (internal relations)
+    $table->uuid('uuid')->index();  // UUID column (public-facing identifier)
+    $table->foreignId('organization_id')->constrained();
     // ...
 });
 
@@ -612,14 +614,14 @@ it('scopes events by organization', function () {
 - `url()` - use `route()` for named routes
 - `DB::raw()`, `DB::select()` - use Eloquent/Query Builder
 - `env()` - only in config files
-- Auto-increment IDs - use UUID
+- UUID-only primary keys - use dual-key pattern (`id` + `uuid`)
 - String status values - use enums
 
 **✅ ALWAYS use:**
 - Named routes: `route('events.show', $event)`
 - Eloquent/Query Builder for queries
 - Enums for status/type fields
-- UUID primary keys
+- Dual-key pattern (`id` + `uuid`) in migrations
 - Form Requests for validation
 - Policies for authorization
 - Soft deletes for user data
@@ -653,11 +655,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('your_table', function (Blueprint $table) {
-            // Primary key (UUID)
-            $table->uuid('id')->primary();
+            // Primary key + public identifier
+            $table->id();                   // Auto-increment int PK (internal)
+            $table->uuid('uuid')->index();  // UUID column (public-facing)
 
             // Foreign keys (multi-tenant)
-            $table->foreignUuid('organization_id')
+            $table->foreignId('organization_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
@@ -691,7 +694,7 @@ return new class extends Migration
 Before committing, ensure:
 
 - [ ] Model extends `App\Models\Base`
-- [ ] UUID primary key (not auto-increment)
+- [ ] Dual-key pattern: `$table->id()` + `$table->uuid('uuid')->index()`
 - [ ] Multi-tenant models have `organization_id`
 - [ ] Soft deletes for user-facing models
 - [ ] All status/type fields use enums
@@ -731,14 +734,14 @@ php artisan seed:dev          # Seed dev data only
 
 ### Common Pitfalls to Avoid
 
-1. **Not using Base model** → Missing UUID, auditing, media
+1. **Not using Base model** → Missing dual-key pattern (id + uuid), auditing, media
 2. **String status values** → Use enums for type safety
 3. **Missing organization_id** → Breaks multi-tenancy
 4. **No soft deletes** → Data loss on accidental delete
 5. **Controller validation** → Use Form Requests
 6. **Missing return types** → Relationships need types
 7. **Raw SQL queries** → Use Eloquent/Query Builder
-8. **Auto-increment IDs** → Use UUID primary keys
+8. **UUID-only primary keys** → Use dual-key pattern: `$table->id()` + `$table->uuid('uuid')->index()`
 
 ## Summary
 

@@ -11,7 +11,7 @@ structure with pre-configured packages and conventions.
 - **Framework**: Laravel 12+ with PHP 8.4+
 - **Frontend**: Livewire 4 + TailwindCSS v4 + Alpine.js
 - **Testing**: Pest PHP (not PHPUnit syntax)
-- **Database**: MySQL with UUID primary keys
+- **Database**: MySQL with dual-key pattern (auto-increment `id` for internal relations + `uuid` column for public-facing identifiers)
 
 ## Common Commands
 
@@ -54,7 +54,7 @@ use App\Models\Base as Model;
 
 class Product extends Model
 {
-    // UUID primary keys - automatic
+    // Auto-increment id (internal) + uuid column (public-facing) - automatic
     // Auditing - automatic
     // Media support - automatic
 }
@@ -62,7 +62,7 @@ class Product extends Model
 
 The Base model provides:
 
-- UUID primary keys (`InteractsWithUuid`)
+- Dual-key pattern: auto-increment `id` + auto-generated `uuid` column (`InteractsWithUuid`)
 - Auditing via owen-it/laravel-auditing
 - Media attachments via Spatie Media Library
 - User tracking (created_by, updated_by)
@@ -70,7 +70,7 @@ The Base model provides:
 
 ### Database Conventions
 
-- **Primary keys**: Always UUID (`$table->uuid('id')->primary()`)
+- **Primary keys**: Auto-increment `id` for internal DB relations + `uuid` column for public-facing identifiers (`$table->id()` + `$table->uuid('uuid')->index()`)
 - **Soft deletes**: Use for all user-facing models
 - **Column naming**: snake_case
 - **Credentials columns**: Always cast with `encrypted:array` (not manual `encrypt()`)
@@ -356,7 +356,7 @@ Mail::send('emails.order', $data, function ($message) { ... });
 ### DO
 
 - Extend `App\Models\Base` for all models
-- Use UUID primary keys
+- Use dual-key pattern: auto-increment `id` (internal) + `uuid` column (public-facing, URLs, APIs)
 - Use enums for status/type fields with `Enum` contract and `InteractsWithEnum` trait
 - Use Pest syntax for tests
 - Use policies for authorization
@@ -370,7 +370,7 @@ Mail::send('emails.order', $data, function ($message) { ... });
 ### DON'T
 
 - Extend `Illuminate\Database\Eloquent\Model` directly
-- Use auto-increment IDs
+- Expose auto-increment `id` in URLs or APIs — use `uuid` for public-facing identifiers
 - Use `url()` helper — use `route()` instead
 - Use `dd()`, `dump()` in production code
 - Use raw SQL queries — use Eloquent

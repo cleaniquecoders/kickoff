@@ -220,7 +220,8 @@ curl -X GET "https://api.example.com/api/{resources}?search=term&per_page=20" \
 
 | Column | Type | Nullable | Default | Description |
 |--------|------|----------|---------|-------------|
-| `uuid` | UUID | No | - | Primary key |
+| `id` | BIGINT | No | Auto | Internal primary key |
+| `uuid` | UUID | No | Auto | Public-facing identifier |
 | `name` | VARCHAR(255) | No | - | {Resource} name |
 | `status` | ENUM | No | 'active' | {Resource} status |
 | `meta` | JSON | Yes | NULL | Additional metadata |
@@ -232,7 +233,8 @@ curl -X GET "https://api.example.com/api/{resources}?search=term&per_page=20" \
 
 | Name | Type | Columns | Description |
 |------|------|---------|-------------|
-| `{resources}_pkey` | PRIMARY | `uuid` | Primary key |
+| `{resources}_pkey` | PRIMARY | `id` | Primary key |
+| `{resources}_uuid_index` | INDEX | `uuid` | Public identifier lookup |
 | `{resources}_status_created_at_index` | COMPOSITE | `status, created_at` | Query optimization |
 | `{resources}_name_index` | INDEX | `name` | Search optimization |
 
@@ -486,7 +488,7 @@ This Laravel application follows the CleaniqueCoders Kickoff template architectu
 ## Architecture Patterns
 
 ### 1. Model-View-Controller (MVC)
-- **Models**: Extend `App\Models\Base` for UUID support and common functionality
+- **Models**: Extend `App\Models\Base` for dual-key pattern (id + uuid) and common functionality
 - **Views**: Blade templates with reusable components
 - **Controllers**: Thin controllers that delegate to Actions and Services
 
@@ -528,14 +530,14 @@ tests/              # Pest PHP tests
 ## Database Design
 
 ### Core Principles
-- **UUID Primary Keys**: All models use UUIDs instead of auto-increment
+- **Dual-Key Pattern**: All models use auto-increment `id` (internal) + `uuid` column (public-facing)
 - **Soft Deletes**: User-facing data uses soft deletes
 - **Auditing**: Changes tracked via `owen-it/laravel-auditing`
 - **Media Management**: Files handled by Spatie Media Library
 
 ### Base Model Features
 All models extend `App\Models\Base` which provides:
-- UUID primary key generation
+- Dual-key pattern: auto-increment `id` + auto-generated `uuid` column (`InteractsWithUuid`)
 - Audit trail logging
 - Media attachment capabilities
 - Meta data storage (JSON field)

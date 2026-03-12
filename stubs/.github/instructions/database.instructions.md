@@ -7,7 +7,7 @@ This document defines the database design principles, naming conventions, and ba
 
 ## Core principles
 
-- UUID everywhere: All primary keys are ULIDs/UUIDs provided by `App\Models\Base` (via Traitify InteractsWithUuid). No auto-increment IDs in public APIs.
+- Dual-key pattern: All tables use auto-increment `id` for internal DB relations + a `uuid` column (indexed) for public-facing identifiers, provided by `App\Models\Base` (via Traitify `InteractsWithUuid`). Never expose auto-increment IDs in public APIs — use `uuid` instead.
 - Soft deletes by default: Add `deleted_at` to all user-facing tables. Use Laravel's `SoftDeletes`.
 - Ownership & authz: Enforce access via policies and Spatie Permissions; never rely only on foreign keys.
 - Money is integer: Store prices/amounts in minor units (e.g., cents) as `bigInteger` to avoid float errors. Currency code (ISO 4217) as string(3).
@@ -20,7 +20,8 @@ This document defines the database design principles, naming conventions, and ba
 
 ## Standard columns
 
-- id (uuid, pk)
+- id (auto-increment int, pk)
+- uuid (uuid, indexed, public-facing identifier)
 - created_at, updated_at (timestampsTz)
 - deleted_at (soft deletes)
 - meta (json, nullable)
@@ -59,7 +60,7 @@ Already present (baseline): users, permissions/roles (Spatie), audits, authentic
 
 ## Migration authoring checklist
 
-- Create table with UUID pk, timestampsTz, soft deletes when applicable.
+- Create table with `$table->id()` + `$table->uuid('uuid')->index()`, timestampsTz, soft deletes when applicable.
 - Define enums as string columns and validate via PHP enums in code.
 - Add necessary unique constraints and indexes.
 - Include `meta` JSON when future-proofing is needed (but avoid overuse).

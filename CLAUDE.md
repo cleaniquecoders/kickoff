@@ -184,7 +184,7 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 **Custom Stubs** (`stubs/stubs/`):
 
 - `model.stub`: Extends `App\Models\Base` (not Eloquent Model)
-- `migration.create.stub`: UUID primary keys
+- `migration.create.stub`: Dual-key pattern (auto-increment `id` + `uuid` column)
 - `pest.stub`: Pest syntax for tests
 - `policy.stub`: Standard policy methods
 - `enum.stub`: Enum with `InteractsWithEnum` trait and `Enum` contract
@@ -284,7 +284,7 @@ Projects created with `kickoff start` receive:
 
 - Laravel 12+, PHP 8.4+
 - 15+ packages: Spatie (permission, media, settings, activity log), Laravel (Sanctum, Horizon, Telescope), Livewire Flux
-- Custom Base model with UUIDs, auditing, media support
+- Custom Base model with dual-key pattern (id + uuid), auditing, media support
 - Helper functions organized by domain
 
 **Frontend**:

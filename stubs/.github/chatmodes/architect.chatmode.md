@@ -89,7 +89,7 @@ interface ProductRepositoryInterface
 ### Database Architecture
 
 **Table Design Principles:**
-- UUID primary keys for all user-facing entities
+- Dual-key pattern: auto-increment `id` (internal) + `uuid` column (public-facing) for all entities
 - Soft deletes for data retention
 - Proper indexing for query performance
 - Foreign key constraints for data integrity
@@ -97,23 +97,25 @@ interface ProductRepositoryInterface
 ```sql
 -- Example: Well-designed product table
 CREATE TABLE products (
-    uuid CHAR(36) PRIMARY KEY,
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    uuid CHAR(36) NOT NULL,
     name VARCHAR(255) NOT NULL,
     price DECIMAL(10,2) UNSIGNED NOT NULL,
-    category_id CHAR(36) NOT NULL,
-    user_id CHAR(36) NOT NULL,
+    category_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
     status ENUM('active', 'inactive') DEFAULT 'active',
     meta JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
 
+    INDEX idx_products_uuid (uuid),
     INDEX idx_products_category_status (category_id, status),
     INDEX idx_products_user_created (user_id, created_at),
     INDEX idx_products_name_search (name),
 
-    FOREIGN KEY (category_id) REFERENCES categories(uuid) ON DELETE RESTRICT,
-    FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE RESTRICT
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
 ```
 
@@ -393,7 +395,7 @@ class ProductController extends Controller
 ## Best Practices Summary
 
 ### Do's ✅
-- Use UUIDs for all public identifiers
+- Use dual-key pattern: auto-increment `id` (internal) + `uuid` column for all public identifiers
 - Implement proper authorization at every layer
 - Cache expensive operations strategically
 - Write tests for all business logic
@@ -403,7 +405,7 @@ class ProductController extends Controller
 
 ### Don'ts ❌
 - Don't put business logic in controllers
-- Don't use auto-increment IDs for public APIs
+- Don't expose auto-increment `id` in URLs or APIs — use `uuid` for public-facing identifiers
 - Don't skip authorization checks
 - Don't ignore database indexing
 - Don't mix presentation with business logic

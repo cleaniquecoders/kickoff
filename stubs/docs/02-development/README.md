@@ -8,7 +8,7 @@ This project is built with:
 
 - **Backend**: Laravel 12+, PHP 8.4+
 - **Frontend**: Livewire 3, Alpine.js, TailwindCSS v4
-- **Database**: MySQL with UUID primary keys
+- **Database**: MySQL with dual-key pattern (auto-increment `id` + `uuid` column)
 - **Real-time**: Laravel Echo, WebSockets
 - **Admin**: Livewire Flux components
 
@@ -72,7 +72,7 @@ vendor/bin/pest --coverage
 ### Models
 
 - Extend `App\Models\Base` (not Eloquent Model)
-- Use UUID primary keys
+- Use dual-key pattern: auto-increment `id` (internal) + `uuid` column (public-facing)
 - Include audit trails and soft deletes
 - Follow naming: `User`, `BlogPost`, `OrderItem`
 

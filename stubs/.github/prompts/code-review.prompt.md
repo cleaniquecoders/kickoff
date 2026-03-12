@@ -26,7 +26,7 @@ Ask the user what to review:
 
 **✅ Check:**
 - Models extend `App\Models\Base` (never raw Eloquent)
-- UUIDs used as primary keys (not auto-increment)
+- Dual-key pattern used: auto-increment `id` (internal) + `uuid` column (public-facing)
 - Proper use of traits and contracts
 - Single Responsibility Principle followed
 - Dependency injection used correctly
@@ -40,9 +40,9 @@ class Product extends \Illuminate\Database\Eloquent\Model
     // ...
 }
 
-// ❌ BAD: Auto-increment ID
+// ❌ BAD: Missing uuid column
 Schema::create('products', function (Blueprint $table) {
-    $table->id(); // Should be UUID
+    $table->id(); // Missing $table->uuid('uuid')->index()
 });
 
 // ❌ BAD: Fat controller
@@ -63,10 +63,10 @@ class Product extends App\Models\Base
     // UUID, auditing, media automatically included
 }
 
-// ✅ GOOD: UUID primary key
+// ✅ GOOD: Dual-key pattern (auto-increment id + uuid column)
 Schema::create('products', function (Blueprint $table) {
-    $table->uuid('uuid')->primary();
-    // Base migration handles this
+    $table->id();                      // Auto-increment for internal DB joins
+    $table->uuid('uuid')->index();     // UUID for public-facing identifiers
 });
 
 // ✅ GOOD: Thin controller with Action
@@ -375,7 +375,7 @@ public function updateStock(string $productId, int $quantity): Product
 
 **Migration Quality:**
 ```php
-// ❌ BAD: Missing constraints and indexes
+// ❌ BAD: Missing uuid column and constraints
 Schema::create('products', function (Blueprint $table) {
     $table->id();
     $table->string('name');
@@ -383,21 +383,17 @@ Schema::create('products', function (Blueprint $table) {
     $table->timestamps();
 });
 
-// ✅ GOOD: Proper constraints and indexes
+// ✅ GOOD: Dual-key pattern with proper constraints and indexes
 Schema::create('products', function (Blueprint $table) {
-    $table->uuid('uuid')->primary();
+    $table->id();                      // Auto-increment for internal DB joins
+    $table->uuid('uuid')->index();     // UUID for public-facing identifiers
     $table->string('name');
     $table->decimal('price', 10, 2)->unsigned();
-    $table->uuid('category_id');
+    $table->foreignId('category_id')->constrained();
     $table->enum('status', ['active', 'inactive'])->default('active');
     $table->json('meta')->nullable();
     $table->timestampsTz();
     $table->softDeletesTz();
-
-    // Foreign keys
-    $table->foreign('category_id')
-          ->references('uuid')->on('categories')
-          ->onDelete('restrict');
 
     // Indexes
     $table->index(['status', 'created_at']);
@@ -469,7 +465,7 @@ class Product extends Base
 
 ### 🏗️ Architecture
 - [ ] Models extend Base
-- [ ] UUIDs used correctly
+- [ ] Dual-key pattern used (id + uuid)
 - [ ] Single responsibility
 
 ## Detailed Comments
@@ -545,8 +541,8 @@ class Product extends Model // Should extend App\Models\Base
 {
 }
 
-// ❌ Auto-increment IDs
-protected $keyType = 'int'; // Should use UUIDs
+// ❌ Missing dual-key pattern
+// Not extending Base means no auto uuid column for public identifiers
 
 // ❌ Fat Model
 class Product extends Base

@@ -30,7 +30,7 @@ This project follows Laravel best practices with additional opinionated standard
 
 ### Database Conventions
 
-- **Primary Keys**: UUIDs (not auto-incrementing integers)
+- **Primary Keys**: Dual-key pattern — auto-increment `id` (internal DB joins) + `uuid` column (public-facing identifiers)
 - **Base Model**: Extend `App\Models\Base` for auditing and media support
 - **Migrations**: Use descriptive names with timestamps
 - **Relationships**: Define in models with type hints
@@ -108,7 +108,7 @@ composer test-coverage
 Located in `stubs/`:
 
 - `model.stub` - Extends `App\Models\Base`
-- `migration.create.stub` - UUID primary keys
+- `migration.create.stub` - Dual-key pattern (id + uuid)
 - `pest.stub` - Pest test syntax
 - `policy.stub` - Standard policy methods
 
@@ -131,12 +131,12 @@ Utility scripts in `bin/`:
 
 ## Architectural Decisions
 
-### Why UUIDs?
+### Why Dual-Key Pattern (id + uuid)?
 
-- No sequential ID guessing
+- Auto-increment `id` for fast internal DB joins and indexing
+- `uuid` column for public-facing identifiers (URLs, APIs) — no sequential ID guessing
 - Distributed system friendly
-- Merge conflicts reduced
-- Better for public APIs
+- Better security for public APIs
 
 ### Why Extend Base Model?
 

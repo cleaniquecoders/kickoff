@@ -98,10 +98,10 @@ it('generates a slug from name', function () {
     expect($product->slug)->toBe('test-product');
 });
 
-it('has uuid as primary key', function () {
+it('has dual-key pattern with id and uuid', function () {
     $product = Product::factory()->create();
 
-    expect($product->getKeyName())->toBe('uuid');
+    expect($product->id)->toBeInt();
     expect($product->uuid)->toBeString();
 });
 

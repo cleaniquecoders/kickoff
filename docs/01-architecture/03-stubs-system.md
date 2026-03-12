@@ -172,7 +172,7 @@ composer update
 // Extends App\Models\Base instead of Eloquent Model
 class {{ class }} extends Base
 {
-    // UUID primary keys by default
+    // Dual-key pattern: auto-increment id + uuid column
     // Auditing enabled
     // Media library support
 }
@@ -181,8 +181,9 @@ class {{ class }} extends Base
 **migration.create.stub**:
 
 ```php
-// UUID primary keys
-$table->uuid('id')->primary();
+// Dual-key pattern: auto-increment id for internal DB joins + uuid for public identifiers
+$table->id();
+$table->uuid('uuid')->index();
 ```
 
 **pest.stub**:
@@ -246,7 +247,7 @@ All helpers wrapped in `function_exists()` checks.
 Comprehensive guide for AI assistants working with generated projects:
 
 - Laravel conventions
-- Model architecture (Base model with UUIDs, auditing)
+- Model architecture (Base model with dual-key pattern, auditing)
 - Livewire component patterns
 - Route organization
 - Testing strategies

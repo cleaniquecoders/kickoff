@@ -228,10 +228,11 @@ class {ModelName}Policy
 
 ## Migration Standards
 
-Use UUID primary keys and follow project conventions:
+Use the dual-key pattern and follow project conventions:
 ```php
 Schema::create('{table}', function (Blueprint $table) {
-    $table->uuid('uuid')->primary();
+    $table->id();                      // Auto-increment for internal DB joins
+    $table->uuid('uuid')->index();     // UUID for public-facing identifiers
     $table->string('name');
     // Add other fields
     $table->timestampsTz();
@@ -371,7 +372,7 @@ Before completing generation:
 - [ ] Form requests handle validation
 - [ ] Policies implement all required methods
 - [ ] Tests cover happy path and edge cases
-- [ ] Migrations use UUID primary keys
+- [ ] Migrations use dual-key pattern (id + uuid)
 - [ ] Routes follow RESTful conventions
 - [ ] Views use Blade components
 - [ ] All files follow naming conventions
