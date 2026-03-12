@@ -2,7 +2,7 @@
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-function step(string $message, callable $callback, OutputInterface $output, bool $verbose = false): void
+function step(string $message, callable $callback, OutputInterface $output, bool $verbose = false, bool $critical = true): void
 {
     $output->write("⏳ $message...");
     try {
@@ -16,6 +16,9 @@ function step(string $message, callable $callback, OutputInterface $output, bool
         $output->writeln("<error>{$e->getMessage()}</error>");
         if ($verbose && $e->getTraceAsString()) {
             $output->writeln("<comment>Trace:</comment> {$e->getTraceAsString()}");
+        }
+        if ($critical) {
+            throw $e;
         }
     }
 }
