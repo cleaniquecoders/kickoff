@@ -88,6 +88,14 @@ function putFile(string $path, string $content): void
 function gitCommit(string $message, bool $verbose = false): void
 {
     runCommand('git add -A', $verbose);
+
+    // Check if there are staged changes before committing
+    exec('git diff --cached --quiet 2>&1', $output, $exitCode);
+    if ($exitCode === 0) {
+        // Nothing staged — skip commit silently
+        return;
+    }
+
     runCommand('git commit -m "'.addslashes($message).'"', $verbose);
 }
 
@@ -112,6 +120,8 @@ function copyRecursively(string $src, string $dst, bool $verbose = false, ?Outpu
             }
         } else {
             copy($item->getPathname(), $targetPath);
+            // Preserve file permissions (especially executable bit for bin/ scripts)
+            chmod($targetPath, $item->getPerms() & 0777);
             if ($verbose && $output) {
                 $output->writeln("<info>Copied file:</info> {$item->getPathname()} to $targetPath");
             }
