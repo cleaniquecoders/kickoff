@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Lab404\Impersonate\Models\Impersonate;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
@@ -34,6 +35,7 @@ class User extends Authenticatable implements AuditableContract, HasMedia, MustV
     use InteractsWithUuid;
     use Notifiable;
     use SoftDeletes;
+    use TwoFactorAuthenticatable;
 
     protected $fillable = [
         'name', 'email', 'password', 'uuid',
