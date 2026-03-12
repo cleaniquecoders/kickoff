@@ -187,17 +187,35 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 - `migration.create.stub`: UUID primary keys
 - `pest.stub`: Pest syntax for tests
 - `policy.stub`: Standard policy methods
+- `enum.stub`: Enum with `InteractsWithEnum` trait and `Enum` contract
+- `helper.stub`: Helper function template
 
 **Helper Functions** (`stubs/support/`):
 
-- Organized by domain: `user.php`, `flash.php`, `media.php`, `menu.php`, etc.
-- Auto-loaded via `support/helpers.php`
+- Organized by domain: `user.php`, `flash.php`, `media.php`, `menu.php`, `toast.php`, etc.
+- 16 domain-specific files auto-loaded via `support/helpers.php`
 
-**GitHub Copilot Instructions**:
+**AI Coding Instructions**:
 
-- `stubs/.github/copilot-instructions.md`: Comprehensive guide for generated Laravel projects
-- Contains conventions for Models, Livewire, routes, testing, etc.
-- This file is copied to all generated projects
+- `stubs/CLAUDE.md`: Primary conventions guide for generated projects — models, enums, Livewire patterns, gotchas, DO/DON'T rules. This is the most critical file for AI-assisted development in generated projects.
+- `stubs/.claude/settings.local.json`: Claude Code local settings for generated projects
+- `stubs/.github/copilot-instructions.md`: GitHub Copilot guide (models, Livewire, routes, testing)
+
+**GitHub Resources** (`stubs/.github/`):
+
+- `workflows/`: CI pipelines (run-tests, lint, rector, update-changelog)
+- `instructions/`: 7 coding instruction files (performance, backend, frontend, code-review, database, security, testing)
+- `prompts/`: 8 Claude prompts (uat, setup-component, gen-docs, debug-issue, refactor-code, write-tests, code-review)
+- `chatmodes/`: Claude chat modes (architect, reviewer, debugger)
+- `ISSUE_TEMPLATE/`: Bug report and feature request templates
+- `pull_request_template.md`: PR template
+
+**Documentation** (`stubs/docs/`):
+
+- `01-getting-started/`: Installation, setup, Docker
+- `02-development/`: 13 development guides (database, Livewire, API, commands, datatable, access control, upload, secure files, sidebar, toast notifications)
+- `03-architecture/`: Code quality guide
+- `04-deployment/`: Deployment guide
 
 ## Modifying Kickoff Behavior
 
@@ -272,7 +290,7 @@ Projects created with `kickoff start` receive:
 **Frontend**:
 
 - Vite + TailwindCSS v4
-- Livewire 3 + Alpine.js
+- Livewire 4 + Alpine.js
 - Blade Lucide Icons
 - Tippy.js for tooltips
 
@@ -283,4 +301,5 @@ Projects created with `kickoff start` receive:
 - Deployment scripts in `bin/`
 - Architecture tests using Pest Arch
 
-See `stubs/.github/copilot-instructions.md` for complete generated project conventions.
+See `stubs/CLAUDE.md` for the complete generated project conventions (primary source of truth),
+and `stubs/.github/copilot-instructions.md` for GitHub Copilot-specific guidance.

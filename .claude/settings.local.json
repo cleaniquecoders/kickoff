@@ -2,22 +2,29 @@
   "permissions": {
     "allow": [
       "Bash(command -v:*)",
+      "Bash(composer:*)",
+      "Bash(curl:*)",
+      "Bash(docker:*)",
+      "Bash(find:*)",
+      "Bash(gh:*)",
+      "Bash(git:*)",
+      "Bash(grep:*)",
+      "Bash(laravel new:*)",
+      "Bash(ls:*)",
       "Bash(markdownlint:*)",
+      "Bash(mkdir:*)",
+      "Bash(php artisan:*)",
       "Bash(tree:*)",
       "Bash(wc:*)",
-      "Bash(php artisan tinker:*)",
-      "Bash(ls:*)",
-      "Bash(grep:*)",
-      "Bash(composer test:*)",
-      "Bash(composer analyse:*)",
-      "Bash(composer lint:*)",
-      "Bash(find:*)",
+      "Bash(bash:*)",
+      "Bash(bin/*:*)",
+      "Bash(./bin/*:*)",
+      "Bash(vendor/bin/*:*)",
+      "Bash(./vendor/bin/*:*)",
       "Skill(docs)",
-      "Bash(php artisan:*)",
-      "Bash(git:*)",
-      "Bash(gh release:*)",
-      "Bash(laravel new:*)",
-      "Bash(bash:*)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:packagist.org)",
+      "WebSearch"
     ]
   }
 }
