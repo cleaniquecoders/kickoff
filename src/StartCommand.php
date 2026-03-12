@@ -67,7 +67,9 @@ class StartCommand extends Command
             }
         }
 
-        $this->validateProject($output);
+        if (! $this->validateProject($output)) {
+            return Command::FAILURE;
+        }
 
         $output->writeln("\n🎉 Let's kickoff your <info>$projectOwner/$projectName</info> now!\n");
 
@@ -95,12 +97,15 @@ class StartCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function validateProject(OutputInterface $output)
+    private function validateProject(OutputInterface $output): bool
     {
         if (! file_exists($filePath = $this->getProjectPath().'/artisan')) {
             $output->writeln("<error>Missing required file: $filePath. Not a valid Laravel project.</error>");
-            exit(Command::FAILURE);
+
+            return false;
         }
+
+        return true;
     }
 
     private function createLaravelProject(OutputInterface $output, string $projectPath, string $projectName, bool $verbose): bool
