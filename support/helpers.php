@@ -47,13 +47,20 @@ function runCommand(string $cmd, bool $verbose = false): void
  */
 function installPackages(array $require, array $requireDev, string $path, bool $verbose = false): void
 {
+    $workingDir = "--working-dir=".escapeshellarg($path);
+    $lockFile = $path.'/composer.lock';
+
     if ($require) {
-        runCommand('rm composer.lock');
-        runCommand('composer require '.implode(' ', $require), $verbose);
+        if (file_exists($lockFile)) {
+            @unlink($lockFile);
+        }
+        runCommand("composer require $workingDir ".implode(' ', $require), $verbose);
     }
     if ($requireDev) {
-        runCommand('rm composer.lock');
-        runCommand('composer require --dev '.implode(' ', $requireDev), $verbose);
+        if (file_exists($lockFile)) {
+            @unlink($lockFile);
+        }
+        runCommand("composer require --dev $workingDir ".implode(' ', $requireDev), $verbose);
     }
 }
 
