@@ -266,6 +266,39 @@ private function myNewStep(OutputInterface $output, bool $verbose)
 }
 ```
 
+## Failure Behavior & Debugging
+
+### Error Handling
+
+- `step()` wraps each phase with loading indicators. **Critical steps** (default) re-throw exceptions and halt execution. Non-critical steps log the error and continue.
+- `runCommand()` checks exit codes — any non-zero exit throws `RuntimeException` with the failed command and output.
+- `validateProject()` returns `false` if target is not a valid Laravel project (no `artisan` file), causing `Command::FAILURE`.
+
+### Debugging Failed Runs
+
+Use verbose flags to see full output from each step:
+
+```bash
+# Show command output
+kickoff start owner project-name -v
+
+# Show detailed debug info
+kickoff start owner project-name -vvv
+```
+
+Common failure points:
+- **Package installation**: Composer version conflicts — check output with `-v`
+- **Laravel creation**: Missing `laravel` installer — `composer global require laravel/installer`
+- **NPM install**: Node version mismatch or network issues
+- **Vendor publish**: Package not installed or provider class changed
+
+### Recovery
+
+If a run fails midway, the project directory still exists with partial setup. You can:
+1. Fix the issue (e.g., install missing dependency)
+2. Re-run `kickoff start` — it will skip Laravel creation if `artisan` exists
+3. Or delete the directory and start fresh
+
 ## Important Gotchas
 
 1. **Testing Framework**: The package uses PHPUnit (not Pest) - Pest is for generated projects only
