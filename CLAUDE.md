@@ -334,6 +334,14 @@ Projects created with `kickoff start` receive:
 - Deployment scripts in `bin/`
 - Architecture tests using Pest Arch
 
+**UI Requirements (enforced in generated projects)**:
+
+- All pages MUST be fully responsive (mobile, tablet, desktop) using Tailwind `sm:`, `md:`, `lg:` breakpoints
+- All pages MUST support dark mode (`dark:` variants for custom elements; Flux UI handles it automatically)
+- Data tables: max 5 visible columns (excluding actions) — combine related columns if more
+- Action buttons in tables: always use 3-dot dropdown menu (`<flux:dropdown>` with ellipsis icon), never inline buttons
+- Icons: use Lucide icons (NOT Heroicons) — import with `php artisan flux:icon <name>`, use plain name in Flux components (e.g., `icon="pencil"`), `lucide-` prefix only for `@svg()` Blade directive
+
 See `stubs/CLAUDE.md` for the complete generated project conventions (primary source of truth),
 and `stubs/.github/copilot-instructions.md` for GitHub Copilot-specific guidance.
 

@@ -353,6 +353,50 @@ Mail::send('emails.order', $data, function ($message) { ... });
 
 ## Important Conventions
 
+### UI Requirements — MUST HAVE
+
+- **Responsive**: All pages MUST be fully responsive (mobile, tablet, desktop). Use Tailwind responsive prefixes (`sm:`, `md:`, `lg:`) consistently.
+- **Dark mode**: All pages MUST support dark mode. Use `dark:` variants for all custom styling. Flux UI components handle this automatically — only add `dark:` for custom HTML/Tailwind elements.
+- **Data tables — max 5 visible columns** (excluding actions). If a model has more than 5 displayable columns, combine related columns into a single column (e.g., "Name + Email" in one cell, "Created + Updated" in one cell). Never render wide, horizontally-scrolling tables.
+- **Action buttons — always use 3-dot menu** (`...` / ellipsis / kebab menu). Never render inline action buttons (Edit, Delete, View) as separate buttons in table rows. Always group actions behind a `<flux:dropdown>` triggered by a 3-dot icon button.
+
+```blade
+{{-- Action column pattern (import icons first: php artisan flux:icon ellipsis eye pencil trash-2) --}}
+<flux:dropdown>
+    <flux:button variant="ghost" size="sm" icon="ellipsis" />
+    <flux:menu>
+        <flux:menu.item icon="eye" href="{{ route('products.show', $product) }}">View</flux:menu.item>
+        <flux:menu.item icon="pencil" href="{{ route('products.edit', $product) }}">Edit</flux:menu.item>
+        <flux:menu.item icon="trash-2" variant="danger" wire:click="delete({{ $product->id }})">Delete</flux:menu.item>
+    </flux:menu>
+</flux:dropdown>
+```
+
+### Icons — Lucide via Flux (NOT Heroicons)
+
+This project uses **Lucide icons** imported via Flux's built-in command, NOT Heroicons. When you need an icon beyond Flux's bundled Heroicons, import from Lucide.
+
+**Before using any icon**, confirm it exists in [Lucide's icon set](https://lucide.dev/icons) and import it:
+
+```bash
+# Import Lucide icons (no prefix needed — just the icon name)
+php artisan flux:icon pencil trash-2 eye ellipsis plus
+```
+
+**Usage in Blade** (no `lucide-` prefix — use the plain icon name after import):
+
+```blade
+{{-- Flux components --}}
+<flux:icon.crown />
+<flux:button icon="pencil">Edit</flux:button>
+<flux:button icon="ellipsis" variant="ghost" size="sm" />
+
+{{-- Standalone via blade-lucide-icons package --}}
+@svg('lucide-eye', 'w-4 h-4')
+```
+
+> **Gotcha:** Flux's `php artisan flux:icon` imports Lucide icons so they work with the **same syntax** as Heroicons — just `icon="pencil"`, NOT `icon="lucide-pencil"`. The `lucide-` prefix is only needed when using the `@svg()` Blade directive from `mallardduck/blade-lucide-icons`. If a Flux component renders a blank/missing icon, you likely forgot to run `php artisan flux:icon <name>`.
+
 ### DO
 
 - Extend `App\Models\Base` for all models
@@ -366,6 +410,12 @@ Mail::send('emails.order', $data, function ($message) { ... });
 - Use `$this->dispatch('toast', ...)` for user feedback notifications
 - Add `cursor-pointer` class to clickable buttons (TailwindCSS v4 default)
 - Register new queue names in `config/horizon.php` supervisor queue list
+- Import Lucide icons with `php artisan flux:icon <name>` before using them in Flux components
+- Confirm icon exists in Lucide's icon set before importing
+- Make all pages responsive (mobile-first with `sm:`, `md:`, `lg:` breakpoints)
+- Support dark mode on all pages (use `dark:` variants for custom elements)
+- Use 3-dot dropdown menu for row actions in data tables
+- Combine columns when table has more than 5 data columns (excluding actions)
 
 ### DON'T
 
@@ -379,6 +429,11 @@ Mail::send('emails.order', $data, function ($message) { ... });
 - Expose `APP_ENV`, `APP_DEBUG`, or SMTP credentials in admin UI
 - Use `Mail::send()` in Livewire — use queued Mailables instead
 - Use `encrypt()` manually when model has `encrypted:array` cast (double-encryption)
+- Render inline action buttons (Edit, Delete, View) in table rows — use 3-dot dropdown menu
+- Create tables with more than 5 visible data columns — combine related columns instead
+- Skip responsive design or dark mode support on any page
+- Use Heroicon-specific names (e.g., `pencil-square`) — use Lucide equivalents (e.g., `pencil`) instead
+- Use icons without importing them first via `php artisan flux:icon <name>`
 
 ## Release Workflow
 

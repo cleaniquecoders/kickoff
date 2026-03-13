@@ -328,6 +328,7 @@ class StartCommand extends Command
                 'barryvdh/laravel-debugbar',
                 'cleaniquecoders/laravel-db-doc',
                 'driftingly/rector-laravel',
+                'laravel/boost',
                 'larastan/larastan',
                 'pestphp/pest-plugin-arch',
             ];
@@ -360,6 +361,10 @@ class StartCommand extends Command
             foreach ($options as $option) {
                 runCommand("php artisan vendor:publish {$option}", $verbose);
             }
+        }, $output, $verbose);
+
+        step('Installing Laravel Boost', function () use ($verbose) {
+            runCommand('php artisan boost:install', $verbose);
         }, $output, $verbose);
 
         if (! $skipNpm) {
