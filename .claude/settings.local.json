@@ -28,7 +28,8 @@
       "Skill(docs)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:packagist.org)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:fluxui.dev)"
     ]
   }
 }
