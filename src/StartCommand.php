@@ -85,27 +85,19 @@ class StartCommand extends Command
         $output->writeln("\n🎉 Let's kickoff your <info>$projectOwner/$projectName</info> now!\n");
 
         $this->copyStubs($output, $verbose);
-        gitCommit('Copy application stubs', $verbose);
-
         $this->setupComposer($output, $verbose);
-        gitCommit('Update composer.json configuration', $verbose);
-
         $this->setupProjectName($output, $verbose);
-        gitCommit('Update project name placeholders', $verbose);
-
         $this->setupEnvironmentFile($output, $verbose);
-        gitCommit('Setup environment file', $verbose);
 
         if (! $skipPackages) {
             $this->installPackages($output, $verbose, $skipNpm);
-            gitCommit('Install packages and dependencies', $verbose);
         } else {
             $output->writeln("\n⏭️  Skipping package installation (--skip-packages)\n");
         }
 
         $this->runTasks($output, $verbose);
         $this->restoreGitIgnoreFiles($output, $verbose);
-        gitCommit('Build application and run tasks', $verbose);
+        gitCommit('Kickoff project setup', $verbose);
 
         $output->writeln("\n🎉 Project setup completed successfully!\n");
 
