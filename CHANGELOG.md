@@ -2,6 +2,42 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.9.0 - 2026-03-13
+
+### What's Changed
+
+#### Bug Fixes
+
+- Fix `.env.example` placeholder typo — `{OWNER}` missing `$` sign (#7)
+- Remove dead Alert/Confirm components that depend on missing `<x-modal>` (#8)
+- Replace `exit()` with proper `return Command::FAILURE` in `validateProject()` (#10)
+- Re-throw exceptions in `step()` for critical steps (#11)
+- Check exit codes in `runCommand()` and throw on failure (#12)
+- Use `$path` parameter in `installPackages()` with `--working-dir` flag (#13)
+- Update Docker Compose — MySQL 8.4, Meilisearch v1.12, modern defaults (#15)
+- Fix `gitCommit()` to skip commit when no changes staged (#22)
+- Preserve executable permissions in `copyRecursively()` for bin/ scripts (#23)
+- Add `TwoFactorAuthenticatable` trait to stubs User model (#24)
+- Fix Logout action return type for Livewire compatibility (#25)
+- Add test overrides for starter kit compatibility (#26)
+
+#### Enhancements
+
+- Implement `toast()` helper with session flash (#16)
+- Add `--dry-run`, `--skip-packages`, `--skip-npm` options to StartCommand (#18, #19)
+- Improve package test coverage from 5 to 20 tests (#14)
+- Consolidate `gitCommit()` to single final commit — ensures `.gitignore` files are in correct state
+- Add `storage/debugbar/.gitignore` to stubs
+
+#### Documentation
+
+- Fix UUID documentation across 16 files to reflect dual int+UUID key pattern (#9)
+- Document failure behavior, debugging with `-v` flag, and recovery steps (#20)
+- Update CLAUDE.md with patterns from real projects, workflow conventions
+- Consolidate Claude Code settings
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.8.0...1.9.0
+
 ## 1.8.0 - 2026-03-02
 
 ### What's Changed
@@ -33,14 +69,19 @@ Replaced runtime `.env` file writes with **Spatie Laravel Settings** for the adm
 **Changes:**
 
 - Added `GeneralSettings`, `MailSettings`, `NotificationSettings` classes with settings migrations
+  
 - Settings UI now only exposes application-level settings:
+  
   - **General**: Site Name
   - **Email**: From Address, From Name
   - **Notifications**: Enabled toggle, Channel selection
   
 - Removed environment select, debug mode toggle, and SMTP credential fields from UI
+  
 - Deleted `env.php` helper (`update_env` / `update_env_multiple` no longer needed)
+  
 - Simplified notification config to static defaults (overridden at runtime by Spatie Settings)
+  
 
 **Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.6.0...1.7.0
 
@@ -110,7 +151,6 @@ This release adds full integration with the [`cleaniquecoders/media-manager`](ht
 - Tailwind CSS for card-like containers (replacing non-existent `flux:card`)
 - Standard HTML tables for list view
 #### Files Added
-
 | File | Description |
 |------|-------------|
 | `stubs/app/Actions/Builder/Menu/MediaManagement.php` | Media menu builder |
@@ -140,6 +180,7 @@ After updating to v1.5.1, run:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -525,6 +566,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -544,6 +586,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -583,6 +626,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -707,6 +751,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -716,6 +761,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -750,11 +796,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -785,11 +833,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -985,11 +1035,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1026,11 +1078,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
