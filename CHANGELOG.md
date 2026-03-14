@@ -2,6 +2,18 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.13.0 - 2026-03-14
+
+### What's Changed
+
+- **Impersonation UI**: Added impersonate action button in user management list (3-dot dropdown) and user detail page
+- **Impersonation banner**: Wired up the `<x-impersonating />` component in the sidebar layout — displays a red warning bar with "Leave Impersonation" link when active
+- **Icon fixes**: Replaced Heroicons with Lucide icons (`circle-alert`, `log-out`) in the impersonation banner
+- **Pre-bundled Flux icons**: Added `ellipsis`, `eye`, `user-check`, `circle-alert`, `arrow-left` icon files to stubs so generated projects don't need manual `php artisan flux:icon` imports
+- **Convention compliance**: User list now uses 3-dot dropdown menu for actions (per project convention)
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.12.0...1.13.0
+
 ## 1.12.0 - 2026-03-13
 
 ### What's Changed
@@ -194,7 +206,6 @@ This release adds full integration with the [`cleaniquecoders/media-manager`](ht
 | `stubs/config/access-control.php` | Added media permissions and administrator role_scope |
 | `stubs/app/Providers/AdminServiceProvider.php` | Added media management gates |
 #### Dependencies
-
 - Requires `cleaniquecoders/media-manager` ^1.0.1 (Livewire 4 compatible)
 
 #### Upgrade Notes
@@ -203,6 +214,7 @@ After updating to v1.5.1, run:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -596,6 +608,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -615,6 +628,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -658,6 +672,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -790,6 +805,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -799,6 +815,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -841,11 +858,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -884,11 +903,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1092,11 +1113,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1141,11 +1164,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
