@@ -5,9 +5,16 @@
                 <flux:heading size="xl">Manage User</flux:heading>
                 <flux:subheading>{{ $sub ?? 'Manage roles for user' }}</flux:subheading>
             </div>
-            <flux:button variant="ghost" icon="arrow-left" href="{{ route('security.users.index') }}" class="cursor-pointer">
-                Back
-            </flux:button>
+            <div class="flex items-center gap-2">
+                @if(auth()->user()->canImpersonate() && $user->canBeImpersonated() && auth()->id() !== $user->id)
+                    <flux:button variant="subtle" icon="user-check" :href="route('impersonate', $user->id)" class="cursor-pointer">
+                        Impersonate
+                    </flux:button>
+                @endif
+                <flux:button variant="ghost" icon="arrow-left" href="{{ route('security.users.index') }}" class="cursor-pointer">
+                    Back
+                </flux:button>
+            </div>
         </div>
 
         {{-- User Info Card --}}

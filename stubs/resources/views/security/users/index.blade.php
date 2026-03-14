@@ -81,9 +81,15 @@
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <flux:button size="sm" variant="ghost" :href="route('security.users.show', $user->uuid)" class="cursor-pointer">
-                                    Manage
-                                </flux:button>
+                                <flux:dropdown>
+                                    <flux:button variant="ghost" size="sm" icon="ellipsis" class="cursor-pointer" />
+                                    <flux:menu>
+                                        <flux:menu.item icon="eye" :href="route('security.users.show', $user->uuid)">Manage</flux:menu.item>
+                                        @if(auth()->user()->canImpersonate() && $user->canBeImpersonated() && auth()->id() !== $user->id)
+                                            <flux:menu.item icon="user-check" :href="route('impersonate', $user->id)">Impersonate</flux:menu.item>
+                                        @endif
+                                    </flux:menu>
+                                </flux:dropdown>
                             </td>
                         </tr>
                     @empty

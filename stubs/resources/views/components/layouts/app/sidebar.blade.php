@@ -49,6 +49,8 @@
             </flux:dropdown>
         </flux:header>
 
+        <x-impersonating />
+
         {{ $slot }}
 
         {{-- Toast Notifications --}}
