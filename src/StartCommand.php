@@ -227,7 +227,7 @@ class StartCommand extends Command
             ];
 
             putFile($composerFile, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            runCommand('composer dump-autoload --working-dir='.escapeshellarg($this->getProjectPath()), $verbose);
+            runCommand('composer dump-autoload --no-scripts --working-dir='.escapeshellarg($this->getProjectPath()), $verbose);
         }, $output, $verbose);
     }
 
