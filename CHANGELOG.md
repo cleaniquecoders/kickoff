@@ -2,6 +2,25 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.15.0 - 2026-03-30
+
+### Auto-configure Boost Third-Party Packages
+
+#### What's Changed
+
+- **Add `spatie/guidelines-skills`** to dev dependencies — provides Spatie coding conventions (laravel-php, javascript, version-control, security)
+- **Auto-register Boost third-party packages** — after `boost:install`, automatically writes the following packages to `boost.json` and runs `boost:update`:
+  - `barryvdh/laravel-debugbar` (guideline)
+  - `laravel/fortify` (skills)
+  - `spatie/guidelines-skills` (guidelines, skills)
+  - `spatie/laravel-medialibrary` (guidelines, skills)
+  - `spatie/laravel-permission` (skills)
+  
+
+This eliminates the interactive third-party selection prompt that was blocking automated project setup.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.14.2...1.15.0
+
 ## 1.14.2 - 2026-03-30
 
 ### Fix: Boost install fully non-interactive
@@ -266,7 +285,6 @@ php artisan reload:db
 ```
 This will seed the new media permissions for your roles.
 #### Verification
-
 1. Log in as superadmin
 2. Verify "Media" section appears in sidebar
 3. Click "Media Library" to access `/media-manager`
@@ -649,6 +667,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -668,6 +687,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -717,6 +737,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -861,6 +882,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -870,6 +892,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -924,11 +947,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -979,11 +1004,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1199,11 +1226,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1260,11 +1289,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
