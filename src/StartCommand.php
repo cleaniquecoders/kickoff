@@ -364,7 +364,7 @@ class StartCommand extends Command
         }, $output, $verbose);
 
         step('Installing Laravel Boost', function () use ($verbose) {
-            runCommand('php artisan boost:install', $verbose);
+            runCommand('php artisan boost:install --guidelines --skills --mcp', $verbose);
         }, $output, $verbose);
 
         if (! $skipNpm) {
