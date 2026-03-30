@@ -331,6 +331,7 @@ class StartCommand extends Command
                 'laravel/boost',
                 'larastan/larastan',
                 'pestphp/pest-plugin-arch',
+                'spatie/guidelines-skills',
             ];
             installPackages($require, $requireDev, $this->getProjectPath(), $verbose);
         }, $output, $verbose);
@@ -365,6 +366,22 @@ class StartCommand extends Command
 
         step('Installing Laravel Boost', function () use ($verbose) {
             runCommand('php artisan boost:install --guidelines --skills --mcp --no-interaction', $verbose);
+
+            // Register third-party packages with Boost and update
+            $boostConfig = $this->getProjectPath().'/boost.json';
+            if (file_exists($boostConfig)) {
+                $config = json_decode(file_get_contents($boostConfig), true) ?: [];
+                $config['packages'] = [
+                    'barryvdh/laravel-debugbar',
+                    'laravel/fortify',
+                    'spatie/guidelines-skills',
+                    'spatie/laravel-medialibrary',
+                    'spatie/laravel-permission',
+                ];
+                ksort($config);
+                file_put_contents($boostConfig, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL);
+                runCommand('php artisan boost:update --no-interaction', $verbose);
+            }
         }, $output, $verbose);
 
         if (! $skipNpm) {
