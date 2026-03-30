@@ -331,7 +331,7 @@ class StartCommand extends Command
                 'laravel/boost',
                 'larastan/larastan',
                 'pestphp/pest-plugin-arch',
-                'spatie/guidelines-skills',
+                'spatie/guidelines-skills:dev-main',
             ];
             installPackages($require, $requireDev, $this->getProjectPath(), $verbose);
         }, $output, $verbose);
