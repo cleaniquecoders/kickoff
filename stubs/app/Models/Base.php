@@ -11,6 +11,8 @@ use CleaniqueCoders\Traitify\Concerns\InteractsWithSearchable;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithToken;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUser;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Auditable as AuditableTrait;
@@ -19,6 +21,8 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+#[Guarded(['id'])]
+#[Hidden(['id'])]
 class Base extends Model implements AuditableContract, HasMedia
 {
     use AuditableTrait;
@@ -31,14 +35,6 @@ class Base extends Model implements AuditableContract, HasMedia
     use InteractsWithToken;
     use InteractsWithUser;
     use InteractsWithUuid;
-
-    protected $guarded = [
-        'id',
-    ];
-
-    protected $hidden = [
-        'id',
-    ];
 
     public function registerMediaConversions(?Media $media = null): void
     {

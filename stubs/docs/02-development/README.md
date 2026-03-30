@@ -6,8 +6,8 @@ This section covers day-to-day development workflows, components, features, and 
 
 This project is built with:
 
-- **Backend**: Laravel 12+, PHP 8.4+
-- **Frontend**: Livewire 3, Alpine.js, TailwindCSS v4
+- **Backend**: Laravel 13+, PHP 8.4+
+- **Frontend**: Livewire 4, Alpine.js, TailwindCSS v4
 - **Database**: MySQL with dual-key pattern (auto-increment `id` + `uuid` column)
 - **Real-time**: Laravel Echo, WebSockets
 - **Admin**: Livewire Flux components

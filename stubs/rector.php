@@ -8,6 +8,7 @@ use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\SetList;
 use Rector\ValueObject\PhpVersion;
 use RectorLaravel\Set\LaravelLevelSetList;
+use RectorLaravel\Set\LaravelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
     // Paths to analyze
@@ -32,10 +33,11 @@ return static function (RectorConfig $rectorConfig): void {
 
     // Apply sets for Laravel and general code quality
     $rectorConfig->sets([
-        LaravelLevelSetList::UP_TO_LARAVEL_110,
+        LaravelLevelSetList::UP_TO_LARAVEL_120,
+        LaravelSetList::LARAVEL_130,
         SetList::CODE_QUALITY,
     ]);
 
     // Define PHP version for Rector
-    $rectorConfig->phpVersion(PhpVersion::PHP_83);
+    $rectorConfig->phpVersion(PhpVersion::PHP_85);
 };

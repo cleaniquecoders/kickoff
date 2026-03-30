@@ -84,7 +84,7 @@ Automated refactoring and upgrades:
 ./vendor/bin/rector --dry-run
 ```
 
-Configuration: `rector.php` (PHP 8.3, Laravel 11)
+Configuration: `rector.php` (PHP 8.5, Laravel 13)
 
 ### Pest
 

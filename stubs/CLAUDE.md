@@ -8,7 +8,7 @@ This is a **Laravel application** bootstrapped with
 [CleaniqueCoders Kickoff](https://github.com/cleaniquecoders/kickoff), providing a standardized
 structure with pre-configured packages and conventions.
 
-- **Framework**: Laravel 12+ with PHP 8.4+
+- **Framework**: Laravel 13+ with PHP 8.4+
 - **Frontend**: Livewire 4 + TailwindCSS v4 + Alpine.js
 - **Testing**: Pest PHP (not PHPUnit syntax)
 - **Database**: MySQL with dual-key pattern (auto-increment `id` for internal relations + `uuid` column for public-facing identifiers)
@@ -47,11 +47,17 @@ php artisan reload:db     # Drop, migrate, and seed (fresh start)
 
 **ALL models MUST extend `App\Models\Base`** instead of `Illuminate\Database\Eloquent\Model`.
 
+Laravel 13 uses **PHP attributes** for model properties instead of `$fillable`, `$guarded`, `$hidden`:
+
 ```php
 namespace App\Models;
 
 use App\Models\Base as Model;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 
+#[Fillable(['name', 'description', 'status'])]
+#[Hidden(['id'])]
 class Product extends Model
 {
     // Auto-increment id (internal) + uuid column (public-facing) - automatic
@@ -400,6 +406,7 @@ php artisan flux:icon pencil trash-2 eye ellipsis plus
 ### DO
 
 - Extend `App\Models\Base` for all models
+- Use PHP attributes for model properties: `#[Fillable([...])]`, `#[Guarded([...])]`, `#[Hidden([...])]`
 - Use dual-key pattern: auto-increment `id` (internal) + `uuid` column (public-facing, URLs, APIs)
 - Use enums for status/type fields with `Enum` contract and `InteractsWithEnum` trait
 - Use Pest syntax for tests
@@ -420,6 +427,7 @@ php artisan flux:icon pencil trash-2 eye ellipsis plus
 ### DON'T
 
 - Extend `Illuminate\Database\Eloquent\Model` directly
+- Use `protected $fillable`, `$guarded`, or `$hidden` properties — use PHP attributes instead
 - Expose auto-increment `id` in URLs or APIs — use `uuid` for public-facing identifiers
 - Use `url()` helper — use `route()` instead
 - Use `dd()`, `dump()` in production code
@@ -542,6 +550,19 @@ bin/backup-app                           # Backup application
 ```
 
 ## Gotchas
+
+### Laravel 13
+
+> **Gotcha:** Laravel 13 uses **PHP attributes** for model properties (`#[Fillable([...])]`,
+> `#[Guarded([...])]`, `#[Hidden([...])]`) instead of `protected $fillable`, `$guarded`, `$hidden`.
+> Always use the attribute syntax for new models. Import from `Illuminate\Database\Eloquent\Attributes`.
+
+> **Gotcha:** CSRF middleware was renamed from `VerifyCsrfToken` to `PreventRequestForgery` in
+> Laravel 13. If you customize CSRF behavior, use the new class name.
+
+> **Gotcha:** Cache serialization defaults to `serializable_classes: false` in Laravel 13.
+> If you need to cache PHP objects (not just strings/arrays), explicitly set
+> `'serializable_classes' => true` in `config/cache.php`.
 
 ### Livewire 4
 

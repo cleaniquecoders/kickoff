@@ -7,6 +7,8 @@ namespace App\Models;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithResourceRoute;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +24,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 use Yadahan\AuthenticationLog\AuthenticationLogable;
 
+#[Fillable(['name', 'email', 'password', 'uuid'])]
+#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements AuditableContract, HasMedia, MustVerifyEmail
 {
     use AuditableTrait;
@@ -36,15 +40,6 @@ class User extends Authenticatable implements AuditableContract, HasMedia, MustV
     use Notifiable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
-
-    protected $fillable = [
-        'name', 'email', 'password', 'uuid',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     public function canImpersonate(): bool
     {

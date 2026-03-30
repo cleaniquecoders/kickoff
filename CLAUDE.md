@@ -168,7 +168,7 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 
 **Configuration Files**:
 
-- `stubs/rector.php`: PHP 8.3, Laravel 11 level set
+- `stubs/rector.php`: PHP 8.5, Laravel 13 level set
 - `stubs/pint.json`: Relaxed PHPDoc rules
 - `stubs/phpunit.xml`: Test environment settings
 - `stubs/tailwind.config.js`: TailwindCSS v4 configuration
@@ -315,9 +315,9 @@ Projects created with `kickoff start` receive:
 
 **Backend**:
 
-- Laravel 12+, PHP 8.4+
+- Laravel 13+, PHP 8.4+
 - 15+ packages: Spatie (permission, media, settings, activity log), Laravel (Sanctum, Horizon, Telescope), Livewire Flux
-- Custom Base model with dual-key pattern (id + uuid), auditing, media support
+- Custom Base model with dual-key pattern (id + uuid), auditing, media support, PHP attribute syntax
 - Helper functions organized by domain
 
 **Frontend**:
