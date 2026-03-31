@@ -2,6 +2,16 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.15.4 - 2026-03-31
+
+### Chore: Refactor Claude Code settings
+
+- Remove duplicate and redundant permission entries
+- Consolidate patterns (`bin/*` covers `./bin/*`, `python3:*` covers inline scripts)
+- Sort alphabetically for readability
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.15.3...1.15.4
+
 ## 1.15.3 - 2026-03-31
 
 ### Docs: Update CLAUDE.md with session lessons
@@ -323,7 +333,6 @@ This will seed the new media permissions for your roles.
 ## 1.5.0 - 2026-01-19
 ### Release Notes - v1.5.0
 **Release Date:** January 20, 2026
-
 #### Overview
 
 Version 1.5.0 is a major release that introduces a complete UI/UX overhaul with new dashboard, welcome page, security management features, notifications system, and improved navigation. This release also includes Livewire 4 upgrade and comprehensive documentation improvements.
@@ -699,6 +708,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -718,6 +728,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -771,6 +782,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -923,6 +935,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -932,6 +945,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -994,11 +1008,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1057,11 +1073,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1285,11 +1303,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1354,11 +1374,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
