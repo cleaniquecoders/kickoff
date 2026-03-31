@@ -2,6 +2,16 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.15.3 - 2026-03-31
+
+### Docs: Update CLAUDE.md with session lessons
+
+- Fix testing framework reference (Pest, not PHPUnit)
+- Add gotchas for Boost interactive setup, unstable package checks, sandbox testing
+- Add Boost gotcha to stubs/CLAUDE.md for generated projects
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.15.2...1.15.3
+
 ## 1.15.2 - 2026-03-30
 
 ### Fix: Simplify Boost setup
@@ -312,7 +322,6 @@ This will seed the new media permissions for your roles.
 4. Test grid/list view toggle, filters, and preview functionality
 ## 1.5.0 - 2026-01-19
 ### Release Notes - v1.5.0
-
 **Release Date:** January 20, 2026
 
 #### Overview
@@ -689,6 +698,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -708,6 +718,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -760,6 +771,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -910,6 +922,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -919,6 +932,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -979,11 +993,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1040,11 +1056,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1266,11 +1284,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1333,11 +1353,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
