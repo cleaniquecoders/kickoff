@@ -301,13 +301,16 @@ If a run fails midway, the project directory still exists with partial setup. Yo
 
 ## Important Gotchas
 
-1. **Testing Framework**: The package uses PHPUnit (not Pest) - Pest is for generated projects only
+1. **Testing Framework**: The package uses Pest (not PHPUnit syntax) — CI must use `vendor/bin/pest`, not `vendor/bin/phpunit`
 2. **Path Handling**: Use absolute paths; `getcwd()` is default when path argument is omitted
 3. **Database Naming**: Project names are converted to snake_case for DB_DATABASE
 4. **Placeholder Format**: Must be exact: `${PROJECT_NAME}` and `${OWNER}`
 5. **Composer Lock**: Gets deleted/regenerated during package installation
 6. **Verbose Mode**: Use `-v`, `-vv`, or `-vvv` for debugging setup issues
 7. **Validation**: Always validates target is a Laravel project (checks for `artisan` file)
+8. **Laravel Boost**: `boost:install` is interactive and cannot be fully automated non-interactively. The step is marked non-critical — if it fails, setup continues. Users should run `php artisan boost:install` manually after project setup for full configuration.
+9. **Unstable packages**: Always check if a package has a stable release before adding it to `$requireDev`. Use explicit version constraints (e.g., `package:dev-main`) for packages without stable releases.
+10. **Always test with sandbox**: Before pushing changes that affect `StartCommand`, run `bin/sandbox run` locally to verify the full setup flow works end-to-end.
 
 ## Generated Project Stack
 

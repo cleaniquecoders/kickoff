@@ -551,6 +551,12 @@ bin/backup-app                           # Backup application
 
 ## Gotchas
 
+### Laravel Boost
+
+> **Gotcha:** `boost:install` requires interactive input for third-party package selection.
+> If Boost was not fully configured during project setup, run `php artisan boost:install`
+> manually to select AI guidelines, skills, and MCP server configuration.
+
 ### Laravel 13
 
 > **Gotcha:** Laravel 13 uses **PHP attributes** for model properties (`#[Fillable([...])]`,
