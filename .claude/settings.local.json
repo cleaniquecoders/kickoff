@@ -1,35 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bash:*)",
       "Bash(bin/*:*)",
-      "Bash(./bin/*:*)",
-      "Bash(command -v:*)",
       "Bash(composer:*)",
-      "Bash(curl:*)",
       "Bash(docker:*)",
-      "Bash(find:*)",
       "Bash(gh:*)",
       "Bash(git:*)",
-      "Bash(grep:*)",
-      "Bash(laravel new:*)",
       "Bash(ls:*)",
-      "Bash(markdownlint:*)",
-      "Bash(mkdir:*)",
       "Bash(node:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(php:*)",
-      "Bash(tree:*)",
+      "Bash(python3:*)",
       "Bash(vendor/bin/*:*)",
-      "Bash(./vendor/bin/*:*)",
       "Bash(wc:*)",
-      "Bash(xargs:*)",
       "Skill(docs)",
+      "WebFetch(domain:fluxui.dev)",
       "WebFetch(domain:github.com)",
+      "WebFetch(domain:laravel-news.com)",
       "WebFetch(domain:packagist.org)",
-      "WebSearch",
-      "WebFetch(domain:fluxui.dev)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch"
     ]
   }
 }
