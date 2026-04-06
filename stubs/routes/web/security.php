@@ -4,7 +4,7 @@ use App\Http\Controllers\Security\AuditTrailController;
 use App\Http\Controllers\Security\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::as('security.')->prefix('security')->group(function () {
+Route::middleware(['throttle:60,1'])->as('security.')->prefix('security')->group(function () {
 
     // User Management
     Route::get('users', [UserController::class, 'index'])

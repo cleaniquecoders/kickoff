@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Database backup script
+backup_dir="/home/${PROJECT_NAME}/backup/db"
+
+# Create backup directory if it doesn't exist
+mkdir -p "$backup_dir"
+
+# Create a unique timestamp for the backup file
+timestamp=$(date +"%Y%m%d-%H%M%S")
+backup_file="${backup_dir}/${timestamp}-${PROJECT_NAME}-db.sql.gz"
+
+# Check for mysqldump
+if ! command -v mysqldump &> /dev/null; then
+  echo "ERROR: mysqldump not found"
+  exit 1
+fi
+
+# Perform database dump with compression
+echo "Backing up database..."
+mysqldump -h "${DB_HOST:-127.0.0.1}" -P "${DB_PORT:-3306}" \
+  -u "${DB_USERNAME:-root}" -p"${DB_PASSWORD}" \
+  --single-transaction --quick --lock-tables=false \
+  "${DB_DATABASE:-${PROJECT_NAME}}" | gzip > "$backup_file"
+
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+  echo "ERROR: Database backup failed"
+  rm -f "$backup_file"
+  exit 1
+fi
+
+echo "Database backup completed: $backup_file"
+
+# Optional GPG encryption
+if [ -n "$BACKUP_GPG_RECIPIENT" ]; then
+  echo "Encrypting backup..."
+  gpg --batch --yes --recipient "$BACKUP_GPG_RECIPIENT" --encrypt "$backup_file"
+  if [ $? -eq 0 ]; then
+    rm -f "$backup_file"
+    backup_file="${backup_file}.gpg"
+    echo "Backup encrypted: $backup_file"
+  else
+    echo "WARNING: GPG encryption failed, keeping unencrypted backup"
+  fi
+fi
+
+# Retention policy: delete backups older than BACKUP_RETENTION_DAYS (default 30)
+retention_days="${BACKUP_RETENTION_DAYS:-30}"
+echo "Cleaning up backups older than ${retention_days} days..."
+find "$backup_dir" -maxdepth 1 -name "*.sql.gz*" -mtime +"$retention_days" -delete
+
+chown -R ${PROJECT_NAME}:${PROJECT_NAME} "$backup_dir"
+
+echo "Database backup completed successfully"

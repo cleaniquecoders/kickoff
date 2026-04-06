@@ -9,6 +9,7 @@ use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,27 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        Password::defaults(function () {
+            $config = config('security.password');
+
+            $rule = Password::min($config['min_length'] ?? 12);
+
+            if ($config['require_mixed_case'] ?? true) {
+                $rule->mixedCase();
+            }
+            if ($config['require_numbers'] ?? true) {
+                $rule->numbers();
+            }
+            if ($config['require_symbols'] ?? true) {
+                $rule->symbols();
+            }
+            if ($config['require_uncompromised'] ?? true) {
+                $rule->uncompromised();
+            }
+
+            return $rule;
+        });
 
         $this->applyDatabaseSettings();
     }

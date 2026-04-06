@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
 // Settings routes for authenticated users (no email verification required for profile)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:60,1'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Route::livewire('settings/profile', 'settings.profile')
@@ -12,7 +12,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Settings routes for verified users only
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'throttle:60,1'])->group(function () {
     Route::livewire('settings/password', 'settings.password')
         ->name('settings.user-password.edit');
 

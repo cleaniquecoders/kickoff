@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum', 'verified', 'can:access.admin-panel'])
+Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admin-panel'])
     ->as('admin.')
     ->prefix('admin')
     ->group(function () {

@@ -70,3 +70,12 @@ arch()
 arch()
     ->expect('App\Contracts')
     ->toBeInterfaces();
+
+arch()
+    ->expect('App\Http\Middleware')
+    ->toBeClasses();
+
+arch()
+    ->expect('dumpSql')
+    ->not
+    ->toBeUsedIn(['app']);

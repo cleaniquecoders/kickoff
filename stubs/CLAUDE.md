@@ -511,7 +511,7 @@ docker compose logs -f
 
 Access points:
 - **Mailpit UI**: http://localhost:8025
-- **MinIO Console**: http://localhost:9001 (minioadmin/minioadmin)
+- **MinIO Console**: http://localhost:9001
 - **Meilisearch**: http://localhost:7700
 
 ## Environment Variables
@@ -522,19 +522,46 @@ Key variables in `.env`:
 # Superadmin (seeded on fresh install)
 SUPERADMIN_NAME="Admin"
 SUPERADMIN_EMAIL="admin@example.com"
-SUPERADMIN_PASSWORD=password
+SUPERADMIN_PASSWORD=CHANGE_ME_BEFORE_DEPLOY
 
 # Features
 ACCESS_CONTROL_ENABLED=true
-TELESCOPE_ENABLED=true
+TELESCOPE_ENABLED=false
+
+# Security
+SESSION_ENCRYPT=true
+PASSWORD_MIN_LENGTH=12
+AUDIT_CONSOLE=true
+BACKUP_RETENTION_DAYS=30
 
 # Docker Services
-DB_ROOT_PASSWORD=root
+DB_ROOT_PASSWORD=CHANGE_ME_BEFORE_DEPLOY
 MAILPIT_UI_PORT=8025
-MEILI_MASTER_KEY=masterKey
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin
+MEILI_MASTER_KEY=CHANGE_ME_BEFORE_DEPLOY
+MINIO_ROOT_USER=CHANGE_ME_BEFORE_DEPLOY
+MINIO_ROOT_PASSWORD=CHANGE_ME_BEFORE_DEPLOY
 ```
+
+## Security & SOC 2 Compliance
+
+This project includes SOC 2-aligned security controls. See `docs/05-security/soc2-compliance.md` for full details.
+
+### Key Security Features
+- **Security Headers**: Global middleware (HSTS, X-Frame-Options, CSP)
+- **Rate Limiting**: Applied to all auth, admin, and security routes
+- **Password Policy**: Configurable via `config/security.php` (min 12 chars, mixed case, numbers, symbols)
+- **2FA**: Fortify two-factor authentication with confirmation
+- **Audit Trail**: Immutable audit records on all models, including console commands
+- **PII Protection**: `EncryptsPii` trait for field-level encryption, `RedactsPiiInAudit` for audit masking
+- **Backup Encryption**: Optional GPG encryption on all backup scripts with retention policy
+- **Deployment Safety**: Maintenance mode, health check, auto-rollback on failure
+
+### Security Conventions
+- Never commit real credentials — use `CHANGE_ME_BEFORE_DEPLOY` placeholders
+- Use `EncryptsPii` for sensitive fields (but NOT fields used in WHERE clauses)
+- Use `RedactsPiiInAudit` on models with PII to mask audit trail values
+- Schedule `data:purge` for retention compliance
+- Run `composer audit` regularly for dependency vulnerabilities
 
 ## Quick Reference
 
@@ -546,7 +573,13 @@ php artisan make:test ProductTest --pest
 
 # Deployment
 bin/deploy -b main                       # Deploy specific branch
-bin/backup-app                           # Backup application
+bin/backup-app                           # Backup application + database
+bin/backup-db                            # Database backup only
+bin/backup-media                         # Media files backup
+
+# Data Retention
+php artisan data:purge --dry-run         # Preview what would be purged
+php artisan data:purge                   # Purge expired data
 ```
 
 ## Gotchas

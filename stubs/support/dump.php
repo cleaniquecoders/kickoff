@@ -7,11 +7,20 @@ use Illuminate\Database\Eloquent\Builder;
 if (! function_exists('dumpSql')) {
     function dumpSql(Builder $builder): string
     {
-        return array_reduce(
-            $builder->getBindings(),
-            fn ($sql, $binding) => preg_replace('/\?/', is_numeric($binding) ? $binding : "'".$binding."'", $sql, 1),
-            $builder->toSql(),
-        );
+        $sql = $builder->toSql();
+        $bindings = $builder->getBindings();
+
+        foreach ($bindings as $binding) {
+            $value = match (true) {
+                is_null($binding) => 'NULL',
+                is_bool($binding) => $binding ? 'TRUE' : 'FALSE',
+                is_numeric($binding) => (string) $binding,
+                default => "'".addslashes((string) $binding)."'",
+            };
+            $sql = preg_replace('/\?/', $value, $sql, 1);
+        }
+
+        return $sql;
     }
 }
 

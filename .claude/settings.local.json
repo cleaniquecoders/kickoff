@@ -1,26 +1,28 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bin/*:*)",
-      "Bash(composer:*)",
-      "Bash(docker:*)",
-      "Bash(gh:*)",
-      "Bash(git:*)",
-      "Bash(ls:*)",
-      "Bash(node:*)",
-      "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(php:*)",
-      "Bash(python3:*)",
-      "Bash(vendor/bin/*:*)",
+      "Bash(command -v:*)",
+      "Bash(markdownlint:*)",
+      "Bash(tree:*)",
       "Bash(wc:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(composer test:*)",
+      "Bash(composer analyse:*)",
+      "Bash(composer lint:*)",
+      "Bash(find:*)",
       "Skill(docs)",
-      "WebFetch(domain:fluxui.dev)",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:laravel-news.com)",
-      "WebFetch(domain:packagist.org)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebSearch"
+      "Bash(php artisan:*)",
+      "Bash(xargs cat:*)",
+      "Bash(chmod +x:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(git rebase:*)",
+      "Bash(GIT_EDITOR=true git rebase:*)"
     ]
   }
 }

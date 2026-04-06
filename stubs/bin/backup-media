@@ -27,7 +27,40 @@ while [ -e "$backup_dir/$(generate_zip_name)" ]; do
   ((incremental++))
 done
 
-# Find files modified in the last 24 hours and create the zip file
-find "$source_dir" -type f -mtime -1 -exec zip -q -r "$backup_dir/$(generate_zip_name)" {} +
+zip_file="$backup_dir/$(generate_zip_name)"
 
-echo "Media backup completed: $backup_dir/$(generate_zip_name)"
+# Find files modified in the last 24 hours and create the zip file
+find "$source_dir" -type f -mtime -1 -exec zip -q -r "$zip_file" {} +
+
+# Verify backup integrity (only if zip was created)
+if [ -f "$zip_file" ]; then
+  echo "Verifying backup integrity..."
+  if zip -T "$zip_file" > /dev/null 2>&1; then
+    echo "Backup verification passed"
+  else
+    echo "ERROR: Backup verification failed for $zip_file"
+    exit 1
+  fi
+
+  # Optional GPG encryption
+  if [ -n "$BACKUP_GPG_RECIPIENT" ]; then
+    echo "Encrypting backup..."
+    gpg --batch --yes --recipient "$BACKUP_GPG_RECIPIENT" --encrypt "$zip_file"
+    if [ $? -eq 0 ]; then
+      rm -f "$zip_file"
+      zip_file="${zip_file}.gpg"
+      echo "Backup encrypted: $zip_file"
+    else
+      echo "WARNING: GPG encryption failed, keeping unencrypted backup"
+    fi
+  fi
+
+  echo "Media backup completed: $zip_file"
+else
+  echo "No media files modified in the last 24 hours"
+fi
+
+# Retention policy: delete backups older than BACKUP_RETENTION_DAYS (default 30)
+retention_days="${BACKUP_RETENTION_DAYS:-30}"
+echo "Cleaning up backups older than ${retention_days} days..."
+find "$backup_dir" -maxdepth 1 -name "*.zip*" -mtime +"$retention_days" -delete

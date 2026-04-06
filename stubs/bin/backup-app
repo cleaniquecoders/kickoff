@@ -27,9 +27,62 @@ while [ -e "$backup_dir/$(generate_zip_name)" ]; do
   ((incremental++))
 done
 
-# Create the zip file
 zip_file="$backup_dir/$(generate_zip_name)"
+
+# Database backup
+echo "Backing up database..."
+db_backup_file="${backup_dir}/${timestamp}-${PROJECT_NAME}-db.sql"
+if command -v mysqldump &> /dev/null; then
+  mysqldump -h "${DB_HOST:-127.0.0.1}" -P "${DB_PORT:-3306}" \
+    -u "${DB_USERNAME:-root}" -p"${DB_PASSWORD}" \
+    "${DB_DATABASE:-${PROJECT_NAME}}" > "$db_backup_file" 2>/dev/null
+
+  if [ $? -eq 0 ]; then
+    echo "Database backup completed: $db_backup_file"
+  else
+    echo "WARNING: Database backup failed"
+    rm -f "$db_backup_file"
+  fi
+else
+  echo "WARNING: mysqldump not found, skipping database backup"
+fi
+
+# Create the application zip file
+echo "Backing up application files..."
 zip -r "$zip_file" "$source_dir"
+
+# Include database dump in the zip if it exists
+if [ -f "$db_backup_file" ]; then
+  zip -j "$zip_file" "$db_backup_file"
+  rm -f "$db_backup_file"
+fi
+
+# Verify backup integrity
+echo "Verifying backup integrity..."
+if zip -T "$zip_file" > /dev/null 2>&1; then
+  echo "Backup verification passed"
+else
+  echo "ERROR: Backup verification failed for $zip_file"
+  exit 1
+fi
+
+# Optional GPG encryption
+if [ -n "$BACKUP_GPG_RECIPIENT" ]; then
+  echo "Encrypting backup..."
+  gpg --batch --yes --recipient "$BACKUP_GPG_RECIPIENT" --encrypt "$zip_file"
+  if [ $? -eq 0 ]; then
+    rm -f "$zip_file"
+    zip_file="${zip_file}.gpg"
+    echo "Backup encrypted: $zip_file"
+  else
+    echo "WARNING: GPG encryption failed, keeping unencrypted backup"
+  fi
+fi
+
+# Retention policy: delete backups older than BACKUP_RETENTION_DAYS (default 30)
+retention_days="${BACKUP_RETENTION_DAYS:-30}"
+echo "Cleaning up backups older than ${retention_days} days..."
+find "$backup_dir" -maxdepth 1 -name "*.zip*" -mtime +"$retention_days" -delete
 
 chown -R ${PROJECT_NAME}:${PROJECT_NAME} "$backup_dir"
 

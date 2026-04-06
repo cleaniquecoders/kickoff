@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Roles;
 
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -13,6 +14,8 @@ use Livewire\Component;
 
 class Show extends Component
 {
+    use AuthorizesRequests;
+
     public Role $role;
 
     public array $selectedPermissions = [];
@@ -35,6 +38,8 @@ class Show extends Component
 
     public function updatePermissions(): void
     {
+        $this->authorize('update', $this->role);
+
         $permissions = Permission::whereIn('id', $this->selectedPermissions)->get();
 
         $this->role->syncPermissions($permissions);
