@@ -2,6 +2,61 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.17.0 - SOC 2 Compliance Controls - 2026-04-06
+
+### SOC 2 Compliance Controls for Generated Projects
+
+This release adds comprehensive security hardening to the stubs/ directory, implementing controls across all five SOC 2 Trust Service Criteria.
+
+#### Security (CC1-CC9)
+
+- **Fix:** Authorization gap in `Admin/Roles/Show` Livewire component — added `$this->authorize()` check
+- **Fix:** SQL injection risk in `dumpSql()` helper — proper escaping with type-safe handling
+- **Removed** default credentials from `.env.example` — all sensitive values now use `CHANGE_ME_BEFORE_DEPLOY`
+- **New:** `SecurityHeaders` middleware — X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS
+- **New:** Rate limiting on auth, admin, and security routes via `throttle` middleware
+- **New:** Password policy via `config/security.php` — min 12 chars, mixed case, numbers, symbols, uncompromised check
+- **New:** Fortify 2FA configuration with password confirmation (`config/fortify.php`)
+
+#### Availability (A1)
+
+- **Improved** backup scripts — database dumps, GPG encryption, integrity verification, retention policy
+- **New:** Dedicated database backup script (`bin/backup-db`)
+- **Improved** deploy script — maintenance mode, pre-deploy backup, health check, auto-rollback on failure
+- **Updated** Docker images — Meilisearch v1.12, MinIO latest, Redis with password authentication
+
+#### Processing Integrity (PI1)
+
+- **Enabled** console audit logging (`AUDIT_CONSOLE=true`)
+- **New:** Architecture tests preventing `dumpSql` usage in app code
+
+#### Confidentiality (C1)
+
+- **New:** `EncryptsPii` trait for field-level PII encryption
+- **New:** `RedactsPiiInAudit` trait for masking sensitive fields in audit records
+- **Hardened** Telescope — hides passwords, secrets, authorization headers; disabled by default
+- **Secured** defaults — `SESSION_ENCRYPT=true`, `MAIL_ENCRYPTION=tls`, `LOG_LEVEL=info`
+- **New:** PHPStan level 5 config for generated projects
+
+#### Privacy (P1-P8)
+
+- **New:** `data:purge` artisan command for data retention (audits, telescope, soft-deleted users)
+- **New:** Security CI workflow (`composer audit` + PHPStan on every push/PR)
+- **New:** SOC 2 compliance documentation (`docs/05-security/soc2-compliance.md`)
+
+#### New Files
+
+- `stubs/app/Http/Middleware/SecurityHeaders.php`
+- `stubs/config/fortify.php`
+- `stubs/config/security.php`
+- `stubs/bin/backup-db`
+- `stubs/app/Concerns/EncryptsPii.php`
+- `stubs/app/Concerns/RedactsPiiInAudit.php`
+- `stubs/.phpstan/phpstan.neon.dist`
+- `stubs/app/Console/Commands/PurgeExpiredDataCommand.php`
+- `stubs/.github/workflows/security.yml`
+- `stubs/docs/05-security/soc2-compliance.md`
+
 ## 1.16.0 - 2026-03-31
 
 ### What's Changed
@@ -352,7 +407,6 @@ This will seed the new media permissions for your roles.
 **Release Date:** January 20, 2026
 #### Overview
 Version 1.5.0 is a major release that introduces a complete UI/UX overhaul with new dashboard, welcome page, security management features, notifications system, and improved navigation. This release also includes Livewire 4 upgrade and comprehensive documentation improvements.
-
 
 ---
 
@@ -726,6 +780,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -745,6 +800,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -800,6 +856,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -956,6 +1013,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -965,6 +1023,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1031,11 +1090,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1098,11 +1159,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1330,11 +1393,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1403,11 +1468,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
