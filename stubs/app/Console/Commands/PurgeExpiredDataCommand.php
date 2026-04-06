@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Laravel\Telescope\Telescope;
 
 class PurgeExpiredDataCommand extends Command
 {
@@ -45,7 +46,7 @@ class PurgeExpiredDataCommand extends Command
 
     private function purgeTelescopeEntries(int $hours, bool $dryRun): void
     {
-        if (! class_exists(\Laravel\Telescope\Telescope::class)) {
+        if (! class_exists(Telescope::class)) {
             return;
         }
 
