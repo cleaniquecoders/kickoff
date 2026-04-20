@@ -2,6 +2,28 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.17.1 - 2026-04-20
+
+### 🐛 Bug Fixes
+
+- **Windows compatibility in `kickoff start`** — fixes `laravel new` failure where `getcwd().'/'.$projectName` produced mixed separators like `C:\Users\USER/myapp`, causing the Composer installer's `mkdir()` to fail.
+
+#### What changed
+
+- Added `normalizePath()` helper in `support/helpers.php` that collapses mixed `/` and `\` to the platform's `DIRECTORY_SEPARATOR`.
+- `StartCommand::execute()` now normalizes `$projectPath` once on assignment.
+- `StartCommand::createLaravelProject()` now:
+  - Detects the `laravel` installer cross-platform (`where` on Windows, `command -v` elsewhere).
+  - Passes the full normalized path directly to `laravel new` instead of chaining `cd && …`, removing shell-dialect (cmd vs bash) assumptions.
+  
+
+#### Tests
+
+- Added `normalizePath()` mixed-separator tests.
+- Added `isWindows()` sanity test matching `PHP_OS_FAMILY`.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.17.0...1.17.1
+
 ## 1.17.0 - SOC 2 Compliance Controls - 2026-04-06
 
 ### SOC 2 Compliance Controls for Generated Projects
@@ -781,6 +803,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -800,6 +823,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -856,6 +880,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1014,6 +1039,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1023,6 +1049,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1091,11 +1118,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1160,11 +1189,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1394,11 +1425,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1469,11 +1502,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
