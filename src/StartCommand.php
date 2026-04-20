@@ -62,8 +62,10 @@ class StartCommand extends Command
 
         if (empty($projectPath)) {
             // If no path provided, create project in current directory with project name as subdirectory
-            $this->projectPath = $projectPath = getcwd().'/'.$projectName;
+            $projectPath = getcwd().DIRECTORY_SEPARATOR.$projectName;
         }
+
+        $this->projectPath = $projectPath = normalizePath($projectPath);
 
         if ($dryRun) {
             return $this->dryRun($output, $projectOwner, $projectName, $projectPath, $skipPackages, $skipNpm);
@@ -148,8 +150,9 @@ class StartCommand extends Command
 
     private function createLaravelProject(OutputInterface $output, string $projectPath, string $projectName, bool $verbose): bool
     {
-        // Check if laravel installer is available
-        exec('command -v laravel 2>/dev/null', $laravelOutput, $laravelReturnCode);
+        // Check if laravel installer is available (cross-platform)
+        $checkCommand = self::isWindows() ? 'where laravel' : 'command -v laravel 2>/dev/null';
+        exec($checkCommand, $laravelOutput, $laravelReturnCode);
         if ($laravelReturnCode !== 0) {
             $output->writeln("<error>Missing 'laravel' installer. Install with: composer global require laravel/installer</error>");
 
@@ -158,7 +161,7 @@ class StartCommand extends Command
 
         // Get parent directory and ensure it exists
         $parentDir = dirname($projectPath);
-        if (! file_exists($parentDir)) {
+        if (! is_dir($parentDir)) {
             $output->writeln("<error>Parent directory does not exist: $parentDir</error>");
 
             return false;
@@ -166,11 +169,13 @@ class StartCommand extends Command
 
         $output->writeln("\n📦 Creating new Laravel project <info>$projectName</info>...\n");
 
-        // Use same arguments as bin/sandbox: --git --livewire --pest --npm --livewire-class-components --no-interaction
+        // Pass the normalized full path directly to `laravel new` instead of chaining
+        // `cd && …`. Chaining leaks shell-dialect assumptions (cmd vs bash) and forced
+        // earlier builds to mix forward and back slashes on Windows, which crashed the
+        // installer's mkdir() call.
         $command = sprintf(
-            'cd %s && laravel new %s --git --livewire --pest --npm --livewire-class-components --no-interaction',
-            escapeshellarg($parentDir),
-            escapeshellarg($projectName)
+            'laravel new %s --git --livewire --pest --npm --livewire-class-components --no-interaction',
+            escapeshellarg($projectPath)
         );
 
         step('Creating Laravel project with Livewire, Pest, and Git', function () use ($command, $verbose) {
@@ -178,7 +183,12 @@ class StartCommand extends Command
         }, $output, $verbose);
 
         // Verify the project was created successfully
-        return file_exists($projectPath.'/artisan');
+        return file_exists($projectPath.DIRECTORY_SEPARATOR.'artisan');
+    }
+
+    private static function isWindows(): bool
+    {
+        return PHP_OS_FAMILY === 'Windows';
     }
 
     private function copyStubs(OutputInterface $output, bool $verbose)

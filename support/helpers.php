@@ -65,6 +65,18 @@ function installPackages(array $require, array $requireDev, string $path, bool $
 }
 
 /**
+ * Normalize a filesystem path to the platform's native directory separator.
+ *
+ * On Windows, getcwd() returns backslash-separated paths. Joining with '/'
+ * produces mixed separators like "C:\Users\USER/myapp" that break downstream
+ * tools (notably `laravel new`, which calls mkdir() on the raw string).
+ */
+function normalizePath(string $path): string
+{
+    return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+}
+
+/**
  * Create a directory if it does not exist.
  */
 function ensureDir(string $path, int $mode = 0755): void

@@ -115,4 +115,22 @@ class StartCommandTest extends TestCase
         $this->assertEquals('${PROJECT_NAME}', StartCommand::PLACEHOLDER_PROJECT_NAME);
         $this->assertEquals('${OWNER}', StartCommand::PLACEHOLDER_OWNER);
     }
+
+    public function test_normalize_path_collapses_mixed_separators_to_native()
+    {
+        $sep = DIRECTORY_SEPARATOR;
+
+        $this->assertEquals("C:{$sep}Users{$sep}USER{$sep}myapp", normalizePath('C:\\Users\\USER/myapp'));
+        $this->assertEquals("{$sep}tmp{$sep}demo", normalizePath('/tmp/demo'));
+        $this->assertEquals("a{$sep}b{$sep}c", normalizePath('a\\b/c'));
+    }
+
+    public function test_is_windows_matches_php_os_family()
+    {
+        $reflection = new \ReflectionClass(StartCommand::class);
+        $method = $reflection->getMethod('isWindows');
+        $method->setAccessible(true);
+
+        $this->assertSame(PHP_OS_FAMILY === 'Windows', $method->invoke(null));
+    }
 }
