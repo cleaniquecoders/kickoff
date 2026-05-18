@@ -43,12 +43,12 @@ for one-off post-deploy tasks that don't belong in migrations — backfills, dat
 permission seeding, third-party sync, cache warm-up, etc.
 
 The package works like migrations: each operation runs once per environment, tracked in the
-`deploy_operations` table.
+`operations` table.
 
 ### Creating a Deploy Operation
 
 ```bash
-php artisan make:deploy-operation backfill_user_uuids
+php artisan make:operation backfill_user_uuids
 ```
 
 This generates a file in `operations/` similar to:
@@ -69,18 +69,24 @@ return new class extends Operation
 
 ### Running Deploy Operations
 
-The `bin/deploy` script runs `php artisan deploy-operations --force` automatically after
+The `bin/deploy` script runs `php artisan operations --force` automatically after
 `php artisan migrate --force`. To run manually:
 
 ```bash
 # Run all pending operations
-php artisan deploy-operations
+php artisan operations
 
 # Run in production (skip confirmation)
-php artisan deploy-operations --force
+php artisan operations --force
 
 # Check status
-php artisan deploy-operations:status
+php artisan operations:status
+
+# Rollback the last batch
+php artisan operations:rollback
+
+# Re-run all operations from scratch
+php artisan operations:fresh
 ```
 
 ### When to Use
@@ -92,10 +98,10 @@ php artisan deploy-operations:status
 | Re-runnable seed data (roles, default settings) | Seeder |
 | Code change | Just deploy — no operation needed |
 
-> **Gotcha:** Deploy operations are tracked per-environment in the `deploy_operations` table.
+> **Gotcha:** Deploy operations are tracked per-environment in the `operations` table.
 > The migration for this table is set up during project bootstrap via
-> `php artisan deploy-operations:install`. If you clone an existing project and the table is
-> missing, run `php artisan deploy-operations:install` followed by `php artisan migrate`.
+> `php artisan operations:install`. If you clone an existing project and the table is
+> missing, run `php artisan operations:install` followed by `php artisan migrate`.
 
 > **Gotcha:** Operations should be **idempotent where possible**. Even though each runs once,
 > a failed run mid-execution can leave partial state. Wrap multi-step changes in transactions

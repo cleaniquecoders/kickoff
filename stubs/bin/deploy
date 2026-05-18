@@ -78,7 +78,7 @@ echo "Running migration"
 php artisan migrate --force
 
 echo "Running deploy operations"
-php artisan deploy-operations --force
+php artisan operations --force
 
 echo "Restart Horizon"
 php artisan horizon:terminate

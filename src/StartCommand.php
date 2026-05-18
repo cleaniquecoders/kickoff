@@ -394,7 +394,7 @@ class StartCommand extends Command
             runCommand('npm run build', $verbose);
             runCommand('php artisan key:generate', $verbose);
             runCommand('php artisan make:notifications-table', $verbose);
-            runCommand('php artisan deploy-operations:install', $verbose);
+            runCommand('php artisan operations:install', $verbose);
             runCommand('php artisan reload:db', $verbose);
         }, $output, $verbose);
     }
