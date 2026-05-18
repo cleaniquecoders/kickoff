@@ -168,6 +168,33 @@ $settings->save();
 
 > **Gotcha:** Never write to `.env` at runtime. Use Spatie Settings for any value that admins should be able to change from the UI.
 
+### Deploy Operations (post-deploy data tasks)
+
+For **one-off post-deploy tasks** that don't belong in migrations — backfills, data fixes,
+permission seeding, third-party sync, cache warm-up — use
+[`dragon-code/laravel-deploy-operations`](https://github.com/TheDragonCode/laravel-deploy-operations).
+Operations live in `operations/`, run once per environment, and are tracked in the `operations` table.
+
+```bash
+php artisan make:operation backfill_user_uuids   # scaffold
+php artisan operations                            # run pending
+php artisan operations --force                    # run in production (no prompt)
+php artisan operations:status                     # show ran/pending
+php artisan operations:rollback                   # rollback last batch
+php artisan operations:fresh                      # re-run all from scratch
+```
+
+`bin/deploy` runs `php artisan operations --force` automatically after `migrate --force`.
+
+| Use Case | Tool |
+|---|---|
+| Schema change (add column, create table) | **Migration** |
+| One-off data backfill or fix | **Deploy Operation** |
+| Re-runnable seed data (roles, default settings) | Seeder |
+| Code change only | Just deploy — no operation needed |
+
+See `docs/04-deployment/01-deployment.md` for full guidance.
+
 ### Helper Functions
 
 Located in `support/` directory, auto-loaded via Composer:
@@ -423,6 +450,7 @@ php artisan flux:icon pencil trash-2 eye ellipsis plus
 - Support dark mode on all pages (use `dark:` variants for custom elements)
 - Use 3-dot dropdown menu for row actions in data tables
 - Combine columns when table has more than 5 data columns (excluding actions)
+- Use **Deploy Operations** (`make:operation`) for one-off post-deploy data tasks — backfills, data fixes, third-party sync
 
 ### DON'T
 
@@ -442,6 +470,8 @@ php artisan flux:icon pencil trash-2 eye ellipsis plus
 - Skip responsive design or dark mode support on any page
 - Use Heroicon-specific names (e.g., `pencil-square`) — use Lucide equivalents (e.g., `pencil`) instead
 - Use icons without importing them first via `php artisan flux:icon <name>`
+- Use the `deploy-operations:*` command namespace — the correct prefix is `operations:*` (e.g., `operations:install`, NOT `deploy-operations:install`)
+- Put one-off data backfills inside migrations — use a **Deploy Operation** instead
 
 ## Release Workflow
 
@@ -473,6 +503,7 @@ Before committing:
 - **spatie/laravel-medialibrary**: File/media management
 - **owen-it/laravel-auditing**: Audit trail
 - **cleaniquecoders/traitify**: Common traits and contracts
+- **dragon-code/laravel-deploy-operations**: One-off post-deploy tasks (backfills, data fixes) — `operations:*` namespace
 
 ### Development
 
@@ -580,6 +611,11 @@ bin/backup-media                         # Media files backup
 # Data Retention
 php artisan data:purge --dry-run         # Preview what would be purged
 php artisan data:purge                   # Purge expired data
+
+# Deploy Operations (post-deploy data tasks)
+php artisan make:operation <name>        # Scaffold a new operation
+php artisan operations                   # Run pending operations
+php artisan operations:status            # Show ran/pending operations
 ```
 
 ## Gotchas
@@ -646,6 +682,19 @@ php artisan data:purge                   # Purge expired data
 > **Gotcha:** When adding new queue names (e.g., `backups`, `webhooks`), they must be
 > registered in `config/horizon.php` supervisor queue list — otherwise Horizon won't pick
 > up jobs dispatched to those queues. Also ensure supervisor `timeout` >= job `$timeout`.
+
+### Deploy Operations
+
+> **Gotcha:** `dragon-code/laravel-deploy-operations` exposes its artisan commands under the
+> `operations:*` namespace, NOT `deploy-operations:*`. The correct commands are
+> `operations`, `operations:install`, `operations:status`, `operations:rollback`,
+> `operations:fresh`, and `make:operation` (not `make:deploy-operation`). The tracking
+> table is `operations`, not `deploy_operations`. Using the `deploy-operations:*` prefix
+> will fail with *"There are no commands defined in the 'deploy-operations' namespace."*
+
+> **Gotcha:** Deploy operations should be **idempotent where possible**. Even though each
+> operation runs once per environment, a failed run mid-execution can leave partial state.
+> Wrap multi-step changes in transactions or guard with existence checks.
 
 ### BackedEnum
 
