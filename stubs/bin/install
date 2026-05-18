@@ -17,18 +17,31 @@ DB_USER=${DB_USERNAME:-root}
 DB_PASS=${DB_PASSWORD}
 DB_HOST=${DB_HOST:-localhost}
 
-# Create the database if it does not exist
-echo "Checking if database '$DB_DATABASE' exists..."
-MYSQL_CMD="mysql -u$DB_USER -h$DB_HOST"
-if [ -n "$DB_PASS" ]; then
-    MYSQL_CMD+=" -p$DB_PASS"
+# Read DB_CONNECTION from .env so we don't try MySQL when the project is on SQLite.
+DB_CONNECTION_FROM_ENV=""
+if [ -f .env ]; then
+    DB_CONNECTION_FROM_ENV=$(grep -E '^DB_CONNECTION=' .env | head -1 | cut -d= -f2 | tr -d '"' | tr -d "'")
 fi
 
-if ! $MYSQL_CMD -e "USE $DB_DATABASE;" 2>/dev/null; then
-    echo "Database '$DB_DATABASE' does not exist. Creating..."
-    $MYSQL_CMD -e "CREATE DATABASE $DB_DATABASE;"
+if [ "$DB_CONNECTION_FROM_ENV" = "sqlite" ]; then
+    echo "DB_CONNECTION=sqlite — ensuring database/database.sqlite exists..."
+    mkdir -p database
+    touch database/database.sqlite
+elif [ "$DB_CONNECTION_FROM_ENV" = "mysql" ] || [ -z "$DB_CONNECTION_FROM_ENV" ]; then
+    echo "Checking if database '$DB_DATABASE' exists..."
+    MYSQL_CMD="mysql -u$DB_USER -h$DB_HOST"
+    if [ -n "$DB_PASS" ]; then
+        MYSQL_CMD+=" -p$DB_PASS"
+    fi
+
+    if ! $MYSQL_CMD -e "USE $DB_DATABASE;" 2>/dev/null; then
+        echo "Database '$DB_DATABASE' does not exist. Creating..."
+        $MYSQL_CMD -e "CREATE DATABASE $DB_DATABASE;" || echo "WARNING: Could not create '$DB_DATABASE' — set up MySQL or switch DB_CONNECTION=sqlite in .env."
+    else
+        echo "Database '$DB_DATABASE' already exists."
+    fi
 else
-    echo "Database '$DB_DATABASE' already exists."
+    echo "DB_CONNECTION=$DB_CONNECTION_FROM_ENV — skipping auto-create."
 fi
 
 # Update .env.example with the current directory name

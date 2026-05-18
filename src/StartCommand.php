@@ -97,6 +97,7 @@ class StartCommand extends Command
             $output->writeln("\n⏭️  Skipping package installation (--skip-packages)\n");
         }
 
+        $this->setupDatabase($output, $verbose);
         $this->runTasks($output, $verbose);
         $this->restoreGitIgnoreFiles($output, $verbose);
         gitCommit('Kickoff project setup', $verbose);
@@ -303,30 +304,40 @@ class StartCommand extends Command
             $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $file);
         }, $output, $verbose);
 
-        step('Update .env.example', function () {
-            $file = $this->getProjectPath().'/.env.example';
-            $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
-        }, $output, $verbose);
+        // .env.example placeholder substitution is handled in setupEnvironmentFile() so
+        // that DB_DATABASE / MINIO_BUCKET get snake-cased BEFORE the generic ${PROJECT_NAME}
+        // replacement runs.
     }
 
     private function setupEnvironmentFile(OutputInterface $output, bool $verbose)
     {
         step('Update project environment file', function () {
-            // Update placeholders in .env.example first
             $envExampleFile = $this->getProjectPath().'/.env.example';
+
+            // Snake-case DB_DATABASE and MINIO_BUCKET BEFORE the generic ${PROJECT_NAME}
+            // substitution — MySQL won't accept kebab-case database names.
+            $this->snakeCaseDbPlaceholders($envExampleFile);
+
             $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $envExampleFile);
             $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $envExampleFile);
 
-            // Copy .env.example to .env
             copy($envExampleFile, $this->getProjectPath().'/.env');
-
-            // Update .env with database name (snake_case)
-            $envFile = $this->getProjectPath().'/.env';
-            $content = file_get_contents($envFile);
-            $content = str_replace('DB_DATABASE=${PROJECT_NAME}', 'DB_DATABASE='.$this->getDatabaseName(), $content);
-            $content = str_replace('MINIO_BUCKET=${PROJECT_NAME}', 'MINIO_BUCKET='.$this->getDatabaseName(), $content);
-            file_put_contents($envFile, $content);
         }, $output, $verbose);
+    }
+
+    private function snakeCaseDbPlaceholders(string $file): void
+    {
+        if (! is_file($file)) {
+            return;
+        }
+        $snake = $this->getDatabaseName();
+        $content = file_get_contents($file);
+        $content = str_replace(
+            ['DB_DATABASE=${PROJECT_NAME}', 'MINIO_BUCKET=${PROJECT_NAME}'],
+            ["DB_DATABASE=$snake", "MINIO_BUCKET=$snake"],
+            $content
+        );
+        file_put_contents($file, $content);
     }
 
     private function getDatabaseName(): string
@@ -431,6 +442,130 @@ class StartCommand extends Command
         } else {
             $output->writeln('⏭️  Skipping NPM package installation (--skip-npm)');
         }
+    }
+
+    private function setupDatabase(OutputInterface $output, bool $verbose)
+    {
+        step('Provisioning database', function () use ($output, $verbose) {
+            $envFile = $this->getProjectPath().'/.env';
+            if (! is_file($envFile)) {
+                throw new \RuntimeException('.env not found — cannot provision database.');
+            }
+
+            $env = $this->parseEnvFile($envFile);
+            $connection = $env['DB_CONNECTION'] ?? 'mysql';
+
+            if ($connection === 'sqlite') {
+                $this->ensureSqliteFile();
+                if ($verbose) {
+                    $output->writeln('<info>   .env already targets SQLite — file ensured.</info>');
+                }
+
+                return;
+            }
+
+            if ($connection !== 'mysql') {
+                if ($verbose) {
+                    $output->writeln("<comment>   Non-MySQL connection ($connection) — skipping auto-provision.</comment>");
+                }
+
+                return;
+            }
+
+            $dbName = $env['DB_DATABASE'] ?? '';
+
+            if ($this->tryCreateMysqlDatabase($env, $dbName, $verbose, $output)) {
+                if ($verbose) {
+                    $output->writeln("<info>   MySQL database '$dbName' is ready.</info>");
+                }
+
+                return;
+            }
+
+            $this->switchEnvToSqlite($envFile);
+            $output->writeln('');
+            $output->writeln("   <comment>⚠️  MySQL not reachable — switched .env to SQLite (database/database.sqlite).</comment>");
+            $output->writeln('   <comment>   To switch back: set DB_CONNECTION=mysql and configure DB_HOST/DB_USERNAME/DB_PASSWORD in .env.</comment>');
+        }, $output, $verbose);
+    }
+
+    private function tryCreateMysqlDatabase(array $env, string $dbName, bool $verbose, OutputInterface $output): bool
+    {
+        if ($dbName === '') {
+            return false;
+        }
+
+        exec('command -v mysql 2>/dev/null', $whichOut, $whichExit);
+        if ($whichExit !== 0) {
+            if ($verbose) {
+                $output->writeln('<comment>   mysql CLI not found.</comment>');
+            }
+
+            return false;
+        }
+
+        $host = $env['DB_HOST'] ?? '127.0.0.1';
+        $port = $env['DB_PORT'] ?? '3306';
+        $user = $env['DB_USERNAME'] ?? 'root';
+        $pass = $env['DB_PASSWORD'] ?? '';
+
+        // Skip placeholder passwords — we know they won't work.
+        if ($pass === 'CHANGE_ME_BEFORE_DEPLOY') {
+            $pass = '';
+        }
+
+        $parts = [
+            'mysql',
+            '-h'.escapeshellarg($host),
+            '-P'.escapeshellarg($port),
+            '-u'.escapeshellarg($user),
+        ];
+        if ($pass !== '') {
+            $parts[] = '-p'.escapeshellarg($pass);
+        }
+        $parts[] = '-e';
+        $parts[] = escapeshellarg("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+
+        $cmd = implode(' ', $parts).' 2>&1';
+        exec($cmd, $out, $exit);
+
+        if ($exit !== 0 && $verbose) {
+            $output->writeln('<comment>   MySQL CREATE DATABASE failed: '.implode(' ', $out).'</comment>');
+        }
+
+        return $exit === 0;
+    }
+
+    private function switchEnvToSqlite(string $envFile): void
+    {
+        $this->ensureSqliteFile();
+        $content = file_get_contents($envFile);
+        $content = preg_replace('/^DB_CONNECTION=.*/m', 'DB_CONNECTION=sqlite', $content);
+        file_put_contents($envFile, $content);
+    }
+
+    private function ensureSqliteFile(): void
+    {
+        $sqlitePath = $this->getProjectPath().'/database/database.sqlite';
+        ensureDir(dirname($sqlitePath));
+        if (! file_exists($sqlitePath)) {
+            touch($sqlitePath);
+        }
+    }
+
+    private function parseEnvFile(string $file): array
+    {
+        $env = [];
+        foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+            $trimmed = ltrim($line);
+            if ($trimmed === '' || str_starts_with($trimmed, '#') || ! str_contains($line, '=')) {
+                continue;
+            }
+            [$k, $v] = explode('=', $line, 2);
+            $env[trim($k)] = trim($v, " \"'");
+        }
+
+        return $env;
     }
 
     private function runTasks(OutputInterface $output, bool $verbose)
