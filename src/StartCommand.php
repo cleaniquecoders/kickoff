@@ -484,7 +484,7 @@ class StartCommand extends Command
 
             $this->switchEnvToSqlite($envFile);
             $output->writeln('');
-            $output->writeln("   <comment>⚠️  MySQL not reachable — switched .env to SQLite (database/database.sqlite).</comment>");
+            $output->writeln('   <comment>⚠️  MySQL not reachable — switched .env to SQLite (database/database.sqlite).</comment>');
             $output->writeln('   <comment>   To switch back: set DB_CONNECTION=mysql and configure DB_HOST/DB_USERNAME/DB_PASSWORD in .env.</comment>');
         }, $output, $verbose);
     }
