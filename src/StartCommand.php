@@ -103,7 +103,53 @@ class StartCommand extends Command
 
         $output->writeln("\n🎉 Project setup completed successfully!\n");
 
+        $this->printPostInstallInfo($output, $projectName);
+
         return Command::SUCCESS;
+    }
+
+    private function printPostInstallInfo(OutputInterface $output, string $projectName): void
+    {
+        $projectPath = $this->getProjectPath();
+
+        $output->writeln('<comment>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</comment>');
+        $output->writeln('<info>📋 Next steps — configure your .env before running the app</info>');
+        $output->writeln('<comment>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</comment>');
+        $output->writeln('');
+        $output->writeln("Project ready at: <info>$projectPath</info>");
+        $output->writeln('');
+        $output->writeln('<info>1. Credentials & secrets</info> — replace every <comment>CHANGE_ME_BEFORE_DEPLOY</comment> in .env:');
+        $output->writeln('   • <comment>SUPERADMIN_PASSWORD</comment>      — initial admin login password');
+        $output->writeln('   • <comment>DB_PASSWORD</comment> / <comment>DB_ROOT_PASSWORD</comment> — MySQL credentials');
+        $output->writeln('   • <comment>REDIS_PASSWORD</comment>           — leave blank if local Redis has no auth');
+        $output->writeln('   • <comment>MEILI_MASTER_KEY</comment>         — Meilisearch master key');
+        $output->writeln('   • <comment>MINIO_ROOT_USER</comment> / <comment>MINIO_ROOT_PASSWORD</comment> — MinIO S3 credentials');
+        $output->writeln('');
+        $output->writeln('<info>2. Cache / session / queue drivers</info> — defaults assume Redis:');
+        $output->writeln('   • <comment>CACHE_DRIVER=redis</comment>   • <comment>SESSION_DRIVER=redis</comment>   • <comment>QUEUE_CONNECTION=sync</comment>');
+        $output->writeln('   Switch any to <comment>file</comment> / <comment>database</comment> if you are not running Redis locally.');
+        $output->writeln('');
+        $output->writeln('<info>3. Mail</info> — defaults to Mailpit on <comment>localhost:1025</comment>. Update <comment>MAIL_*</comment> for SMTP/SES/etc.');
+        $output->writeln('');
+        $output->writeln('<info>4. Application settings</info> (site name, mail-from, notifications) live in the');
+        $output->writeln('   <comment>database</comment> via Spatie Settings — manage them at <info>/admin/settings</info> after login.');
+        $output->writeln('   Do NOT put these in .env.');
+        $output->writeln('');
+        $output->writeln('<info>5. Local services</info> — Docker Compose ships MySQL, Redis, Mailpit, Meilisearch, MinIO:');
+        $output->writeln("   <comment>cd $projectName && docker compose up -d</comment>");
+        $output->writeln('');
+        $output->writeln('<info>6. Run the app</info>:');
+        $output->writeln("   <comment>cd $projectName && composer dev</comment>");
+        $output->writeln('   Then open <info>http://localhost:8000</info>');
+        $output->writeln('');
+        $output->writeln('<info>7. Optional</info>:');
+        $output->writeln('   • <comment>php artisan boost:install</comment>   — finish interactive Laravel Boost setup');
+        $output->writeln('   • <comment>php artisan horizon</comment>         — run the queue worker dashboard');
+        $output->writeln('   • <comment>php artisan telescope:install</comment> — set <comment>TELESCOPE_ENABLED=true</comment> first');
+        $output->writeln('');
+        $output->writeln('<comment>📚 Full guide:</comment> <info>docs/01-getting-started/</info> in the new project');
+        $output->writeln('<comment>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</comment>');
+        $output->writeln('');
     }
 
     private function dryRun(OutputInterface $output, string $owner, string $name, string $path, bool $skipPackages, bool $skipNpm): int
@@ -392,11 +438,41 @@ class StartCommand extends Command
         step('Building application', function () use ($verbose) {
             runCommand('bin/install', $verbose);
             runCommand('npm run build', $verbose);
-            runCommand('php artisan key:generate', $verbose);
-            runCommand('php artisan make:notifications-table', $verbose);
-            runCommand('php artisan operations:install', $verbose);
-            runCommand('php artisan reload:db', $verbose);
+
+            // Force array-backed cache/session for bootstrap artisan calls so they don't
+            // depend on Redis being up with the matching REDIS_PASSWORD. Spatie Laravel
+            // Data's structure cache resolves CACHE_STORE → CACHE_DRIVER=redis from the
+            // stub .env and would otherwise try to authenticate against local Redis.
+            $this->withSafeBootstrapEnv(function () use ($verbose) {
+                runCommand('php artisan key:generate', $verbose);
+                runCommand('php artisan make:notifications-table', $verbose);
+                runCommand('php artisan operations:install', $verbose);
+                runCommand('php artisan reload:db', $verbose);
+            });
         }, $output, $verbose);
+    }
+
+    private function withSafeBootstrapEnv(callable $callback): void
+    {
+        $overrides = [
+            'CACHE_STORE' => 'array',
+            'CACHE_DRIVER' => 'array',
+            'SESSION_DRIVER' => 'array',
+        ];
+
+        $previous = [];
+        foreach ($overrides as $key => $value) {
+            $previous[$key] = getenv($key);
+            putenv("$key=$value");
+        }
+
+        try {
+            $callback();
+        } finally {
+            foreach ($previous as $key => $value) {
+                putenv($value === false ? $key : "$key=$value");
+            }
+        }
     }
 
     private function restoreGitIgnoreFiles(OutputInterface $output, bool $verbose)
