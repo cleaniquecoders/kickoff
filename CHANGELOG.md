@@ -2,6 +2,34 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.19.0 - 2026-05-18
+
+### Bug Fixes
+
+- **`operations:install` no longer crashes with `RedisException`** during bootstrap. The dragon-code package passes options through Spatie Laravel Data's `OptionsData::from(...)`, which boots the data structure cache. That cache resolves `CACHE_STORE` → falls back to `CACHE_DRIVER=redis` from the stub `.env`, then authenticates against local Redis with the `REDIS_PASSWORD=CHANGE_ME_BEFORE_DEPLOY` placeholder — and fails when local Redis has no password configured.
+  
+  `runTasks()` now wraps bootstrap artisan calls in `withSafeBootstrapEnv()`, which `putenv()`s `CACHE_STORE=array`, `CACHE_DRIVER=array`, `SESSION_DRIVER=array` for the duration so the data structure cache stays in-memory and Redis is never touched during setup.
+  
+
+### New Features
+
+- **Post-install summary** printed at the end of `kickoff start`. Tells the developer exactly what to configure before running the app:
+  - Every `CHANGE_ME_BEFORE_DEPLOY` value in `.env` (superadmin, DB, Redis, Meili, MinIO)
+  - Cache / session / queue driver defaults and when to switch off Redis
+  - Mail (defaults to Mailpit)
+  - Spatie Settings reminder — application-level settings live in the DB, not `.env`
+  - Docker Compose one-liner to spin up local services
+  - `composer dev` to run the app, plus optional `boost:install`, `horizon`, `telescope:install` follow-ups
+  
+
+### Maintenance
+
+- Root `CLAUDE.md` documents the bootstrap-vs-Redis trap as gotcha #11 with a rule: always wrap new bootstrap artisan calls in `withSafeBootstrapEnv()` if they might boot the application container.
+
+Verified end-to-end with `bin/sandbox run`.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.18.2...1.19.0
+
 ## 1.18.2 - 2026-05-18
 
 ### Documentation
@@ -866,6 +894,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -885,6 +914,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -945,6 +975,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1111,6 +1142,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1120,6 +1152,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1196,11 +1229,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1273,11 +1308,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1515,11 +1552,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1598,11 +1637,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
