@@ -35,3 +35,68 @@ Deploy it anywhere in your server, then run:
 sudo su
 . ./deploy
 ```
+
+## Deploy Operations
+
+This project ships with [`dragon-code/laravel-deploy-operations`](https://github.com/TheDragonCode/laravel-deploy-operations)
+for one-off post-deploy tasks that don't belong in migrations — backfills, data fixes,
+permission seeding, third-party sync, cache warm-up, etc.
+
+The package works like migrations: each operation runs once per environment, tracked in the
+`deploy_operations` table.
+
+### Creating a Deploy Operation
+
+```bash
+php artisan make:deploy-operation backfill_user_uuids
+```
+
+This generates a file in `operations/` similar to:
+
+```php
+<?php
+
+use DragonCode\LaravelDeployOperations\Operation;
+
+return new class extends Operation
+{
+    public function up(): void
+    {
+        // One-off logic — backfill data, sync state, fix records, etc.
+    }
+};
+```
+
+### Running Deploy Operations
+
+The `bin/deploy` script runs `php artisan deploy-operations --force` automatically after
+`php artisan migrate --force`. To run manually:
+
+```bash
+# Run all pending operations
+php artisan deploy-operations
+
+# Run in production (skip confirmation)
+php artisan deploy-operations --force
+
+# Check status
+php artisan deploy-operations:status
+```
+
+### When to Use
+
+| Use Case | Tool |
+|---|---|
+| Schema change (add column, create table) | **Migration** |
+| One-off data backfill or fix | **Deploy Operation** |
+| Re-runnable seed data (roles, default settings) | Seeder |
+| Code change | Just deploy — no operation needed |
+
+> **Gotcha:** Deploy operations are tracked per-environment in the `deploy_operations` table.
+> The migration for this table is set up during project bootstrap via
+> `php artisan deploy-operations:install`. If you clone an existing project and the table is
+> missing, run `php artisan deploy-operations:install` followed by `php artisan migrate`.
+
+> **Gotcha:** Operations should be **idempotent where possible**. Even though each runs once,
+> a failed run mid-execution can leave partial state. Wrap multi-step changes in transactions
+> or guard with existence checks.
