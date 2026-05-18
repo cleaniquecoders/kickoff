@@ -2,6 +2,23 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.18.0 - 2026-05-18
+
+### What's Changed
+
+#### Features
+
+- Add [`dragon-code/laravel-deploy-operations`](https://github.com/TheDragonCode/laravel-deploy-operations) to bootstrap dependencies for one-off post-deploy tasks (data backfills, fixes, third-party sync, etc.).
+- Wire `php artisan deploy-operations:install` into the project bootstrap so the `deploy_operations` table is set up automatically.
+- Run `php artisan deploy-operations --force` after `migrate --force` in `stubs/bin/deploy`.
+
+#### Documentation
+
+- New "Deploy Operations" section in `stubs/docs/04-deployment/01-deployment.md` — covers `make:deploy-operation`, run commands, migration-vs-operation-vs-seeder decision table, and gotchas (install on clone, idempotency).
+- Updated `stubs/docs/04-deployment/README.md` automated/manual workflows to include deploy operations.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.17.1...1.18.0
+
 ## 1.17.1 - 2026-04-20
 
 ### 🐛 Bug Fixes
@@ -804,6 +821,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -823,6 +841,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -880,6 +899,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1040,6 +1060,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1049,6 +1070,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1119,11 +1141,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1190,11 +1214,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1426,11 +1452,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1503,11 +1531,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
