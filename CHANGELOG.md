@@ -2,6 +2,23 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.19.1 - 2026-05-18
+
+### Bug Fixes
+
+- **Kebab-case DB name bug** — the snake-case substitution for `DB_DATABASE` / `MINIO_BUCKET` in `.env` never ran because a redundant `Update .env.example` step replaced `${PROJECT_NAME}` with the raw kebab name first. Projects like `g8member-app` ended up with `DB_DATABASE=g8member-app`, which MySQL rejects with `Unknown database 'g8member-app'`. Fix: removed the duplicate step; `setupEnvironmentFile()` now snake-cases the DB lines before the generic placeholder pass.
+
+### New Features
+
+- **Auto-create database with SQLite fallback** — new `setupDatabase()` step runs right after package install. If `DB_CONNECTION=mysql` it attempts `CREATE DATABASE IF NOT EXISTS` via the `mysql` CLI using the `.env` credentials (ignoring the `CHANGE_ME_BEFORE_DEPLOY` placeholder). If MySQL isn't reachable or the CLI is missing, kickoff rewrites `.env` to `DB_CONNECTION=sqlite` and touches `database/database.sqlite` so setup completes cleanly on machines without MySQL running.
+  
+- **stubs/bin/install** now reads `DB_CONNECTION` from `.env` and only attempts MySQL provisioning when applicable — SQLite projects skip the `mysql` CLI calls cleanly.
+  
+
+Verified with both `bin/sandbox run` and the originally-failing hyphenated name `developers-hub-my g8member-app` — `.env` now correctly contains `DB_DATABASE=g8member_app` and the database is auto-created.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.19.0...1.19.1
+
 ## 1.19.0 - 2026-05-18
 
 ### Bug Fixes
@@ -895,6 +912,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -914,6 +932,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -975,6 +994,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1143,6 +1163,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1152,6 +1173,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1230,11 +1252,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1309,11 +1333,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1553,11 +1579,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1638,11 +1666,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
