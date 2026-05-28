@@ -13,6 +13,12 @@ structure with pre-configured packages and conventions.
 - **Testing**: Pest PHP (not PHPUnit syntax)
 - **Database**: MySQL with dual-key pattern (auto-increment `id` for internal relations + `uuid` column for public-facing identifiers)
 
+### Architecture decisions (ADRs)
+
+Significant architectural choices are recorded as ADRs under [`docs/adr/`](docs/adr/). Read the
+relevant ADR before changing core abstractions (identity, money, audit, identifiers, swappable
+drivers). See [`docs/adr/README.md`](docs/adr/README.md) for the template and when to write one.
+
 ## Common Commands
 
 ```bash
@@ -342,6 +348,88 @@ class MyComponent extends Component
     }
 }
 ```
+
+### Form Modal vs Flyout — Standard
+
+Two shared components live at the top of `resources/views/components/`:
+
+- **`<x-form-modal>`** (`form-modal.blade.php`) — for inline create/edit forms. Renders heading/subheading scaffolding and switches between modal and flyout via the `variant` prop.
+- **`<x-flyout>`** (`flyout.blade.php`) — a low-level flyout primitive (just `<flux:modal variant="flyout">` + size class). Use directly when you need a side panel for **non-form** content (detail view, filter panel, preview, etc.). `<x-form-modal variant="flyout">` delegates to this internally.
+
+For forms, always use `<x-form-modal>` and pick the variant based on form size — never roll a custom `<flux:modal>` wrapper.
+
+| Form size | Variant | When |
+|---|---|---|
+| **Flyout** (default for forms) | `variant="flyout"` | 3+ fields, rich content (RTE), multi-section panels, embedded lists / role grids, anything that benefits from a tall scroll area |
+| **Modal** | `max-width="md"` (omit `variant`) | 1–2 simple fields, quick single-purpose edits (e.g. tag name + slug) |
+
+Flyout (wide side panel, the default for non-trivial forms):
+
+```blade
+<x-form-modal
+    name="banner-form"
+    :heading="$editingUuid ? __('Edit Banner') : __('New Banner')"
+    wire:model="showForm"
+    variant="flyout"
+>
+    @if ($showForm)
+        <livewire:admin.banners.form :uuid="$editingUuid" :key="'banner-form-'.$formKey" />
+    @endif
+</x-form-modal>
+```
+
+Modal (compact, only for genuinely small forms):
+
+```blade
+<x-form-modal
+    name="tag-form"
+    :heading="$editingUuid ? __('Edit Tag') : __('New Tag')"
+    wire:model="showForm"
+    max-width="md"
+>
+    @if ($showForm)
+        <livewire:admin.tags.form :uuid="$editingUuid" :key="'tag-form-'.$formKey" />
+    @endif
+</x-form-modal>
+```
+
+Standalone flyout (non-form content — detail panel, filters, preview):
+
+```blade
+<x-flyout name="user-detail" size="lg">
+    @if ($selectedUuid)
+        <livewire:users.detail :uuid="$selectedUuid" :key="'detail-'.$selectedUuid" />
+    @endif
+</x-flyout>
+```
+
+`<x-flyout>` accepts `size`: `sm` | `default` | `lg` | `xl`.
+
+The parent Index component owns flyout/modal state with the same shape across the codebase:
+
+```php
+public bool $showForm = false;
+public ?string $editingUuid = null;
+public int $formKey = 0;   // bumped each open so the child component re-mounts cleanly
+
+public function openCreate(): void { $this->editingUuid = null; $this->formKey++; $this->showForm = true; }
+public function openEdit(string $uuid): void { /* authorize, set $editingUuid, bump $formKey, $showForm = true */ }
+
+#[On('<resource>-form-saved')]
+public function onFormSaved(): void { $this->showForm = false; $this->editingUuid = null; }
+```
+
+The child form dispatches `<resource>-form-saved` after `$this->validate()` + persist, and
+the form view ends with a footer that includes `<flux:modal.close>` for Cancel and a primary
+Save button.
+
+> **Gotcha:** Don't add a `variant="default"` value — the component defaults to a modal when
+> `variant` is omitted, and using `variant="default"` is treated identically. Either set
+> `variant="flyout"` for flyout, or omit `variant` (and optionally set `max-width`) for modal.
+
+> **Gotcha:** Always wrap the child `<livewire:...>` inside `@if ($showForm)` and pass a
+> `:key="...$formKey"` that increments on each open. Without the guard + key, edits to one
+> record bleed state into the next open.
 
 ### Page Header Pattern
 
@@ -701,6 +789,41 @@ php artisan operations:status            # Show ran/pending operations
 > **Gotcha:** `BackedEnum` objects cannot be cast to string with `(string)`. Use
 > `$value instanceof \BackedEnum ? $value->value : $value` when normalizing model
 > attributes for comparison (e.g., snapshot diffs, array comparisons).
+
+### Secure Media (cleaniquecoders/laravel-media-secure)
+
+All private-disk media is served through this package via `secure_media_url()`
+(`support/media.php`). The published `config/laravel-media-secure.php` **middleware**
+stack must contain all three, in order:
+
+```php
+'middleware' => [
+    'web',                    // StartSession — without it the session cookie is
+                              // never read, so auth:sanctum can't see the logged-in
+                              // user and embedded <img> requests redirect to /login
+    'auth:sanctum',
+    ValidateMediaAccess::class, // mandatory: resolves media by uuid, runs the policy,
+                              // attaches media to the request (else controller aborts 422)
+],
+```
+
+> **Gotcha:** The package registers its route with `->hasRoute('web')` which uses
+> `loadRoutesFrom` — this does **not** apply Laravel's `web` middleware group. You must
+> add `'web'` explicitly in the config middleware. Symptom of a missing `web`: a logged-in
+> user sees broken `<img>` thumbnails and `GET /media/view/{uuid}` returns `302 → /login`
+> even with a valid session cookie. Verify with `php artisan route:list --path=media` — the
+> `media/{type}/{uuid}` route must list `web` first.
+
+> **Gotcha:** `actingAs()` in tests sets the user directly on the guard and bypasses
+> session middleware, so a feature test using `actingAs()` will **pass even when `web` is
+> missing** from the route. To catch session/middleware regressions, verify with a real
+> login flow (cookie jar) against the running server, not just `actingAs()`.
+
+> **Gotcha:** Strict mode (`LARAVEL_MEDIA_SECURE_STRICT=true`, the default) delegates
+> authorization to the owning model's policy. For `view` URLs the model policy needs a
+> `view` method; `stream`/`download` URLs need matching `stream`/`download` methods —
+> a missing method means a 403. Any model whose media is served via `secure_media_url()`
+> must expose all three.
 
 ---
 

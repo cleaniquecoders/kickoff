@@ -33,6 +33,7 @@ Building features and working with the codebase:
 Understanding the codebase structure and standards:
 
 - [Code Quality](03-architecture/01-code-quality.md) - Linting, testing, and analysis standards
+- [Architecture Decision Records](adr/README.md) - Significant architectural choices, template, and when to write one
 
 ### Deployment
 
