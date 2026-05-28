@@ -30,4 +30,39 @@ return [
         'encrypt' => env('SESSION_ENCRYPT', true),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Security Headers
+    |--------------------------------------------------------------------------
+    |
+    | Content-Security-Policy applied by App\Http\Middleware\SecurityHeaders.
+    | CSP is auto-enabled in production only — local/dev serves assets via the
+    | Vite dev server (different origin + ws HMR), which a 'self' policy would
+    | break. Set SECURITY_CSP=1 / 0 to force it on/off in any environment
+    | (e.g. to verify in staging).
+    |
+    | The default policy keeps 'unsafe-inline'/'unsafe-eval' for scripts and
+    | styles because Livewire injects inline scripts and Alpine evaluates
+    | expressions at runtime; it still locks down object-src, base-uri,
+    | frame-ancestors and form-action.
+    |
+    */
+
+    'headers' => [
+        'csp' => env('SECURITY_CSP', null), // null = auto (production only)
+        'csp_policy' => env(
+            'SECURITY_CSP_POLICY',
+            "default-src 'self'; ".
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; ".
+            "style-src 'self' 'unsafe-inline'; ".
+            "img-src 'self' data: blob:; ".
+            "font-src 'self' data:; ".
+            "connect-src 'self'; ".
+            "object-src 'none'; ".
+            "base-uri 'self'; ".
+            "frame-ancestors 'none'; ".
+            "form-action 'self'"
+        ),
+    ],
+
 ];

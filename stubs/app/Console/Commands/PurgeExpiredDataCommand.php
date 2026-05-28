@@ -9,7 +9,7 @@ use Laravel\Telescope\Telescope;
 class PurgeExpiredDataCommand extends Command
 {
     protected $signature = 'data:purge
-        {--audit-days=365 : Days to retain audit records}
+        {--audit-days= : Days to retain CRUD audit records (default: config audit.retention.crud_audits_days)}
         {--telescope-hours=48 : Hours to retain telescope entries}
         {--dry-run : Show what would be deleted without deleting}';
 
@@ -23,7 +23,12 @@ class PurgeExpiredDataCommand extends Command
             $this->info('DRY RUN - no records will be deleted');
         }
 
-        $this->purgeAuditRecords((int) $this->option('audit-days'), $dryRun);
+        // The --audit-days option overrides the configured retention; otherwise
+        // fall back to config (7 years), NOT a hard-coded 365 that would shred
+        // a year of forensic history every night the scheduler runs.
+        $auditDays = (int) ($this->option('audit-days') ?? config('audit.retention.crud_audits_days', 2555));
+
+        $this->purgeAuditRecords($auditDays, $dryRun);
         $this->purgeTelescopeEntries((int) $this->option('telescope-hours'), $dryRun);
         $this->purgeSoftDeletedRecords($dryRun);
 
@@ -34,6 +39,15 @@ class PurgeExpiredDataCommand extends Command
     {
         $cutoff = now()->subDays($days);
         $table = config('audit.drivers.database.table', 'audits');
+
+        // Hard guard: this command purges owen-it CRUD diffs only. Any
+        // append-only domain audit table (e.g. `audit_logs`) is the immutable
+        // governance trail and must never be deleted here.
+        if ($table === 'audit_logs') {
+            $this->error('Refusing to purge the append-only audit_logs table.');
+
+            return;
+        }
 
         $count = DB::table($table)->where('created_at', '<', $cutoff)->count();
         $this->info("Audit records older than {$days} days: {$count}");
@@ -67,10 +81,11 @@ class PurgeExpiredDataCommand extends Command
 
     private function purgeSoftDeletedRecords(bool $dryRun): void
     {
-        $cutoff = now()->subDays(90);
+        $days = (int) config('audit.retention.soft_deleted_users_days', 90);
+        $cutoff = now()->subDays($days);
 
         $count = DB::table('users')->whereNotNull('deleted_at')->where('deleted_at', '<', $cutoff)->count();
-        $this->info("Soft-deleted users older than 90 days: {$count}");
+        $this->info("Soft-deleted users older than {$days} days: {$count}");
 
         if (! $dryRun && $count > 0) {
             DB::table('users')->whereNotNull('deleted_at')->where('deleted_at', '<', $cutoff)->delete();

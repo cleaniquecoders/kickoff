@@ -171,4 +171,25 @@ return [
     */
 
     'console' => env('AUDIT_CONSOLE', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retention (data:purge)
+    |--------------------------------------------------------------------------
+    |
+    | Retention windows applied by the `data:purge` command.
+    |
+    | - crud_audits_days: owen-it `audits` table (PII-bearing field-level
+    |   diffs). Default 7 years (2555 days). The command treats any
+    |   append-only domain audit table (e.g. `audit_logs`) as off-limits
+    |   and refuses to purge it.
+    | - soft_deleted_users_days: window before a soft-deleted user is
+    |   hard deleted.
+    |
+    */
+
+    'retention' => [
+        'crud_audits_days' => (int) env('AUDIT_CRUD_RETENTION_DAYS', 2555),
+        'soft_deleted_users_days' => (int) env('AUDIT_SOFT_DELETE_PURGE_DAYS', 90),
+    ],
 ];
