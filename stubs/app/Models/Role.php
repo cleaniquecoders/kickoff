@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use OwenIt\Auditing\Auditable as AuditingTrait;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property string $name
+ * @property string $display_name
+ * @property string|null $description
+ * @property bool $is_enabled
+ */
 class Role extends \Spatie\Permission\Models\Role implements Auditable
 {
     use AuditingTrait;

@@ -26,7 +26,9 @@ return new class extends Migration
         });
 
         Schema::table('model_has_permissions', function (Blueprint $table) {
-            $table->uuid()->unique()->after('permission_id');
+            // Nullable: Spatie's givePermissionTo() inserts pivot rows directly
+            // and never fills this column.
+            $table->uuid()->nullable()->unique()->after('permission_id');
         });
     }
 

@@ -18,6 +18,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
@@ -28,7 +30,7 @@ use Yadahan\AuthenticationLog\AuthenticationLogable;
 
 #[Fillable(['name', 'email', 'password', 'uuid'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements AuditableContract, HasMedia, MustVerifyEmail
+class User extends Authenticatable implements AuditableContract, HasMedia, MustVerifyEmail, PasskeyUser
 {
     use AuditableTrait;
     use AuthenticationLogable;
@@ -40,6 +42,7 @@ class User extends Authenticatable implements AuditableContract, HasMedia, MustV
     use InteractsWithResourceRoute;
     use InteractsWithUuid;
     use Notifiable;
+    use PasskeyAuthenticatable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
 

@@ -22,10 +22,17 @@
         <env name="APP_KEY" value="base64:KfpjALH43CmNV7I0Zys8J7w1kuOl+3uzE+oiJPky+qs="/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="REDIS_PASSWORD" value=""/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
+        <env name="PASSWORD_MIN_LENGTH" value="8"/>
+        <env name="PASSWORD_REQUIRE_MIXED_CASE" value="false"/>
+        <env name="PASSWORD_REQUIRE_NUMBERS" value="false"/>
+        <env name="PASSWORD_REQUIRE_SYMBOLS" value="false"/>
+        <env name="PASSWORD_REQUIRE_UNCOMPROMISED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
