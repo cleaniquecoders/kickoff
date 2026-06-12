@@ -357,6 +357,10 @@ All bugs, features, and improvements **must** have a GitHub issue created before
 Use `gh issue create` to create issues with appropriate labels and descriptions.
 Reference issues in commit messages and PRs.
 
+**All task tracking lives on GitHub** — put task checklists in the issue body
+(`- [ ]` task lists) and update them with `gh issue edit` as work progresses.
+Do NOT create local tracking files like `tasks/todo.md`.
+
 ### Labels
 
 - `bug`: Something broken or inconsistent
@@ -384,7 +388,7 @@ Reference issues in commit messages and PRs.
 
 ### 3. Self-Improvement Loop
 
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- After ANY correction from the user: record the pattern in `CLAUDE.md` (gotcha/preference/DO-DON'T)
 - Write rules for yourself that prevent the same mistake
 - Ruthlessly iterate on these lessons until mistake rate drops
 - Review lessons at session start for relevant project
@@ -412,12 +416,12 @@ Reference issues in commit messages and PRs.
 
 ### Task Management
 
-1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
+1. **Plan First**: Create a GitHub issue with a `- [ ]` task checklist in the body
 2. **Verify Plan**: Check in before starting implementation
-3. **Track Progress**: Mark items complete as you go
+3. **Track Progress**: Tick checklist items via `gh issue edit` as you go
 4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section to `tasks/todo.md`
-6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+5. **Document Results**: Comment results/review on the issue, then close it
+6. **Capture Lessons**: Record corrections in `CLAUDE.md` (gotchas/preferences), not local files
 
 Scale process to task size — simple fixes skip steps 1–2.
 
