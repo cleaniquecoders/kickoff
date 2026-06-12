@@ -2,6 +2,28 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.22.0 - 2026-06-12
+
+### What's New
+
+#### Artisan Runner — Superadmin Only (#37)
+
+Pre-configured [cleaniquecoders/laravel-artisan-runner](https://github.com/cleaniquecoders/laravel-artisan-runner) — run allowlisted Artisan commands from a Livewire UI with queued execution, logs, and notifications.
+
+- Route gated with `can:access.artisan-runner` (the package has no built-in gate — middleware is the only access control)
+- `admin.access.artisan-runner` permission seeded but **deliberately not granted to any role** — superadmin-only via wildcard; grant explicitly to share
+- Gate wired in `AdminServiceProvider` (Horizon/Telescope pattern), menu item under Audit & Monitoring
+- Safe manual command allowlist defaults; docs guide + `ARTISAN_RUNNER_NOTIFY_EMAIL` env
+
+#### Fixes
+
+- Register the artisan-runner Livewire namespace app-side — works around the package's facade `method_exists` check that breaks component resolution on Livewire 4 ([upstream #5](https://github.com/cleaniquecoders/laravel-artisan-runner/issues/5))
+- Ship artisan-runner logo SVGs in stubs — upstream export-ignores `/art` so composer installs have no assets ([upstream #6](https://github.com/cleaniquecoders/laravel-artisan-runner/issues/6)) (#38)
+
+Verified in sandbox: superadmin → ALLOW, administrator → DENY; page renders with logo.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.21.0...1.22.0
+
 ## 1.21.0 - 2026-06-12
 
 ### What's New
@@ -950,6 +972,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -969,6 +992,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1032,6 +1056,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1204,6 +1229,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1213,6 +1239,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1295,11 +1322,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1378,11 +1407,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1626,11 +1657,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1715,11 +1748,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
