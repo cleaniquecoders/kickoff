@@ -759,6 +759,13 @@ php artisan operations:status            # Show ran/pending operations
 > **Gotcha:** TailwindCSS v4 does not add `cursor: pointer` to `<button>` elements by
 > default. Always add `cursor-pointer` class to clickable buttons explicitly.
 
+### User Suspension vs. Soft Delete
+
+> **Gotcha:** Users have TWO independent "inactive" states: `suspended_at` (sign-in blocked,
+> still visible to admins, enforced by `EnsureUserIsNotSuspended` middleware) and `deleted_at`
+> (soft-deleted, hidden). Never overload soft deletes to mean suspension. Status display is
+> derived via `User::status()` returning the `UserStatus` enum — do not store a status column.
+
 ### Cookies Written by JavaScript
 
 > **Gotcha:** Laravel encrypts cookies by default, so a cookie written by JavaScript

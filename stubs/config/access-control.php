@@ -42,6 +42,12 @@ return [
             'create.account' => 'Create User Account',
             'update.account' => 'Update User Account',
             'delete.account' => 'Delete User Account',
+            'restore.account' => 'Restore Deleted User Account',
+            'suspend.account' => 'Suspend or Activate User Account',
+            'assign.roles' => 'Assign Roles to User',
+            'assign.permissions' => 'Assign Direct Permissions to User',
+            'send.password-reset' => 'Send Password Reset Link',
+            'send.verification' => 'Resend Verification Email',
         ],
 
         'roles' => [
@@ -103,6 +109,12 @@ return [
             'users.create.account',
             'users.update.account',
             'users.delete.account',
+            'users.restore.account',
+            'users.suspend.account',
+            'users.assign.roles',
+            'users.assign.permissions',
+            'users.send.password-reset',
+            'users.send.verification',
 
             // Role Management
             'roles.view.list',

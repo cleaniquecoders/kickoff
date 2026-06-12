@@ -19,7 +19,16 @@ class Role extends \Spatie\Permission\Models\Role implements Auditable
         'display_name',
         'description',
         'guard_name',
+        'is_enabled',
     ];
+
+    /**
+     * Roles seeded from config/access-control.php — cannot be deleted or disabled.
+     */
+    public function isProtected(): bool
+    {
+        return in_array($this->name, array_keys(config('access-control.roles', [])));
+    }
 
     protected function displayName(): Attribute
     {

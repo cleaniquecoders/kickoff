@@ -29,6 +29,7 @@ This project is built with:
 4. [Secure File Access](08-secure-file-access.md) - Protected file downloads
 5. [Sidebar Navigation](09-sidebar.md) - Dynamic menu system
 6. [Toast Notifications](10-toast-notifications.md) - Flash messages and alerts
+7. [User Management](11-user-management.md) - User CRUD, account status, roles & permissions
 
 ## Development Workflow
 
