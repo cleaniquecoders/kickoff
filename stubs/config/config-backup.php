@@ -1,5 +1,7 @@
 <?php
 
+use Spatie\LaravelSettings\Models\SettingsProperty;
+
 // config for CleaniqueCoders\ConfigBackup
 return [
 
@@ -63,7 +65,7 @@ return [
     'database' => [
         // Application settings managed via spatie/laravel-settings (Admin > Settings).
         'settings' => [
-            'model' => \Spatie\LaravelSettings\Models\SettingsProperty::class,
+            'model' => SettingsProperty::class,
             'match' => ['group', 'name'],
         ],
     ],
