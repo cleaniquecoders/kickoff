@@ -416,10 +416,12 @@ class StartCommand extends Command
                 '--tag=blade-lucide-icons',
                 '--tag=blade-lucide-icons-config',
                 '--tag=impersonate',
-                // config tags intentionally skipped — pre-configured configs ship in stubs/config
-                '--tag=laravel-config-backup-migrations',
-                '--tag=laravel-config-sso-migrations',
-                '--tag=laravel-config-webhook-migrations',
+                // config tags intentionally skipped — pre-configured configs ship in stubs/config.
+                // NOTE: spatie/laravel-package-tools tags use the package shortName
+                // (without the "laravel-" prefix).
+                '--tag=config-backup-migrations',
+                '--tag=config-sso-migrations',
+                '--tag=config-webhook-migrations',
                 '--tag=laravel-errors',
                 '--tag=livewire:assets',
                 '--tag=media-secure-config',

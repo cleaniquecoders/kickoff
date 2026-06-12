@@ -66,6 +66,23 @@ select:focus[data-flux-control] {
     @apply size-4;
 } */
 
+/* Smooth expand/collapse for sidebar menu groups (ui-disclosure toggles
+   the data-open attribute; grid-rows animates height without JS). */
+.navlist-group-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease;
+}
+
+.navlist-group-panel[data-open] {
+    grid-template-rows: 1fr;
+}
+
+.navlist-group-panel-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
 /* Collapsible sidebar — desktop icon rail.
    Menus render both variants; CSS switches them based on the collapsed state.
    Below lg the rail never applies, so mobile stashable behavior is untouched. */
