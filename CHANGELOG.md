@@ -2,6 +2,42 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.21.0 - 2026-06-12
+
+### What's New
+
+#### Collapsible Sidebar & Menu (#27)
+
+- Desktop toggle between full sidebar and icon-only rail, persisted via cookie (zero-flicker SSR under `wire:navigate`)
+- Flyout submenus next to the rail when collapsed, with tooltips
+- Collapsible menu groups (multi-open) with smooth grid-rows transitions and rotating chevrons (#36)
+
+#### User Management Overhaul (#28)
+
+- Users index as a full Livewire component: search, role/status filters, status-aligned stats, bulk delete + bulk role assignment
+- Create/edit users via flyout panels with an invite flow (user sets own password via reset link)
+- Manage Access flyout: role toggles + direct permission toggles with inherited-via-role hints
+- Account suspension (`suspended_at` + middleware), admin-triggered password reset & verification resend
+- Role CRUD with protected-role and in-use guards
+- Supersedes the interim `UserIndex`/`UserPanel` components from 1.20.0
+
+#### Pre-configured Packages (#29, #30, #31)
+
+- [cleaniquecoders/laravel-config-webhook](https://github.com/cleaniquecoders/laravel-config-webhook) — outgoing webhooks admin UI, `webhooks` queue in Horizon
+- [cleaniquecoders/laravel-config-backup](https://github.com/cleaniquecoders/laravel-config-backup) — encrypted config backup/restore, Spatie settings allowlist pre-filled
+- [cleaniquecoders/laravel-config-sso](https://github.com/cleaniquecoders/laravel-config-sso) — database-backed SSO providers admin UI
+- New `admin.manage.{webhooks,config-backup,sso}` permissions seeded to administrator
+
+#### Fixes
+
+- Starter-kit drift breaking fresh projects: Fortify passkeys feature + trait, phpunit `CACHE_STORE`, password-policy test env, `model_has_permissions.uuid` nullable (#32)
+- `REDIS_PASSWORD=null` default so fresh projects work with non-Docker Redis (#34)
+- Correct `vendor:publish` tags for the config-* packages (package-tools shortName) (#35)
+
+Generated projects pass **79/79** Pest tests out of the box.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.20.0...1.21.0
+
 ## 1.19.1 - 2026-05-18
 
 ### Bug Fixes
@@ -913,6 +949,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -932,6 +969,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -994,6 +1032,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1164,6 +1203,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1173,6 +1213,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1253,11 +1294,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1334,11 +1377,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1580,11 +1625,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1667,11 +1714,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
