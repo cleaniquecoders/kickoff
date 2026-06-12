@@ -759,6 +759,15 @@ php artisan operations:status            # Show ran/pending operations
 > **Gotcha:** TailwindCSS v4 does not add `cursor: pointer` to `<button>` elements by
 > default. Always add `cursor-pointer` class to clickable buttons explicitly.
 
+### Cookies Written by JavaScript
+
+> **Gotcha:** Laravel encrypts cookies by default, so a cookie written by JavaScript
+> (e.g. the sidebar's `sidebar_collapsed` toggle state) comes back as `null` from
+> `request()->cookie()` unless excluded:
+> `$middleware->encryptCookies(except: ['cookie_name'])` in `bootstrap/app.php`.
+> Prefer a plain cookie over localStorage when Blade needs the value server-side
+> (e.g. to render UI state under `wire:navigate` without flicker).
+
 ### Forms & Grid Layout
 
 > **Gotcha:** When adding fields to a 2-column `sm:grid-cols-2` form, always maintain proper

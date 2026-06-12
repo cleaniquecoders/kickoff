@@ -65,3 +65,32 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+/* Collapsible sidebar — desktop icon rail.
+   Menus render both variants; CSS switches them based on the collapsed state.
+   Below lg the rail never applies, so mobile stashable behavior is untouched. */
+[data-flux-sidebar] {
+    transition: width 0.2s ease;
+}
+
+.sidebar-collapsed-only {
+    display: none;
+}
+
+@media (min-width: 64rem) {
+    [data-flux-sidebar][data-collapsed] {
+        width: 4.5rem;
+    }
+
+    [data-flux-sidebar][data-collapsed] .sidebar-expanded-only {
+        display: none;
+    }
+
+    [data-flux-sidebar][data-collapsed] .sidebar-collapsed-only {
+        display: block;
+    }
+
+    [data-flux-sidebar][data-collapsed] .sidebar-header {
+        flex-direction: column;
+    }
+}

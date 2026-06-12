@@ -10,14 +10,8 @@
     <flux:navlist.item icon="{{ data_get($menu, 'icon') }}" @click="open = !open" class="cursor-pointer">
         <div class="flex items-center justify-between w-full">
             <span>{{ data_get($menu, 'label') }}</span>
-            <svg x-show="!open" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <svg x-show="open" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
+            <flux:icon.chevron-right x-show="!open" class="size-4!" />
+            <flux:icon.chevron-down x-show="open" class="size-4!" />
         </div>
     </flux:navlist.item>
 

@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(SecurityHeaders::class);
 
+        // Written by JS for the sidebar rail toggle; must stay readable server-side.
+        $middleware->encryptCookies(except: ['sidebar_collapsed']);
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,

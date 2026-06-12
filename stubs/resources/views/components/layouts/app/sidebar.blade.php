@@ -9,12 +9,28 @@
 
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         @include('components.breadcrumbs')
-        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        @php
+            // Plain cookie (see bootstrap/app.php encryptCookies exception) so the
+            // collapsed rail renders server-side under wire:navigate without flicker.
+            $sidebarCollapsed = request()->cookie('sidebar_collapsed') === '1';
+        @endphp
+        <flux:sidebar sticky stashable x-data :data-collapsed="$sidebarCollapsed"
+            x-bind:data-collapsed="$store.sidebar.collapsed || false"
+            class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
-                <x-app-logo />
-            </a>
+            <div class="sidebar-header flex items-center justify-between gap-2">
+                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+                    <x-app-logo />
+                </a>
+
+                <button type="button" x-on:click="$store.sidebar.toggle()"
+                    class="hidden lg:flex items-center justify-center rounded-lg p-1.5 cursor-pointer text-zinc-500 hover:bg-zinc-800/5 hover:text-zinc-800 dark:text-white/80 dark:hover:bg-white/[7%] dark:hover:text-white"
+                    data-tippy-content="{{ __('Toggle sidebar') }}">
+                    <flux:icon.panel-left-close class="size-5 sidebar-expanded-only" />
+                    <flux:icon.panel-left-open class="size-5 sidebar-collapsed-only" />
+                </button>
+            </div>
 
             <flux:navlist variant="outline">
                 <x-menu menu-builder="sidebar" />
@@ -27,9 +43,16 @@
             <flux:spacer />
 
             <!-- Desktop User Menu -->
-            <flux:dropdown class="hidden lg:block" position="bottom" align="start">
+            <flux:dropdown class="hidden lg:block sidebar-expanded-only" position="bottom" align="start">
                 <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
                     icon:trailing="chevrons-up-down" />
+
+                <x-user-menu />
+            </flux:dropdown>
+
+            <!-- Desktop User Menu (collapsed rail) -->
+            <flux:dropdown class="sidebar-collapsed-only" position="bottom" align="start">
+                <flux:profile :initials="auth()->user()->initials()" data-tippy-content="{{ auth()->user()->name }}" />
 
                 <x-user-menu />
             </flux:dropdown>
