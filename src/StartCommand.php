@@ -172,7 +172,7 @@ class StartCommand extends Command
         $output->writeln('    '.($exists ? '3' : '4').'. Replace placeholders (${PROJECT_NAME}, ${OWNER})');
         $output->writeln('    '.($exists ? '4' : '5').'. Setup .env file');
         if (! $skipPackages) {
-            $output->writeln('    '.($exists ? '5' : '6').'. Install Composer packages (19 require, 5 require-dev)');
+            $output->writeln('    '.($exists ? '5' : '6').'. Install Composer packages (23 require, 6 require-dev)');
             $output->writeln('    '.($exists ? '6' : '7').'. Publish vendor configs & migrations');
             if (! $skipNpm) {
                 $output->writeln('    '.($exists ? '7' : '8').'. Install NPM packages (lodash, axios, tippy.js)');
@@ -372,6 +372,9 @@ class StartCommand extends Command
             $require = [
                 'laravel/sanctum',
                 'blade-ui-kit/blade-icons',
+                'cleaniquecoders/laravel-config-backup',
+                'cleaniquecoders/laravel-config-sso',
+                'cleaniquecoders/laravel-config-webhook',
                 'cleaniquecoders/laravel-media-secure',
                 'cleaniquecoders/traitify',
                 'diglactic/laravel-breadcrumbs',
@@ -413,6 +416,10 @@ class StartCommand extends Command
                 '--tag=blade-lucide-icons',
                 '--tag=blade-lucide-icons-config',
                 '--tag=impersonate',
+                // config tags intentionally skipped — pre-configured configs ship in stubs/config
+                '--tag=laravel-config-backup-migrations',
+                '--tag=laravel-config-sso-migrations',
+                '--tag=laravel-config-webhook-migrations',
                 '--tag=laravel-errors',
                 '--tag=livewire:assets',
                 '--tag=media-secure-config',

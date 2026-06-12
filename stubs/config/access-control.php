@@ -31,6 +31,9 @@ return [
         'admin' => [
             'view.panel' => 'View Admin Panel',
             'manage.settings' => 'Manage System Settings',
+            'manage.webhooks' => 'Manage Webhooks',
+            'manage.config-backup' => 'Manage Configuration Backups',
+            'manage.sso' => 'Manage SSO Providers',
             'access.telescope' => 'Access Telescope Debugging',
             'access.horizon' => 'Access Horizon Queue Monitor',
             'impersonate.users' => 'Impersonate Other Users',
@@ -99,6 +102,9 @@ return [
             // Admin Panel Access
             'admin.view.panel',
             'admin.manage.settings',
+            'admin.manage.webhooks',
+            'admin.manage.config-backup',
+            'admin.manage.sso',
             'admin.access.telescope',
             'admin.access.horizon',
             'admin.impersonate.users',
