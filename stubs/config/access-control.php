@@ -36,6 +36,9 @@ return [
             'manage.sso' => 'Manage SSO Providers',
             'access.telescope' => 'Access Telescope Debugging',
             'access.horizon' => 'Access Horizon Queue Monitor',
+            // Deliberately NOT in any role_scope below — running Artisan commands
+            // is superadmin-only by default (superadmin gets it via the wildcard).
+            'access.artisan-runner' => 'Access Artisan Runner',
             'impersonate.users' => 'Impersonate Other Users',
         ],
 

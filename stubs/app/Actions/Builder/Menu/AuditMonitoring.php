@@ -6,6 +6,7 @@ namespace App\Actions\Builder\Menu;
 
 use App\Actions\Builder\MenuItem;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 
 class AuditMonitoring extends Base
 {
@@ -35,7 +36,22 @@ class AuditMonitoring extends Base
             fn () => $this->createAuditTrailMenuItem(),
             fn () => $this->createTelescopeMenuItem(),
             fn () => $this->createHorizonMenuItem(),
+            fn () => $this->createArtisanRunnerMenuItem(),
         ];
+    }
+
+    /**
+     * Create the Artisan Runner menu item.
+     */
+    private function createArtisanRunnerMenuItem(): MenuItem
+    {
+        return (new MenuItem)
+            ->setLabel(__('Artisan Runner'))
+            ->setUrl(Route::has('artisan-runner.index') ? route('artisan-runner.index') : '#')
+            ->setIcon('terminal')
+            ->setDescription(__('Run allowlisted Artisan commands from the browser'))
+            ->setTooltip(__('Artisan Runner'))
+            ->setVisible(fn () => Route::has('artisan-runner.index') && Gate::allows('access.artisan-runner'));
     }
 
     /**

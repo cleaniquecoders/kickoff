@@ -122,7 +122,10 @@ class AdminServiceProvider extends ServiceProvider
     {
         // Audit & Monitoring menu access gate
         Gate::define('access.audit-monitoring', function (User $user) {
-            return $user->can('view.audit-logs') || $user->can('access.telescope') || $user->can('access.horizon');
+            return $user->can('view.audit-logs')
+                || $user->can('access.telescope')
+                || $user->can('access.horizon')
+                || $user->can('access.artisan-runner');
         });
 
         Gate::define('access.telescope', function (User $user) {
@@ -131,6 +134,12 @@ class AdminServiceProvider extends ServiceProvider
 
         Gate::define('access.horizon', function (User $user) {
             return $user->can('admin.access.horizon');
+        });
+
+        // Superadmin-only by default — admin.access.artisan-runner is not
+        // granted to any role in config/access-control.php role_scope.
+        Gate::define('access.artisan-runner', function (User $user) {
+            return $user->can('admin.access.artisan-runner');
         });
 
         // Gates required by Laravel packages (Telescope and Horizon)
