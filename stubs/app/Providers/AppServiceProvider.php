@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Settings\GeneralSettings;
 use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
+use CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -63,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function registerVendorLivewireNamespaces(): void
     {
-        if (! class_exists(\CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner::class)) {
+        if (! class_exists(CommandRunner::class)) {
             return;
         }
 
