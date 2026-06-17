@@ -372,6 +372,7 @@ class StartCommand extends Command
             $require = [
                 'laravel/sanctum',
                 'blade-ui-kit/blade-icons',
+                'cleaniquecoders/laravel-mcp-kit',
                 'cleaniquecoders/laravel-media-secure',
                 'cleaniquecoders/traitify',
                 'diglactic/laravel-breadcrumbs',
@@ -582,6 +583,7 @@ class StartCommand extends Command
                 runCommand('php artisan key:generate', $verbose);
                 runCommand('php artisan make:notifications-table', $verbose);
                 runCommand('php artisan operations:install', $verbose);
+                runCommand('php artisan mcp-kit:install --no-interaction', $verbose);
                 runCommand('php artisan reload:db', $verbose);
             });
         }, $output, $verbose);

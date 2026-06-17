@@ -42,6 +42,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->defineMonitoringGates();
         $this->defineMediaManagementGates();
         $this->defineProfileGates();
+        $this->defineMcpKitGates();
         $this->defineCompositeGates();
     }
 
@@ -170,6 +171,26 @@ class AdminServiceProvider extends ServiceProvider
 
         Gate::define('access.notifications', function (User $user) {
             return $user->can('notifications.view.own');
+        });
+    }
+
+    /**
+     * Define Laravel MCP Kit gates.
+     *
+     * The cleaniquecoders/laravel-mcp-kit package ships no permission system —
+     * it requires these two abilities to be defined to authorize read/write
+     * access to its MCP tools. Mapped into the existing permission system.
+     */
+    private function defineMcpKitGates(): void
+    {
+        // Read-only access to MCP tools/resources (staff-level).
+        Gate::define('mcp-kit.view-tasks', function (User $user) {
+            return $user->can('admin.view.panel');
+        });
+
+        // Write access to MCP tools (admin-level).
+        Gate::define('mcp-kit.manage-tasks', function (User $user) {
+            return $user->can('admin.manage.settings');
         });
     }
 
