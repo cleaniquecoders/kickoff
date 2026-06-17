@@ -6,6 +6,7 @@ namespace App\Actions\Builder\Menu;
 
 use App\Actions\Builder\MenuItem;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 
 class AuditMonitoring extends Base
 {
@@ -59,7 +60,7 @@ class AuditMonitoring extends Base
     {
         return (new MenuItem)
             ->setLabel(__('Telescope'))
-            ->setUrl(route('telescope'))
+            ->setUrl(Route::has('telescope') ? route('telescope') : '#')
             ->setIcon('bug-ant')
             ->setDescription(__('Access application debugging using Laravel Telescope'))
             ->setTooltip(__('Telescope'))
@@ -74,7 +75,7 @@ class AuditMonitoring extends Base
     {
         return (new MenuItem)
             ->setLabel(__('Horizon'))
-            ->setUrl(route('horizon.index'))
+            ->setUrl(Route::has('horizon.index') ? route('horizon.index') : '#')
             ->setIcon('queue-list')
             ->setDescription(__('Access Laravel Horizon to monitor and manage queues'))
             ->setTooltip(__('Horizon'))

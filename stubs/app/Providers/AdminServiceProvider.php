@@ -126,7 +126,9 @@ class AdminServiceProvider extends ServiceProvider
         });
 
         Gate::define('access.telescope', function (User $user) {
-            return $user->can('admin.access.telescope') && App::environment(['local', 'staging']);
+            return $user->can('admin.access.telescope')
+                && App::environment(['local', 'staging'])
+                && config('telescope.enabled');
         });
 
         Gate::define('access.horizon', function (User $user) {
