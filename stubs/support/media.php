@@ -14,20 +14,20 @@ if (! function_exists('secure_media_url')) {
      * Spatie's default /storage/{id}/{file} URL (which 404s when the file
      * lives on the `media` disk).
      *
-     * @param  HasMedia|null  $model       Any HasMedia model, or null
-     *                                     (helper handles the null case
-     *                                     so call sites don't need a
-     *                                     guard).
-     * @param  string         $collection  Spatie media collection name
-     * @param  bool           $signed      When true, returns a time-
-     *                                     limited signed URL safe to
-     *                                     embed on public pages. When
-     *                                     false, returns the
-     *                                     authenticated /media/view URL
-     *                                     — only works inside an
-     *                                     authenticated request.
-     * @param  int|null       $minutes     Signed URL TTL in minutes.
-     *                                     Defaults to the package config.
+     * @param  HasMedia|null  $model  Any HasMedia model, or null
+     *                                (helper handles the null case
+     *                                so call sites don't need a
+     *                                guard).
+     * @param  string  $collection  Spatie media collection name
+     * @param  bool  $signed  When true, returns a time-
+     *                        limited signed URL safe to
+     *                        embed on public pages. When
+     *                        false, returns the
+     *                        authenticated /media/view URL
+     *                        — only works inside an
+     *                        authenticated request.
+     * @param  int|null  $minutes  Signed URL TTL in minutes.
+     *                             Defaults to the package config.
      */
     function secure_media_url(
         ?HasMedia $model,
