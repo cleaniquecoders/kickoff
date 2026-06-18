@@ -146,7 +146,7 @@ class StartCommand extends Command
         $output->writeln('<info>7. Optional</info>:');
         $output->writeln('   • <comment>php artisan boost:install</comment>   — finish interactive Laravel Boost setup');
         $output->writeln('   • <comment>php artisan horizon</comment>         — run the queue worker dashboard');
-        $output->writeln('   • <comment>php artisan telescope:install</comment> — set <comment>TELESCOPE_ENABLED=true</comment> first');
+        $output->writeln('   • <comment>php artisan telescope</comment>     — Telescope is enabled (exception watcher only); dashboard at /telescope in local/staging');
         $output->writeln('');
         $output->writeln('<comment>📚 Full guide:</comment> <info>docs/01-getting-started/</info> in the new project');
         $output->writeln('<comment>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</comment>');

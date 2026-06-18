@@ -82,7 +82,7 @@ This document describes the security controls implemented in this project to sup
 ### Secrets Management
 - No default credentials in `.env.example` — all sensitive values use `CHANGE_ME_BEFORE_DEPLOY` placeholders
 - Telescope hides sensitive request parameters (`password`, `password_confirmation`, `current_password`, `secret`) and headers (`authorization`, `cookie`, CSRF tokens)
-- Telescope disabled by default (`TELESCOPE_ENABLED=false`)
+- Telescope enabled by default with only the exception watcher (`TELESCOPE_ENABLED=true`); dashboard access is gated to local/staging via the `access.telescope` ability
 
 ### Access Control
 - Media files stored with `private` visibility
@@ -123,7 +123,7 @@ This document describes the security controls implemented in this project to sup
 | `AUDIT_CONSOLE` | `true` | Audit console commands |
 | `BACKUP_RETENTION_DAYS` | `30` | Days to retain backups |
 | `BACKUP_GPG_RECIPIENT` | (empty) | GPG key ID for backup encryption |
-| `TELESCOPE_ENABLED` | `false` | Enable/disable Telescope |
+| `TELESCOPE_ENABLED` | `true` | Enable/disable Telescope (exception watcher only; dashboard gated to local/staging) |
 
 ### Key Files
 

@@ -665,7 +665,7 @@ SUPERADMIN_PASSWORD=CHANGE_ME_BEFORE_DEPLOY
 
 # Features
 ACCESS_CONTROL_ENABLED=true
-TELESCOPE_ENABLED=false
+TELESCOPE_ENABLED=true   # exception watcher only; dashboard gated to local/staging
 
 # Security
 SESSION_ENCRYPT=true
