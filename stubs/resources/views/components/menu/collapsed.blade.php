@@ -25,8 +25,8 @@
                             <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
                                 :href="data_get($child, 'url')" target="_blank" rel="noopener noreferrer">
                                 <span class="inline-flex items-center gap-1.5">
-                                    <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                                     <span>{{ data_get($child, 'label') }}</span>
+                                    <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                                 </span>
                             </flux:menu.item>
                         @else
@@ -57,8 +57,8 @@
                         <flux:menu.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
                             :href="data_get($menuItem, 'url')" target="_blank" rel="noopener noreferrer">
                             <span class="inline-flex items-center gap-1.5">
-                                <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                                 <span>{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
+                                <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                             </span>
                         </flux:menu.item>
                     @else
@@ -87,8 +87,8 @@
                             <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
                                 :href="data_get($child, 'url')" target="_blank" rel="noopener noreferrer">
                                 <span class="inline-flex items-center gap-1.5">
-                                    <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                                     <span>{{ data_get($child, 'label') }}</span>
+                                    <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                                 </span>
                             </flux:menu.item>
                         @else
