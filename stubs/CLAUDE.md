@@ -431,6 +431,26 @@ Save button.
 > `:key="...$formKey"` that increments on each open. Without the guard + key, edits to one
 > record bleed state into the next open.
 
+### Page Container
+
+The `x-layouts.app` layout already wraps page content in `<flux:main container>`, which
+provides `max-w-7xl` + `mx-auto` + `p-6 lg:p-8`. **Render page content directly inside the
+layout — do NOT re-wrap in another `max-w-7xl` / `px-*` div**, or you get doubled horizontal
+padding (content too narrow).
+
+```blade
+{{-- DO: content sits directly under the layout --}}
+<x-layouts.app title="Products">
+    <flux:breadcrumbs class="mb-6">...</flux:breadcrumbs>
+    {{-- page content --}}
+</x-layouts.app>
+
+{{-- DON'T: an extra max-w-7xl/px-* wrapper double-pads against flux:main --}}
+<x-layouts.app title="Products">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> ... </div>
+</x-layouts.app>
+```
+
 ### Page Header Pattern
 
 All pages should follow this consistent header structure:

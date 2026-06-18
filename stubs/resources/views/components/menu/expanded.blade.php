@@ -1,6 +1,7 @@
 {{-- Expanded sidebar variant — included by components/menu.blade.php.
      Expects: $menu, $menuItems, $heading, $hasActiveItem --}}
-<flux:navlist.group :heading="$heading" :expandable="filled($heading)" class="grid">
+{{-- Groups collapse by default; the group containing the current page stays open. --}}
+<flux:navlist.group :heading="$heading" :expandable="filled($heading)" :expanded="$hasActiveItem" class="grid">
     @foreach ($menuItems as $menuItem)
         @continue(! data_get($menuItem, 'visible', true))
 
@@ -24,11 +25,22 @@
                 </flux:navlist.item>
             </form>
         @else
-            {{-- Link menu item --}}
-            <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}" :href="data_get($menuItem, 'url')"
-                :current="data_get($menuItem, 'active', false)" wire:navigate>
-                {{ data_get($menuItem, 'label', 'Menu Item') }}
-            </flux:navlist.item>
+            {{-- Link menu item ('_blank' opens in a new tab, so no wire:navigate). --}}
+            @if (data_get($menuItem, 'target') === '_blank')
+                <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
+                    :href="data_get($menuItem, 'url')" :current="data_get($menuItem, 'active', false)"
+                    target="_blank" rel="noopener noreferrer">
+                    <span class="inline-flex items-center gap-1.5">
+                        <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
+                        <span>{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
+                    </span>
+                </flux:navlist.item>
+            @else
+                <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
+                    :href="data_get($menuItem, 'url')" :current="data_get($menuItem, 'active', false)" wire:navigate>
+                    {{ data_get($menuItem, 'label', 'Menu Item') }}
+                </flux:navlist.item>
+            @endif
         @endif
     @endforeach
 </flux:navlist.group>
