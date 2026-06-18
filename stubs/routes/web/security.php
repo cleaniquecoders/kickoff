@@ -4,17 +4,18 @@ use App\Http\Controllers\Security\AuditTrailController;
 use App\Http\Controllers\Security\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['throttle:60,1'])->as('security.')->prefix('security')->group(function () {
+Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1'])->as('security.')->prefix('security')->group(function () {
 
     // User Management
     Route::get('users', [UserController::class, 'index'])
+        ->middleware('can:manage.users')
         ->name('users.index');
-    Route::get('users/{uuid}', [UserController::class, 'show'])
-        ->name('users.show');
 
     // Audit Trail
-    Route::get('audit-trail', [AuditTrailController::class, 'index'])
-        ->name('audit-trail.index');
-    Route::get('audit-trail/{uuid}', [AuditTrailController::class, 'show'])
-        ->name('audit-trail.show');
+    Route::middleware(['can:view.audit-logs'])->group(function () {
+        Route::get('audit-trail', [AuditTrailController::class, 'index'])
+            ->name('audit-trail.index');
+        Route::get('audit-trail/{uuid}', [AuditTrailController::class, 'show'])
+            ->name('audit-trail.show');
+    });
 });

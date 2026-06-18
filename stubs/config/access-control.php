@@ -31,8 +31,14 @@ return [
         'admin' => [
             'view.panel' => 'View Admin Panel',
             'manage.settings' => 'Manage System Settings',
+            'manage.webhooks' => 'Manage Webhooks',
+            'manage.config-backup' => 'Manage Configuration Backups',
+            'manage.sso' => 'Manage SSO Providers',
             'access.telescope' => 'Access Telescope Debugging',
             'access.horizon' => 'Access Horizon Queue Monitor',
+            // Deliberately NOT in any role_scope below — running Artisan commands
+            // is superadmin-only by default (superadmin gets it via the wildcard).
+            'access.artisan-runner' => 'Access Artisan Runner',
             'impersonate.users' => 'Impersonate Other Users',
         ],
 
@@ -42,6 +48,12 @@ return [
             'create.account' => 'Create User Account',
             'update.account' => 'Update User Account',
             'delete.account' => 'Delete User Account',
+            'restore.account' => 'Restore Deleted User Account',
+            'suspend.account' => 'Suspend or Activate User Account',
+            'assign.roles' => 'Assign Roles to User',
+            'assign.permissions' => 'Assign Direct Permissions to User',
+            'send.password-reset' => 'Send Password Reset Link',
+            'send.verification' => 'Resend Verification Email',
         ],
 
         'roles' => [
@@ -93,6 +105,9 @@ return [
             // Admin Panel Access
             'admin.view.panel',
             'admin.manage.settings',
+            'admin.manage.webhooks',
+            'admin.manage.config-backup',
+            'admin.manage.sso',
             'admin.access.telescope',
             'admin.access.horizon',
             'admin.impersonate.users',
@@ -103,6 +118,12 @@ return [
             'users.create.account',
             'users.update.account',
             'users.delete.account',
+            'users.restore.account',
+            'users.suspend.account',
+            'users.assign.roles',
+            'users.assign.permissions',
+            'users.send.password-reset',
+            'users.send.verification',
 
             // Role Management
             'roles.view.list',

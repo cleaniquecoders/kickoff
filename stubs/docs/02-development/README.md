@@ -29,6 +29,11 @@ This project is built with:
 4. [Secure File Access](08-secure-file-access.md) - Protected file downloads
 5. [Sidebar Navigation](09-sidebar.md) - Dynamic menu system
 6. [Toast Notifications](10-toast-notifications.md) - Flash messages and alerts
+7. [User Management](11-user-management.md) - User CRUD, account status, roles & permissions
+8. [Webhooks](12-webhooks.md) - Outgoing webhooks with signed payloads and delivery logs
+9. [Configuration Backup](13-config-backup.md) - Encrypted, portable config backup/restore
+10. [Single Sign-On](14-sso.md) - Database-backed SSO providers via Socialite
+11. [Artisan Runner](15-artisan-runner.md) - Run allowlisted Artisan commands from the browser (superadmin only)
 
 ## Development Workflow
 

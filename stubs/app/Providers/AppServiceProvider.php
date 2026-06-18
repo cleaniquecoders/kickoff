@@ -7,9 +7,11 @@ namespace App\Providers;
 use App\Settings\GeneralSettings;
 use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
+use CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,6 +51,29 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->applyDatabaseSettings();
+        $this->registerVendorLivewireNamespaces();
+    }
+
+    /**
+     * Workaround for cleaniquecoders/laravel-artisan-runner <= 1.2.x on Livewire 4:
+     * the package checks method_exists() on the Livewire FACADE (always false for
+     * __callStatic-proxied methods), so it falls back to Livewire::component()
+     * with a `::` name — which Livewire 4 never resolves. Registering the
+     * namespace here makes `artisan-runner::command-runner` resolvable.
+     * Remove once the package fixes the facade check upstream.
+     */
+    private function registerVendorLivewireNamespaces(): void
+    {
+        if (! class_exists(CommandRunner::class)) {
+            return;
+        }
+
+        Livewire::addNamespace(
+            namespace: 'artisan-runner',
+            classNamespace: 'CleaniqueCoders\\ArtisanRunner\\Livewire',
+            classPath: base_path('vendor/cleaniquecoders/laravel-artisan-runner/src/Livewire'),
+            classViewPath: base_path('vendor/cleaniquecoders/laravel-artisan-runner/resources/views/livewire'),
+        );
     }
 
     /**

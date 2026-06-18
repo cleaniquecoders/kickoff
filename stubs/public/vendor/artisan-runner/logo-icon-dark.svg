@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="artisan-runner icon">
+  <title>artisan-runner icon</title>
+
+  <!-- Dark background rounded rectangle -->
+  <rect x="0" y="0" width="200" height="200" rx="16" ry="16" fill="#0B1120"/>
+
+  <!-- Three cascading chevrons, centered in 200x200 -->
+  <!-- Original points: x spans 46..154 (108px), y spans 60..140 (80px) -->
+  <!-- Center of chevrons: x=(46+154)/2=100, y=(60+140)/2=100 — already centered -->
+  <polyline points="46,60 86,100 46,140"
+    fill="none" stroke="#059669" stroke-width="14"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="80,60 120,100 80,140"
+    fill="none" stroke="#10B981" stroke-width="14"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="114,60 154,100 114,140"
+    fill="none" stroke="#34D399" stroke-width="14"
+    stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

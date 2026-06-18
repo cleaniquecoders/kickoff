@@ -12,39 +12,80 @@
                             <tr>
                                 <th scope="col"
                                     class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-zinc-900 dark:text-zinc-100 sm:pl-6">
-                                    Role
+                                    {{ __('Role') }}
+                                </th>
+                                <th scope="col"
+                                    class="hidden px-3 py-3.5 text-left text-sm font-semibold text-zinc-900 md:table-cell dark:text-zinc-100">
+                                    {{ __('Description') }}
                                 </th>
                                 <th scope="col"
                                     class="px-3 py-3.5 text-left text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                                    Description
+                                    {{ __('Status') }}
+                                </th>
+                                <th scope="col"
+                                    class="px-3 py-3.5 text-left text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                                    {{ __('Users') }}
                                 </th>
                                 <th scope="col" class="py-3.5 pr-4 pl-3 sm:pr-6">
-                                    <span class="sr-only">Actions</span>
+                                    <span class="sr-only">{{ __('Actions') }}</span>
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700 bg-white dark:bg-zinc-900">
                             @forelse ($roles as $role)
-                                <tr>
+                                <tr wire:key="role-{{ $role->uuid }}">
                                     <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-zinc-900 dark:text-white sm:pl-6">
                                         {{ $role->display_name }}
+                                        @if ($role->isProtected())
+                                            <flux:badge size="sm" color="zinc" class="ml-1">{{ __('Protected') }}</flux:badge>
+                                        @endif
                                     </td>
-                                    <td class="px-3 py-4 text-sm text-zinc-700 dark:text-zinc-300">
+                                    <td class="hidden px-3 py-4 text-sm text-zinc-700 md:table-cell dark:text-zinc-300">
                                         {{ $role->description ?? '-' }}
                                     </td>
+                                    <td class="px-3 py-4 text-sm">
+                                        <flux:badge size="sm" color="{{ $role->is_enabled ? 'green' : 'zinc' }}">
+                                            {{ $role->is_enabled ? __('Enabled') : __('Disabled') }}
+                                        </flux:badge>
+                                    </td>
+                                    <td class="px-3 py-4 text-sm text-zinc-700 dark:text-zinc-300">
+                                        {{ $role->users_count }}
+                                    </td>
                                     <td class="py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
-                                        <flux:button
-                                            variant="ghost"
-                                            size="sm"
-                                            :href="route('admin.roles.show', ['uuid' => $role->uuid])"
-                                            wire:navigate>
-                                            View
-                                        </flux:button>
+                                        <flux:dropdown>
+                                            <flux:button variant="ghost" size="sm" icon="ellipsis" class="cursor-pointer" />
+                                            <flux:menu>
+                                                <flux:menu.item icon="shield-check"
+                                                    :href="route('admin.roles.show', ['uuid' => $role->uuid])" wire:navigate>
+                                                    {{ __('Manage Permissions') }}
+                                                </flux:menu.item>
+                                                @can('update', $role)
+                                                    <flux:menu.item icon="pencil"
+                                                        x-on:click="$dispatch('open-role-form', { uuid: '{{ $role->uuid }}' })">
+                                                        {{ __('Edit') }}
+                                                    </flux:menu.item>
+                                                @endcan
+                                                @unless ($role->isProtected())
+                                                    @can('update', $role)
+                                                        <flux:menu.item icon="{{ $role->is_enabled ? 'x' : 'check' }}"
+                                                            wire:click="toggleEnabled('{{ $role->uuid }}')">
+                                                            {{ $role->is_enabled ? __('Disable') : __('Enable') }}
+                                                        </flux:menu.item>
+                                                    @endcan
+                                                    @can('delete', $role)
+                                                        <flux:menu.item icon="trash-2" variant="danger"
+                                                            wire:click="delete('{{ $role->uuid }}')">
+                                                            {{ __('Delete') }}
+                                                        </flux:menu.item>
+                                                    @endcan
+                                                @endunless
+                                            </flux:menu>
+                                        </flux:dropdown>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="py-12 text-center">
+                                    <td colspan="5" class="py-12 text-center">
                                         <x-empty-state
                                             title="No roles found"
                                             description="Get started by creating a new role."

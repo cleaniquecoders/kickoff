@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 120" role="img" aria-label="artisan-runner logo">
+  <title>artisan-runner</title>
+
+  <!-- Chevron icon group — scaled to 100px tall, centered vertically in 120px height -->
+  <!-- Original chevron coords span y=60..140 (80px tall) in a 200x200 viewBox -->
+  <!-- Scale factor: 100/80 = 1.25, then translate to center -->
+  <!-- Transform: scale(0.5) maps 200x200 → 100x100, then shift down 10px to center in 120px -->
+  <g transform="translate(10, 10) scale(0.5)">
+    <!-- dim green chevron -->
+    <polyline points="46,60 86,100 46,140"
+      fill="none" stroke="#059669" stroke-width="14"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- mid green chevron -->
+    <polyline points="80,60 120,100 80,140"
+      fill="none" stroke="#10B981" stroke-width="14"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- bright green chevron -->
+    <polyline points="114,60 154,100 114,140"
+      fill="none" stroke="#34D399" stroke-width="14"
+      stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Wordmark text -->
+  <text
+    x="118"
+    y="72"
+    font-family="'Courier New', Consolas, 'Lucida Console', monospace"
+    font-size="40"
+    font-weight="700"
+    letter-spacing="-0.5"
+    fill="#E2E8F0">artisan-runner</text>
+</svg>

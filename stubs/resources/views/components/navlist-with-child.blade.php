@@ -10,24 +10,22 @@
     <flux:navlist.item icon="{{ data_get($menu, 'icon') }}" @click="open = !open" class="cursor-pointer">
         <div class="flex items-center justify-between w-full">
             <span>{{ data_get($menu, 'label') }}</span>
-            <svg x-show="!open" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <svg x-show="open" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
+            <flux:icon.chevron-right class="size-4! transition-transform duration-200"
+                x-bind:class="open && 'rotate-90'" />
         </div>
     </flux:navlist.item>
 
     {{-- Children menu items --}}
-    <div x-show="open" x-transition class="ml-6 space-y-1">
-        @foreach (data_get($menu, 'children', []) as $child)
-            <flux:navlist.item icon="{{ data_get($child, 'icon') }}" :href="data_get($child, 'url')"
-                :current="data_get($child, 'active')" wire:navigate class="text-sm">
-                {{ data_get($child, 'label') }}
-            </flux:navlist.item>
-        @endforeach
+    <div class="navlist-group-panel" x-bind:data-open="open">
+        <div class="navlist-group-panel-inner">
+            <div class="ml-6 space-y-1">
+                @foreach (data_get($menu, 'children', []) as $child)
+                    <flux:navlist.item icon="{{ data_get($child, 'icon') }}" :href="data_get($child, 'url')"
+                        :current="data_get($child, 'active')" wire:navigate class="text-sm">
+                        {{ data_get($child, 'label') }}
+                    </flux:navlist.item>
+                @endforeach
+            </div>
+        </div>
     </div>
 </div>

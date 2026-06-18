@@ -311,11 +311,11 @@ If a run fails midway, the project directory still exists with partial setup. Yo
 8. **Laravel Boost**: `boost:install` is interactive and cannot be fully automated non-interactively. The step is marked non-critical — if it fails, setup continues. Users should run `php artisan boost:install` manually after project setup for full configuration.
 9. **Unstable packages**: Always check if a package has a stable release before adding it to `$requireDev`. Use explicit version constraints (e.g., `package:dev-main`) for packages without stable releases.
 10. **Always test with sandbox**: Before pushing changes that affect `StartCommand`, run `bin/sandbox run` locally to verify the full setup flow works end-to-end.
-11. **Bootstrap artisan calls must not depend on Redis being up**: The stub `.env` ships with `CACHE_DRIVER=redis` and `SESSION_DRIVER=redis` (and `REDIS_PASSWORD=` blank — see gotcha #15). During `runTasks()`, bootstrap commands run *before* the developer has had a chance to start Docker/Redis — any artisan command that boots **Spatie Laravel Data**'s structure cache (e.g. `operations:install`, which uses `OptionsData::from(...)` internally) will resolve `CACHE_STORE` → `CACHE_DRIVER=redis` and crash (`RedisException` — connection refused if Redis isn't running, or `ERR AUTH ... called without any password configured` if the configured password doesn't match the server). `runTasks()` wraps these calls in `withSafeBootstrapEnv()` which `putenv()`s `CACHE_STORE=array`, `CACHE_DRIVER=array`, `SESSION_DRIVER=array` for the duration. **Always wrap new bootstrap artisan calls in `withSafeBootstrapEnv()`** when they might boot the application container.
+11. **Bootstrap artisan calls must not depend on Redis being up**: The stub `.env` ships with `CACHE_DRIVER=redis` and `SESSION_DRIVER=redis` (and `REDIS_PASSWORD=null` — see gotcha #15). During `runTasks()`, bootstrap commands run *before* the developer has had a chance to start Docker/Redis — any artisan command that boots **Spatie Laravel Data**'s structure cache (e.g. `operations:install`, which uses `OptionsData::from(...)` internally) will resolve `CACHE_STORE` → `CACHE_DRIVER=redis` and crash (`RedisException` — connection refused if Redis isn't running, or `ERR AUTH ... called without any password configured` if the configured password doesn't match the server). `runTasks()` wraps these calls in `withSafeBootstrapEnv()` which `putenv()`s `CACHE_STORE=array`, `CACHE_DRIVER=array`, `SESSION_DRIVER=array` for the duration. **Always wrap new bootstrap artisan calls in `withSafeBootstrapEnv()`** when they might boot the application container.
 12. **Stub `config/fortify.php` must keep `Features::passkeys()` enabled**: The Laravel Livewire starter kit (`laravel new --livewire`) ships passkey (WebAuthn) views — `login.blade.php` renders `<x-passkey-verify />`, plus `passkey-registration`, `confirm-password`, and the security settings page — along with the `passkeys` table migration and a `passkeys` rate limiter in `FortifyServiceProvider`. Fortify only registers the `passkey.*` routes (`passkey.login-options`, `passkey.login`, `passkey.store`, …) when `Features::passkeys()` is present in `config/fortify.php`. The kickoff stub **overwrites** the starter kit's `config/fortify.php`, so if that feature flag is dropped, `/login` throws `RouteNotFoundException: Route [passkey.login-options] not defined` while everything else looks fine. **Keep `Features::passkeys()` in the stub features array** (or remove the passkey views) — the two must stay in sync.
 13. **The `audits` table needs a `uuid` column**: `App\Models\Audit` uses `InteractsWithUuid`, and the security audit-trail route/controller/view resolve audits by uuid (`route('security.audit-trail.show', $audit->uuid)`, `Audit::whereUuid(...)`). But owen-it/laravel-auditing publishes `create_audits_table` **without** a uuid column, and `InteractsWithUuid` guards its `creating` hook with `Schema::hasColumn(...)` — so it *silently skips* setting the uuid when the column is missing. Result: `$audit->uuid` is always null and the index view throws `UrlGenerationException: Missing parameter: uuid`. The stub migration `9999_12_31_000002_add_uuid_to_audits_table.php` adds the column; its `9999_*` prefix guarantees it runs *after* the published audits migration. `migrate:fresh` runs all migrations before seeding, so audits created during seeding get a uuid automatically.
 14. **Never `Route::redirect()` Telescope/Horizon dashboards to their own path**: Telescope registers its dashboard as `->name('telescope')` (only when `TELESCOPE_ENABLED=true`) and Horizon as `->name('horizon.index')` (always). A stub line like `Route::redirect('/telescope', config('telescope.path', 'telescope'))->name('telescope')` is both a duplicate of the vendor route name **and** a self-redirect (source path === target path === `telescope`) → `ERR_TOO_MANY_REDIRECTS`, guaranteed when Telescope is disabled and its real route never registers. **Link the Audit & Monitoring menu directly to the vendor route names** (`route('telescope')`, `route('horizon.index')`) and guard the eager `setUrl(...)` call with `Route::has(...)` so menu construction doesn't throw when Telescope is off. The `access.telescope` gate also checks `config('telescope.enabled')` so the menu item hides when disabled.
-15. **`REDIS_PASSWORD` ships blank in the stub `.env`**: The stub defaults `CACHE_DRIVER=redis` / `SESSION_DRIVER=redis`, so the very first request after `composer dev` opens a Redis connection. If `REDIS_PASSWORD` is a non-empty placeholder (e.g. `CHANGE_ME_BEFORE_DEPLOY`) but the developer's local Redis has no auth, PhpRedis sends `AUTH` and Redis replies `ERR AUTH <password> called without any password configured` → 500 on `GET /`. So the stub `.env.example` ships `REDIS_PASSWORD=` (blank) — passwordless local Redis works out of the box, and `docker-compose.yml` applies whatever value is set via `redis-server --requirepass "${REDIS_PASSWORD:-}"`. **Set a real password before deploying to production**; do not re-introduce a placeholder value as the stub default.
+15. **`REDIS_PASSWORD` ships as `null` in the stub `.env`**: The stub defaults `CACHE_DRIVER=redis` / `SESSION_DRIVER=redis`, so the very first request after `composer dev` opens a Redis connection. If `REDIS_PASSWORD` is a non-empty placeholder (e.g. `CHANGE_ME_BEFORE_DEPLOY`) but the developer's local Redis has no auth, PhpRedis sends `AUTH` and Redis replies `ERR AUTH <password> called without any password configured` → 500 on `GET /`. So the stub `.env.example` ships `REDIS_PASSWORD=null` (no auth) — passwordless local Redis works out of the box, and `docker-compose.yml` applies whatever value is set via `redis-server --requirepass "${REDIS_PASSWORD:-}"`. **Set a real password before deploying to production**; do not re-introduce a placeholder value as the stub default.
 
 ## Generated Project Stack
 
@@ -361,6 +361,10 @@ All bugs, features, and improvements **must** have a GitHub issue created before
 Use `gh issue create` to create issues with appropriate labels and descriptions.
 Reference issues in commit messages and PRs.
 
+**All task tracking lives on GitHub** — put task checklists in the issue body
+(`- [ ]` task lists) and update them with `gh issue edit` as work progresses.
+Do NOT create local tracking files like `tasks/todo.md`.
+
 ### Labels
 
 - `bug`: Something broken or inconsistent
@@ -388,7 +392,7 @@ Reference issues in commit messages and PRs.
 
 ### 3. Self-Improvement Loop
 
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- After ANY correction from the user: record the pattern in `CLAUDE.md` (gotcha/preference/DO-DON'T)
 - Write rules for yourself that prevent the same mistake
 - Ruthlessly iterate on these lessons until mistake rate drops
 - Review lessons at session start for relevant project
@@ -416,12 +420,12 @@ Reference issues in commit messages and PRs.
 
 ### Task Management
 
-1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
+1. **Plan First**: Create a GitHub issue with a `- [ ]` task checklist in the body
 2. **Verify Plan**: Check in before starting implementation
-3. **Track Progress**: Mark items complete as you go
+3. **Track Progress**: Tick checklist items via `gh issue edit` as you go
 4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section to `tasks/todo.md`
-6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+5. **Document Results**: Comment results/review on the issue, then close it
+6. **Capture Lessons**: Record corrections in `CLAUDE.md` (gotchas/preferences), not local files
 
 Scale process to task size — simple fixes skip steps 1–2.
 

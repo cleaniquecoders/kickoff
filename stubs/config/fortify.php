@@ -87,15 +87,13 @@ return [
         Features::emailVerification(),
         Features::updateProfileInformation(),
         Features::updatePasswords(),
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-        ]),
         // Passkeys (WebAuthn) — the Livewire starter kit ships the login/registration
         // views and the `passkeys` table migration + rate limiter. This feature flag is
         // what registers the `passkey.*` routes those views reference; without it the
         // login page throws RouteNotFoundException for [passkey.login-options].
-        Features::passkeys([
+        Features::passkeys(),
+        Features::twoFactorAuthentication([
+            'confirm' => true,
             'confirmPassword' => true,
         ]),
     ],

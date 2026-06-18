@@ -267,10 +267,54 @@ class Reports extends Base
 
 The `<x-menu>` component (`resources/views/components/menu.blade.php`) handles all rendering:
 
-- Checks section authorization via `isAuthorized()` and `getAuthorizationForBlade()`
-- Renders items as `<flux:navlist.item>` within a `<flux:navlist.group>`
+- Checks section authorization via `isAuthorized()` (string authorizations are evaluated through `Gate::allows()`)
+- Renders **two sibling variants** per menu, switched purely by CSS:
+  - `resources/views/components/menu/expanded.blade.php` — full sidebar (`.sidebar-expanded-only`)
+  - `resources/views/components/menu/collapsed.blade.php` — icon rail (`.sidebar-collapsed-only`)
 - Supports link items (default) and form items (for logout, etc.)
-- Supports nested children via `<x-navlist-with-child>`
+- Supports nested children via `<x-navlist-with-child>` (expanded) or flattened flyout entries (collapsed)
+
+## Collapsible Sidebar & Menu Groups
+
+### Desktop Icon Rail
+
+On desktop (`lg+`), the sidebar toggles between the full sidebar and a narrow icon-only rail
+via the toggle button next to the logo. Mobile keeps the existing stashable hamburger behavior —
+the rail only applies at `lg+`.
+
+**State persistence** uses a plain cookie named `sidebar_collapsed` (`1`/`0`, 1 year):
+
+- Written by the Alpine store `$store.sidebar` (registered in `resources/js/app.js`)
+- Read server-side in `resources/views/components/layouts/app/sidebar.blade.php` to render
+  the `data-collapsed` attribute on `<flux:sidebar>` — so under `wire:navigate` every
+  server-rendered response is already in the correct state (no flicker, unlike localStorage)
+- Excluded from cookie encryption in `bootstrap/app.php`:
+  `$middleware->encryptCookies(except: ['sidebar_collapsed'])` — without this,
+  `request()->cookie('sidebar_collapsed')` returns `null` for the JS-written cookie
+
+**CSS contract** (`resources/css/app.css`): elements marked `.sidebar-expanded-only` are hidden
+in rail mode; `.sidebar-collapsed-only` elements are hidden everywhere *except* rail mode.
+The rules are scoped to `[data-flux-sidebar][data-collapsed]` at `lg+`.
+
+### Flyout Submenus (Rail Mode)
+
+In rail mode, each menu group renders as a ghost icon button (the builder's heading icon) that
+opens a right-positioned `<flux:dropdown>` flyout listing the group's items. Icon-only items
+(heading-less builders like `sidebar`) get tippy tooltips via `data-tippy-content` — tooltips
+are re-initialized after `livewire:navigated` in `app.js`.
+
+The trigger button gets an accent highlight when the group contains the active page.
+
+### Collapsible Menu Groups (Expanded Mode)
+
+Groups with headings render as `<flux:navlist.group expandable>` — each group collapses and
+expands independently (multi-open) with a chevron, using the published override at
+`resources/views/flux/navlist/group.blade.php`. Groups default to expanded on page load.
+
+### Best Practice: Always Set a Heading Icon
+
+Menu builders **must** call `setHeadingIcon()` — the heading icon becomes the group's rail icon
+in collapsed mode. Without it, the rail falls back to a generic `circle` icon.
 
 ## Best Practices
 

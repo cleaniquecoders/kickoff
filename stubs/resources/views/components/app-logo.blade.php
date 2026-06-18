@@ -5,7 +5,7 @@
     </div>
 
     {{-- App Name --}}
-    <div class="flex flex-col">
+    <div class="flex flex-col sidebar-expanded-only">
         <span class="text-base font-bold text-zinc-900 dark:text-white">
             {{ config('app.name') }}
         </span>
