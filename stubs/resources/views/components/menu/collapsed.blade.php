@@ -21,10 +21,20 @@
                         {{ data_get($menuItem, 'label') }}
                     </div>
                     @foreach (data_get($menuItem, 'children', []) as $child)
-                        <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
-                            :href="data_get($child, 'url')" wire:navigate>
-                            {{ data_get($child, 'label') }}
-                        </flux:menu.item>
+                        @if (data_get($child, 'target') === '_blank')
+                            <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
+                                :href="data_get($child, 'url')" target="_blank" rel="noopener noreferrer">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
+                                    <span>{{ data_get($child, 'label') }}</span>
+                                </span>
+                            </flux:menu.item>
+                        @else
+                            <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
+                                :href="data_get($child, 'url')" wire:navigate>
+                                {{ data_get($child, 'label') }}
+                            </flux:menu.item>
+                        @endif
                     @endforeach
                 @elseif (data_get($menuItem, 'type', 'link') === 'form')
                     @php $formMethod = strtoupper(data_get($menuItem, 'formAttributes.method', 'POST')); @endphp
@@ -43,10 +53,20 @@
                         </flux:menu.item>
                     </form>
                 @else
-                    <flux:menu.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
-                        :href="data_get($menuItem, 'url')" wire:navigate>
-                        {{ data_get($menuItem, 'label', 'Menu Item') }}
-                    </flux:menu.item>
+                    @if (data_get($menuItem, 'target') === '_blank')
+                        <flux:menu.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
+                            :href="data_get($menuItem, 'url')" target="_blank" rel="noopener noreferrer">
+                            <span class="inline-flex items-center gap-1.5">
+                                <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
+                                <span>{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
+                            </span>
+                        </flux:menu.item>
+                    @else
+                        <flux:menu.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
+                            :href="data_get($menuItem, 'url')" wire:navigate>
+                            {{ data_get($menuItem, 'label', 'Menu Item') }}
+                        </flux:menu.item>
+                    @endif
                 @endif
             @endforeach
         </flux:menu>
@@ -63,10 +83,20 @@
 
                 <flux:menu class="min-w-48">
                     @foreach (data_get($menuItem, 'children', []) as $child)
-                        <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
-                            :href="data_get($child, 'url')" wire:navigate>
-                            {{ data_get($child, 'label') }}
-                        </flux:menu.item>
+                        @if (data_get($child, 'target') === '_blank')
+                            <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
+                                :href="data_get($child, 'url')" target="_blank" rel="noopener noreferrer">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
+                                    <span>{{ data_get($child, 'label') }}</span>
+                                </span>
+                            </flux:menu.item>
+                        @else
+                            <flux:menu.item icon="{{ data_get($child, 'icon', 'circle') }}"
+                                :href="data_get($child, 'url')" wire:navigate>
+                                {{ data_get($child, 'label') }}
+                            </flux:menu.item>
+                        @endif
                     @endforeach
                 </flux:menu>
             </flux:dropdown>
@@ -84,6 +114,10 @@
                     class="w-full cursor-pointer" :current="data_get($menuItem, 'active', false)"
                     data-tippy-content="{{ data_get($menuItem, 'label') }}" />
             </form>
+        @elseif (data_get($menuItem, 'target') === '_blank')
+            <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}" :href="data_get($menuItem, 'url')"
+                :current="data_get($menuItem, 'active', false)"
+                data-tippy-content="{{ data_get($menuItem, 'label') }}" target="_blank" rel="noopener noreferrer" />
         @else
             <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}" :href="data_get($menuItem, 'url')"
                 :current="data_get($menuItem, 'active', false)" wire:navigate

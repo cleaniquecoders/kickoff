@@ -51,6 +51,7 @@ class AuditMonitoring extends Base
             ->setIcon('terminal')
             ->setDescription(__('Run allowlisted Artisan commands from the browser'))
             ->setTooltip(__('Artisan Runner'))
+            ->setTarget('_blank')
             ->setVisible(fn () => Route::has('artisan-runner.index') && Gate::allows('access.artisan-runner'));
     }
 

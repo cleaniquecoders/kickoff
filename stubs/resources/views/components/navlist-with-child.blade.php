@@ -20,10 +20,21 @@
         <div class="navlist-group-panel-inner">
             <div class="ml-6 space-y-1">
                 @foreach (data_get($menu, 'children', []) as $child)
-                    <flux:navlist.item icon="{{ data_get($child, 'icon') }}" :href="data_get($child, 'url')"
-                        :current="data_get($child, 'active')" wire:navigate class="text-sm">
-                        {{ data_get($child, 'label') }}
-                    </flux:navlist.item>
+                    @if (data_get($child, 'target') === '_blank')
+                        <flux:navlist.item icon="{{ data_get($child, 'icon') }}" :href="data_get($child, 'url')"
+                            :current="data_get($child, 'active')" class="text-sm"
+                            target="_blank" rel="noopener noreferrer">
+                            <span class="inline-flex items-center gap-1.5">
+                                <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
+                                <span>{{ data_get($child, 'label') }}</span>
+                            </span>
+                        </flux:navlist.item>
+                    @else
+                        <flux:navlist.item icon="{{ data_get($child, 'icon') }}" :href="data_get($child, 'url')"
+                            :current="data_get($child, 'active')" wire:navigate class="text-sm">
+                            {{ data_get($child, 'label') }}
+                        </flux:navlist.item>
+                    @endif
                 @endforeach
             </div>
         </div>
