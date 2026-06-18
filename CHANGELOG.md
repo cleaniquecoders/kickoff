@@ -2,6 +2,28 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.23.0 - 2026-06-18
+
+### Highlights
+
+#### New
+
+- **Laravel MCP Kit** — generated projects now bootstrap a ready-to-use MCP server via `cleaniquecoders/laravel-mcp-kit` (token-authenticated `mcp/tasks` endpoint + local STDIO transport), with the required Gate abilities mapped into the permission model. (#39)
+- **Sidebar UX** — Horizon/Telescope/Artisan Runner open in a new tab (with a right-aligned external-link icon); menu groups collapse by default and auto-expand the active group. (#41, #42, #43)
+- **`flux:main` page container** — standardised page width/padding (`max-w-7xl` + `mx-auto` + `p-6 lg:p-8`); removed redundant per-page wrappers that caused double padding. (#41)
+- **Telescope enabled by default** — exception watcher only; dashboard still gated to local/staging. (#44)
+- **Refreshed Kickoff logo** — clean single-`K` mark. (#45)
+
+#### Fixes (fresh-provision runtime errors)
+
+- `/login` — re-enabled `Features::passkeys()` (the starter-kit passkey views need it) → no more `RouteNotFoundException [passkey.login-options]`. (#39)
+- `/security/audit-trail` — added a `uuid` column to the `audits` table → no more `UrlGenerationException`. (#39)
+- `/telescope` — removed the self-redirect routes that caused `ERR_TOO_MANY_REDIRECTS`. (#39)
+- `GET /` — `REDIS_PASSWORD` now ships as `null` so passwordless local Redis works out of the box. (#39)
+- `/admin/roles` — pinned the Spatie `Role`/`Permission` guard to `web` so `auth:sanctum`'s default-guard flip no longer breaks `Role::withCount('users')` (500). (#40)
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.22.0...1.23.0
+
 ## 1.22.0 - 2026-06-12
 
 ### What's New
@@ -973,6 +995,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -992,6 +1015,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1056,6 +1080,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1230,6 +1255,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1239,6 +1265,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1323,11 +1350,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1408,11 +1437,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1658,11 +1689,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1749,11 +1782,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
