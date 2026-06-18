@@ -2,6 +2,22 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.24.0 - 2026-06-18
+
+### Row-click detail flyouts (#46)
+
+Admin list pages now open a **detail flyout when you click a row** — a consistent, faster way to inspect a record without leaving the list.
+
+- **Roles** — flyout shows role info + permissions management (reuses `admin.roles.show`); 3-dot menu kept for writes.
+- **Users** — detail flyout (status, verification, roles, joined) with inline actions: edit, manage access, reset password, resend verification, suspend/activate, delete. Row checkbox and 3-dot menu are click-isolated.
+- **Audit-trail** — static index converted to a Livewire component; **read-only** detail flyout. The detail markup is shared between the flyout and the show page, so the deep-link URL still works.
+
+#### Convention
+
+Added **"Flyout vs Modal vs Dedicated Page — when to use which"** to `stubs/CLAUDE.md` (decision table, heuristics, and the parent-owns-state row-click→flyout pattern).
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.23.0...1.24.0
+
 ## 1.23.0 - 2026-06-18
 
 ### Highlights
@@ -996,6 +1012,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1015,6 +1032,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1080,6 +1098,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1256,6 +1275,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1265,6 +1285,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1351,11 +1372,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1438,11 +1461,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1690,11 +1715,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1783,11 +1810,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
