@@ -30,7 +30,7 @@
                 <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
                     :href="data_get($menuItem, 'url')" :current="data_get($menuItem, 'active', false)"
                     target="_blank" rel="noopener noreferrer">
-                    <span class="inline-flex items-center gap-1.5">
+                    <span class="flex w-full items-center justify-between gap-2">
                         <span>{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
                         <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                     </span>
