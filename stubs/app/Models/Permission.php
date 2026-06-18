@@ -24,6 +24,23 @@ class Permission extends \Spatie\Permission\Models\Permission implements Auditab
         'is_enabled',
     ];
 
+    /**
+     * Pin fresh instances to the `web` guard.
+     *
+     * Browser routes authenticate via `auth:sanctum`; once that guard passes,
+     * Laravel makes `sanctum` the request's default guard. Spatie would then
+     * resolve a guardless fresh instance against `sanctum` (provider is null),
+     * and relation building (`morphedByMany(null, …)`) throws "Class name must
+     * be a valid object or a string". All roles/permissions here are stored under
+     * `web`, so pin it. Hydrated rows still get their real guard from the DB.
+     */
+    public function __construct(array $attributes = [])
+    {
+        $attributes['guard_name'] ??= 'web';
+
+        parent::__construct($attributes);
+    }
+
     protected function displayName(): Attribute
     {
         return Attribute::make(
