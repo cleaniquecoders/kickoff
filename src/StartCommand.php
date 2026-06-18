@@ -122,7 +122,7 @@ class StartCommand extends Command
         $output->writeln('<info>1. Credentials & secrets</info> — replace every <comment>CHANGE_ME_BEFORE_DEPLOY</comment> in .env:');
         $output->writeln('   • <comment>SUPERADMIN_PASSWORD</comment>      — initial admin login password');
         $output->writeln('   • <comment>DB_PASSWORD</comment> / <comment>DB_ROOT_PASSWORD</comment> — MySQL credentials');
-        $output->writeln('   • <comment>REDIS_PASSWORD</comment>           — leave blank if local Redis has no auth');
+        $output->writeln('   • <comment>REDIS_PASSWORD</comment>           — blank by default; set one before deploying to production');
         $output->writeln('   • <comment>MEILI_MASTER_KEY</comment>         — Meilisearch master key');
         $output->writeln('   • <comment>MINIO_ROOT_USER</comment> / <comment>MINIO_ROOT_PASSWORD</comment> — MinIO S3 credentials');
         $output->writeln('');
@@ -376,6 +376,7 @@ class StartCommand extends Command
                 'cleaniquecoders/laravel-config-backup',
                 'cleaniquecoders/laravel-config-sso',
                 'cleaniquecoders/laravel-config-webhook',
+                'cleaniquecoders/laravel-mcp-kit',
                 'cleaniquecoders/laravel-media-secure',
                 'cleaniquecoders/traitify',
                 'diglactic/laravel-breadcrumbs',
@@ -593,6 +594,7 @@ class StartCommand extends Command
                 runCommand('php artisan key:generate', $verbose);
                 runCommand('php artisan make:notifications-table', $verbose);
                 runCommand('php artisan operations:install', $verbose);
+                runCommand('php artisan mcp-kit:install --no-interaction', $verbose);
                 runCommand('php artisan reload:db', $verbose);
             });
         }, $output, $verbose);
