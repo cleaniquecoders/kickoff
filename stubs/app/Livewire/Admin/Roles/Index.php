@@ -18,6 +18,22 @@ class Index extends Component
     use InteractsWithLivewireConfirm;
     use WithPagination;
 
+    public ?string $detailUuid = null;
+
+    public bool $showDetail = false;
+
+    public int $detailKey = 0;
+
+    /**
+     * Open the role detail flyout (reuses the admin.roles.show component).
+     */
+    public function openDetail(string $uuid): void
+    {
+        $this->detailUuid = $uuid;
+        $this->detailKey++;
+        $this->showDetail = true;
+    }
+
     public function delete(string $uuid): void
     {
         $role = Role::where('uuid', $uuid)->firstOrFail();
