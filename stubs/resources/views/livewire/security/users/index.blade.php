@@ -95,8 +95,10 @@
             </thead>
             <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                 @forelse ($this->users as $user)
-                    <tr wire:key="user-{{ $user->uuid }}" class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
-                        <td class="px-4 py-4">
+                    <tr wire:key="user-{{ $user->uuid }}"
+                        wire:click="openDetail('{{ $user->uuid }}')"
+                        class="cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
+                        <td class="px-4 py-4" @click.stop>
                             <flux:checkbox wire:model.live="selected" value="{{ $user->uuid }}" />
                         </td>
                         <td class="px-4 py-4">
@@ -135,7 +137,7 @@
                         <td class="hidden px-4 py-4 text-sm text-zinc-500 md:table-cell dark:text-zinc-400">
                             {{ $user->created_at->format('M d, Y') }}
                         </td>
-                        <td class="px-4 py-4 text-right">
+                        <td class="px-4 py-4 text-right" @click.stop>
                             <flux:dropdown>
                                 <flux:button variant="ghost" size="sm" icon="ellipsis" class="cursor-pointer" />
                                 <flux:menu>
@@ -215,4 +217,84 @@
     <div class="mt-4">
         {{ $this->users->links() }}
     </div>
+
+    {{-- User detail flyout (opened by row click) --}}
+    <x-flyout name="user-detail" size="lg" wire:model="showDetail">
+        @php $u = $this->selectedUser; @endphp
+        @if ($u)
+            <div class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-700">
+                        <span class="text-lg font-semibold text-zinc-600 dark:text-zinc-300">{{ $u->initials() }}</span>
+                    </div>
+                    <div class="min-w-0">
+                        <flux:heading size="lg">{{ $u->name }}</flux:heading>
+                        <flux:subheading>{{ $u->email }}</flux:subheading>
+                    </div>
+                </div>
+
+                <dl class="grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
+                    <div>
+                        <dt class="font-medium text-zinc-500 dark:text-zinc-400">{{ __('Status') }}</dt>
+                        <dd class="mt-1"><flux:badge size="sm" color="{{ $u->status()->color() }}">{{ $u->status()->label() }}</flux:badge></dd>
+                    </div>
+                    <div>
+                        <dt class="font-medium text-zinc-500 dark:text-zinc-400">{{ __('Email verified') }}</dt>
+                        <dd class="mt-1 text-zinc-900 dark:text-zinc-100">{{ $u->hasVerifiedEmail() ? __('Yes') : __('No') }}</dd>
+                    </div>
+                    <div class="col-span-2">
+                        <dt class="font-medium text-zinc-500 dark:text-zinc-400">{{ __('Roles') }}</dt>
+                        <dd class="mt-1 flex flex-wrap gap-1">
+                            @forelse ($u->roles as $role)
+                                <flux:badge size="sm" color="{{ $role->name === 'superadmin' ? 'red' : ($role->name === 'administrator' ? 'amber' : 'zinc') }}">{{ $role->display_name ?? $role->name }}</flux:badge>
+                            @empty
+                                <span class="italic text-zinc-400 dark:text-zinc-500">{{ __('No roles') }}</span>
+                            @endforelse
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="font-medium text-zinc-500 dark:text-zinc-400">{{ __('Joined') }}</dt>
+                        <dd class="mt-1 text-zinc-900 dark:text-zinc-100">{{ $u->created_at->format('M d, Y') }}</dd>
+                    </div>
+                </dl>
+
+                <flux:separator variant="subtle" />
+
+                <div class="flex flex-wrap gap-2">
+                    @if ($u->trashed())
+                        @can('restore', $u)
+                            <flux:button size="sm" icon="rotate-ccw" wire:click="restore('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Restore') }}</flux:button>
+                        @endcan
+                    @else
+                        @can('update', $u)
+                            <flux:button size="sm" icon="pencil" class="cursor-pointer"
+                                x-on:click="$dispatch('open-user-form', { uuid: '{{ $u->uuid }}' }); $wire.set('showDetail', false)">{{ __('Edit') }}</flux:button>
+                        @endcan
+                        @can('assignRoles', $u)
+                            <flux:button size="sm" variant="ghost" icon="shield-check" class="cursor-pointer"
+                                x-on:click="$dispatch('open-user-access', { uuid: '{{ $u->uuid }}' }); $wire.set('showDetail', false)">{{ __('Manage Access') }}</flux:button>
+                        @endcan
+                        @can('sendPasswordReset', $u)
+                            <flux:button size="sm" variant="ghost" icon="key-round" wire:click="sendPasswordResetLink('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Send Password Reset') }}</flux:button>
+                        @endcan
+                        @if (! $u->hasVerifiedEmail())
+                            @can('sendVerification', $u)
+                                <flux:button size="sm" variant="ghost" icon="mail-check" wire:click="resendVerification('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Resend Verification') }}</flux:button>
+                            @endcan
+                        @endif
+                        @can('suspend', $u)
+                            @if ($u->isSuspended())
+                                <flux:button size="sm" variant="ghost" icon="user-check" wire:click="activate('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Activate') }}</flux:button>
+                            @else
+                                <flux:button size="sm" variant="ghost" icon="user-x" wire:click="suspend('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Suspend') }}</flux:button>
+                            @endif
+                        @endcan
+                        @can('delete', $u)
+                            <flux:button size="sm" variant="danger" icon="trash-2" wire:click="delete('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Delete') }}</flux:button>
+                        @endcan
+                    @endif
+                </div>
+            </div>
+        @endif
+    </x-flyout>
 </div>

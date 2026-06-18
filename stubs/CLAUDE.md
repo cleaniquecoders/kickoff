@@ -349,6 +349,61 @@ class MyComponent extends Component
 }
 ```
 
+### Flyout vs Modal vs Dedicated Page — when to use which
+
+Pick the surface by **what the interaction is**, not by habit:
+
+- **Dedicated page** = a *destination*: deep-linkable/bookmarkable URL, dense or multi-section content, tabs, nested/related lists, print/export, primary place the user goes to and stays.
+- **Flyout (side panel)** = a *quick side task in the context of a list*: view or light-edit one record without leaving the list, especially when hopping between rows. Default for "open this row".
+- **Modal (centered dialog)** = a *focused interruption*: confirmations and 1–2 field quick edits.
+
+Decision signals:
+
+| Signal | Page | Flyout | Modal |
+|---|---|---|---|
+| Needs a shareable/bookmarkable URL (link in email, ticket, audit reference) | ✅ | ❌ | ❌ |
+| Content density | high (sections/tabs/sub-tables) | low–medium (one record) | tiny (one message/field) |
+| Opened repeatedly across rows (open A, close, open B) | painful | ✅ ideal | ok for confirms |
+| Has nested/related lists inside | ✅ | avoid | ❌ |
+| Print / export / SEO | ✅ | ❌ | ❌ |
+
+Heuristics:
+
+- **Default to a flyout** for "view/edit one row" when it fits one scroll and the user bounces between rows. **Promote to a page** the moment it gains tabs, nested lists, a deep-link need, or a long/multi-step form.
+- **Modal only** for confirmations and 1–2 field quick edits (use `<x-form-modal>` without `variant`).
+- **Don't offer two doors** to the same detail — make row-click the primary entry and keep the 3-dot menu for *write* actions (edit/delete/etc.).
+- Audits/records that are referenced elsewhere keep a **dedicated page** (deep-linkable); a flyout quick-peek may be *added* but should not replace the URL.
+
+**Row-click → detail flyout pattern** (parent list component owns the state):
+
+```php
+public ?string $detailUuid = null;
+public bool $showDetail = false;
+public int $detailKey = 0;   // bump each open so the child re-mounts cleanly
+
+public function openDetail(string $uuid): void
+{
+    $this->detailUuid = $uuid;
+    $this->detailKey++;
+    $this->showDetail = true;
+}
+```
+
+```blade
+{{-- Row opens the flyout; the actions cell stops propagation so the 3-dot menu still works --}}
+<tr wire:key="row-{{ $item->uuid }}" wire:click="openDetail('{{ $item->uuid }}')"
+    class="cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
+    {{-- cells --}}
+    <td @click.stop>{{-- <flux:dropdown> 3-dot write actions --}}</td>
+</tr>
+
+<x-flyout name="item-detail" size="lg" wire:model="showDetail">
+    @if ($detailUuid)
+        <livewire:item.detail :uuid="$detailUuid" :key="'item-detail-'.$detailKey" />
+    @endif
+</x-flyout>
+```
+
 ### Form Modal vs Flyout — Standard
 
 Two shared components live at the top of `resources/views/components/`:

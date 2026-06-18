@@ -41,6 +41,35 @@ class Index extends Component
 
     public string $bulkRole = '';
 
+    public ?string $detailUuid = null;
+
+    public bool $showDetail = false;
+
+    public int $detailKey = 0;
+
+    /**
+     * Open the user detail flyout for the given user.
+     */
+    public function openDetail(string $uuid): void
+    {
+        $this->detailUuid = $uuid;
+        $this->detailKey++;
+        $this->showDetail = true;
+    }
+
+    /**
+     * The user shown in the detail flyout.
+     */
+    #[Computed]
+    public function selectedUser(): ?User
+    {
+        if (! $this->detailUuid) {
+            return null;
+        }
+
+        return User::withTrashed()->with('roles')->where('uuid', $this->detailUuid)->first();
+    }
+
     public function updatedSearch(): void
     {
         $this->resetPage();

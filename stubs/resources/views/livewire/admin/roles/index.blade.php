@@ -33,7 +33,9 @@
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700 bg-white dark:bg-zinc-900">
                             @forelse ($roles as $role)
-                                <tr wire:key="role-{{ $role->uuid }}">
+                                <tr wire:key="role-{{ $role->uuid }}"
+                                    wire:click="openDetail('{{ $role->uuid }}')"
+                                    class="cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
                                     <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-zinc-900 dark:text-white sm:pl-6">
                                         {{ $role->display_name }}
                                         @if ($role->isProtected())
@@ -51,12 +53,13 @@
                                     <td class="px-3 py-4 text-sm text-zinc-700 dark:text-zinc-300">
                                         {{ $role->users_count }}
                                     </td>
-                                    <td class="py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
+                                    <td class="py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6"
+                                        @click.stop>
                                         <flux:dropdown>
                                             <flux:button variant="ghost" size="sm" icon="ellipsis" class="cursor-pointer" />
                                             <flux:menu>
                                                 <flux:menu.item icon="shield-check"
-                                                    :href="route('admin.roles.show', ['uuid' => $role->uuid])" wire:navigate>
+                                                    wire:click="openDetail('{{ $role->uuid }}')">
                                                     {{ __('Manage Permissions') }}
                                                 </flux:menu.item>
                                                 @can('update', $role)
@@ -103,4 +106,11 @@
     <div class="mt-4">
         {{ $roles->links() }}
     </div>
+
+    {{-- Role detail flyout (opened by row click / "Manage Permissions") --}}
+    <x-flyout name="role-detail" size="xl" wire:model="showDetail">
+        @if ($detailUuid)
+            <livewire:admin.roles.show :uuid="$detailUuid" :key="'role-detail-'.$detailKey" />
+        @endif
+    </x-flyout>
 </div>
