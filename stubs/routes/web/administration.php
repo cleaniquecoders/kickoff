@@ -31,4 +31,11 @@ Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admi
             })->name('settings.show');
         });
 
+        // Mail History — outbound email audit log (cleaniquecoders/mailhistory)
+        Route::middleware(['can:admin.view.mail-history'])->group(function () {
+            Route::get('mail-history', function () {
+                return view('admin.mail-history.index');
+            })->name('mail-history.index');
+        });
+
     });

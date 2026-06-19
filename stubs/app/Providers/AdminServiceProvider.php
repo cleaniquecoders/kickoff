@@ -104,6 +104,12 @@ class AdminServiceProvider extends ServiceProvider
         Gate::define('manage.settings', function (User $user) {
             return $user->can('admin.manage.settings');
         });
+
+        // Mail History (outbound email audit log) — gated alongside settings
+        // management, consistent with the Mail menu group.
+        Gate::define('admin.view.mail-history', function (User $user) {
+            return $user->can('admin.manage.settings');
+        });
     }
 
     /**

@@ -438,6 +438,7 @@ class StartCommand extends Command
                 '--tag=livewire:config',
                 '--tag=media-manager-config',
                 '--tag=media-manager-views',
+                '--tag=mailhistory-migrations',
             ];
             foreach ($options as $option) {
                 runCommand("php artisan vendor:publish {$option}", $verbose);
