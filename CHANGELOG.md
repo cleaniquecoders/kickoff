@@ -2,6 +2,22 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.25.0 - 2026-06-19
+
+### New
+
+- **Nested Administration menu** — one collapsible Administration group nesting Identity, Mail, Backups, Settings, Developers; Resources group at the bottom. Every leaf is route + gate guarded.
+- **Mail History** — outbound-email audit log at Administration → Mail → History (`admin.mail-history.index`) over `cleaniquecoders/mailhistory`, wired end-to-end (package + publish step + route + gate + component + views).
+- **Full SMTP Mail Settings** — complete SMTP form (Mailer, Encryption, Host, Port, Username, Password, From) + send-test-email; `MailSettings` applied to runtime mail config.
+
+### Improvements
+
+- g8stack-style group headers (`[icon] Label ›`) with a vertical guide line; nested sub-groups re-sync on `livewire:navigated`.
+- Long sidebar labels truncate with an ellipsis (`[data-flux-navlist-item] [data-content]{min-width:0}`).
+- Portable menu `child()` helper — candidate route/ability pairs + `$routeParams`.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.24.0...1.25.0
+
 ## 1.24.0 - 2026-06-18
 
 ### Row-click detail flyouts (#46)
@@ -1013,6 +1029,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1032,6 +1049,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1098,6 +1116,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1276,6 +1295,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1285,6 +1305,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1373,11 +1394,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1462,11 +1485,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1716,11 +1741,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1811,11 +1838,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
