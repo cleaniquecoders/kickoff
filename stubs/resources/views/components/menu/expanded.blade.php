@@ -1,6 +1,8 @@
 {{-- Expanded sidebar variant — included by components/menu.blade.php.
      Expects: $menu, $menuItems, $heading, $headingIcon, $hasActiveItem --}}
-{{-- Groups collapse by default; the group containing the current page stays open. --}}
+{{-- Groups collapse by default; the group containing the current page stays open.
+     Every label truncates with an ellipsis (with the full name in a title tooltip)
+     so long names stay on one line — consistent with the nested sub-groups. --}}
 <flux:navlist.group :heading="$heading" :icon="$headingIcon ?? null" :expandable="filled($heading)" :expanded="$hasActiveItem" class="grid">
     @foreach ($menuItems as $menuItem)
         @continue(! data_get($menuItem, 'visible', true))
@@ -20,8 +22,9 @@
                 @endif
                 @csrf
                 <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}" as="button" type="submit"
-                    class="w-full cursor-pointer" :current="data_get($menuItem, 'active', false)">
-                    {{ data_get($menuItem, 'label', 'Menu Item') }}
+                    class="w-full cursor-pointer" :current="data_get($menuItem, 'active', false)"
+                    title="{{ data_get($menuItem, 'label', 'Menu Item') }}">
+                    <span class="block truncate">{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
                 </flux:navlist.item>
             </form>
         @else
@@ -29,16 +32,17 @@
             @if (data_get($menuItem, 'target') === '_blank')
                 <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
                     :href="data_get($menuItem, 'url')" :current="data_get($menuItem, 'active', false)"
-                    target="_blank" rel="noopener noreferrer">
-                    <span class="flex w-full items-center justify-between gap-2">
-                        <span>{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
+                    target="_blank" rel="noopener noreferrer" title="{{ data_get($menuItem, 'label', 'Menu Item') }}">
+                    <span class="flex w-full items-center justify-between gap-2 min-w-0">
+                        <span class="min-w-0 truncate">{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
                         <flux:icon.arrow-top-right-on-square class="size-3.5 shrink-0 opacity-60" />
                     </span>
                 </flux:navlist.item>
             @else
                 <flux:navlist.item icon="{{ data_get($menuItem, 'icon', 'circle') }}"
-                    :href="data_get($menuItem, 'url')" :current="data_get($menuItem, 'active', false)" wire:navigate>
-                    {{ data_get($menuItem, 'label', 'Menu Item') }}
+                    :href="data_get($menuItem, 'url')" :current="data_get($menuItem, 'active', false)" wire:navigate
+                    title="{{ data_get($menuItem, 'label', 'Menu Item') }}">
+                    <span class="block truncate">{{ data_get($menuItem, 'label', 'Menu Item') }}</span>
                 </flux:navlist.item>
             @endif
         @endif

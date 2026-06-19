@@ -70,10 +70,15 @@ class Administration extends Base
      * route's paired ability is granted. When fewer abilities than routes are
      * given, the last ability is reused for the remaining routes.
      *
+     * Pass $routeParams for routes that take URL parameters (e.g. the
+     * /admin/settings/{section} sections), applied to whichever candidate route
+     * resolves.
+     *
      * @param  string|array<int, string>  $route
      * @param  string|array<int, string>  $ability
+     * @param  array<int|string, mixed>  $routeParams
      */
-    private function child(string $label, string|array $route, string $icon, string|array $ability, string $tooltip = '', bool $newTab = false): MenuItem
+    private function child(string $label, string|array $route, string $icon, string|array $ability, string $tooltip = '', bool $newTab = false, array $routeParams = []): MenuItem
     {
         $routes = array_values((array) $route);
         $abilities = array_values((array) $ability);
@@ -83,7 +88,7 @@ class Administration extends Base
 
         $item = (new MenuItem)
             ->setLabel(__($label))
-            ->setUrl($resolved !== null ? route($resolved) : '#')
+            ->setUrl($resolved !== null ? route($resolved, $routeParams) : '#')
             ->setIcon($icon)
             ->setTooltip($tooltip !== '' ? __($tooltip) : __($label))
             ->setVisible(function () use ($routes, $abilities, $lastAbility) {
@@ -117,7 +122,12 @@ class Administration extends Base
     }
 
     /**
-     * Mail — settings + outbound history (cleaniquecoders/mailhistory).
+     * Mail — settings + the outbound mail history log.
+     *
+     * History maps to the APP-OWNED admin.mail-history.index route (the
+     * cleaniquecoders/mailhistory package only ships tracking-pixel routes, not an
+     * index page), with `mailhistory.index` kept as a fallback name. It stays
+     * hidden until that route + the admin.view.mail-history gate exist.
      */
     private function createMailMenuGroup(): MenuItem
     {
@@ -128,9 +138,10 @@ class Administration extends Base
             ->setTooltip(__('Email settings and history'))
             ->setDescription(__('Mail configuration and the outbound email log'))
             ->setVisible(fn () => (Route::has('admin.settings.index') && Gate::allows('manage.settings'))
+                || (Route::has('admin.mail-history.index') && Gate::allows('admin.view.mail-history'))
                 || (Route::has('mailhistory.index') && Gate::allows('admin.view.mail-history')))
             ->addChild($this->child('Settings', 'admin.settings.index', 'cog', 'manage.settings', 'Mail / SMTP configuration'))
-            ->addChild($this->child('History', 'mailhistory.index', 'history', 'admin.view.mail-history', 'Outbound email audit log'));
+            ->addChild($this->child('History', ['admin.mail-history.index', 'mailhistory.index'], 'history', 'admin.view.mail-history', 'Outbound email audit log'));
     }
 
     /**
