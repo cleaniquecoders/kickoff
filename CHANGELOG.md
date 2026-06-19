@@ -2,6 +2,24 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.25.0 - 2026-06-19
+
+### Highlights
+
+#### New
+
+- **Nested Administration menu** — the sidebar consolidates admin areas into a single collapsible **Administration** group nesting **Identity, Mail, Backups, Settings, Developers** sub-groups (replacing the flat UserManagement/Settings/AuditMonitoring builders), with a **Resources** group (Documentation, Support, Changelog) pinned to the bottom. Every leaf is route + gate guarded so it only appears when its feature/package is installed.
+- **Mail History** — generated projects ship an outbound-email audit log at **Administration → Mail → History** (`admin.mail-history.index`, gated by `admin.view.mail-history`): a Livewire page over `cleaniquecoders/mailhistory` recording every sent email with its delivery-event timeline. Wired end-to-end (package + publish step + route + gate + component + views).
+- **Full SMTP Mail Settings** — the admin email settings page is now a complete SMTP form (Mailer, Encryption, Host, Port, Username, Password, From Address/Name) plus a **send-test-email** action. `MailSettings` carries the full field set (DB-stored Spatie Settings) and is applied to the runtime mail config in `AppServiceProvider`.
+
+#### Improvements
+
+- **g8stack-style grouping** — group headers read `[icon] Label ›` (right-side chevron) with a subtle vertical guide line down the children; nested sub-groups re-sync their open state on `livewire:navigated`.
+- **Truncating labels** — long sidebar labels truncate to a single line with an ellipsis (full name in a hover tooltip) via one CSS rule that lets Flux's navlist label cell shrink (`[data-flux-navlist-item] [data-content]{min-width:0}`).
+- **Portable menu `child()` helper** — accepts candidate route/ability pairs (first existing route wins) and `$routeParams`, so a feature surfaces under whatever route name / permission the host app uses (e.g. MCP, Mail History) without per-project edits.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.24.0...1.25.0
+
 ## 1.23.0 - 2026-06-18
 
 ### Highlights
