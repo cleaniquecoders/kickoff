@@ -2,6 +2,13 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.27.0 - 2026-06-19
+
+### Fixed
+
+- **Test email now tracks opens** — the Settings test email was sent via `Mail::raw` (plaintext), so the mailhistory open pixel (HTML-only) never injected and the email could never reach "Opened". It now sends via `DefaultMail` (an HTML Mailable); `DefaultMail` uses `InteractsWithMailMetadata` to carry the metadata hash.
+- **Open/click tracking on by default** — `config/mailhistory.php` defaults `tracking.open`/`tracking.click` to `true` (was `false`), so tracking works without a per-deploy env var (set `MAILHISTORY_TRACK_*=false` to opt out). The tracking routes are public so email clients can load the pixel.
+
 ## 1.26.0 - 2026-06-19
 
 ### Fixed

@@ -86,16 +86,21 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure open (pixel) and click tracking. When enabled, the package
-    | can inject tracking pixels and rewrite links in outgoing emails.
+    | (mailhistory ^3.1) auto-injects the open pixel and rewrites links in
+    | outgoing HTML mail via its InjectMailTracking listener. Default ON so it
+    | works without a per-deploy env var (set MAILHISTORY_TRACK_* =false to opt
+    | out). The tracking routes are public (middleware: []) so email clients can
+    | load the pixel. NOTE: only HTML mail is tracked — send via a Mailable
+    | (e.g. DefaultMail), not Mail::raw, or no pixel is injected.
     |
     */
 
     'tracking' => [
         'open' => [
-            'enabled' => env('MAILHISTORY_TRACK_OPENS', false),
+            'enabled' => env('MAILHISTORY_TRACK_OPENS', true),
         ],
         'click' => [
-            'enabled' => env('MAILHISTORY_TRACK_CLICKS', false),
+            'enabled' => env('MAILHISTORY_TRACK_CLICKS', true),
             'exclude_patterns' => [
                 '*unsubscribe*',
             ],

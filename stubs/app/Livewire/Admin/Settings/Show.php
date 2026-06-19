@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Settings;
 
+use App\Mail\DefaultMail;
 use App\Settings\GeneralSettings;
 use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
@@ -159,10 +160,14 @@ class Show extends Component
         $appName = config('app.name');
 
         try {
-            Mail::raw(
+            // Use DefaultMail (an HTML Mailable with InteractsWithMailMetadata), not
+            // Mail::raw — so the message carries the mailhistory hash and the open
+            // pixel / click rewriting are injected, letting the test email advance to
+            // "Sent" and "Opened" in the Mail History log.
+            Mail::to($this->testRecipient)->send(new DefaultMail(
+                "Test email from {$appName}",
                 "This is a test email from {$appName}. If you received it, your mail configuration is working.",
-                fn ($message) => $message->to($this->testRecipient)->subject("Test email from {$appName}"),
-            );
+            ));
 
             $this->dispatch('toast', type: 'success', message: __('Test email sent to :recipient.', ['recipient' => $this->testRecipient]), duration: 5000);
         } catch (\Throwable $e) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
+use CleaniqueCoders\MailHistory\Concerns\InteractsWithMailMetadata;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
@@ -13,14 +14,16 @@ use Illuminate\Queue\SerializesModels;
 
 class DefaultMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use InteractsWithMailMetadata, Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
     public function __construct(public string $title, public string $message)
     {
-        //
+        // Tag the message with a mailhistory hash so its delivery status can be
+        // tracked (Sent / Delivered / Opened) and provider webhook correlation works.
+        $this->configureMetadataHash();
     }
 
     /**
