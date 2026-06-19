@@ -62,7 +62,12 @@ return [
     |
     */
 
-    'enabled' => env('TELESCOPE_ENABLED', false),
+    // Default ON so Telescope registers its dashboard route (and the sidebar item
+    // works) even when a deploy/platform doesn't inject TELESCOPE_ENABLED — a
+    // patched project's runtime .env may lack the key. Only the exception watcher
+    // records; dashboard access is gated by access.telescope. Set
+    // TELESCOPE_ENABLED=false to opt out explicitly.
+    'enabled' => env('TELESCOPE_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------

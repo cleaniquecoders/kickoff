@@ -2,6 +2,12 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.26.0 - 2026-06-19
+
+### Fixed
+
+- **Telescope `/telescope` 404 when `TELESCOPE_ENABLED` isn't injected** — `config/telescope.php` now defaults `enabled` to `true` (was `false`). Telescope must register its dashboard route so `/telescope` and the sidebar item work even when a deploy/platform doesn't pass the env var (a patched project's runtime `.env` may lack it). Only the exception watcher records; dashboard access stays gated by `access.telescope`. Set `TELESCOPE_ENABLED=false` to opt out.
+
 ## 1.25.0 - 2026-06-19
 
 ### New
