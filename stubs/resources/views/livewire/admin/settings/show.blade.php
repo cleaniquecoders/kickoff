@@ -27,24 +27,50 @@
             @elseif($section === 'email')
                 <form wire:submit="saveSettings" class="space-y-6">
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <flux:select label="Mailer" wire:model="settings.email.mailer">
+                            <flux:select.option value="smtp">SMTP</flux:select.option>
+                            <flux:select.option value="sendmail">Sendmail</flux:select.option>
+                            <flux:select.option value="ses">Amazon SES</flux:select.option>
+                            <flux:select.option value="mailgun">Mailgun</flux:select.option>
+                            <flux:select.option value="postmark">Postmark</flux:select.option>
+                            <flux:select.option value="log">Log (no send)</flux:select.option>
+                            <flux:select.option value="array">Array (testing)</flux:select.option>
+                        </flux:select>
+
+                        <flux:select label="Encryption" wire:model="settings.email.encryption">
+                            <flux:select.option value="">None</flux:select.option>
+                            <flux:select.option value="tls">TLS</flux:select.option>
+                            <flux:select.option value="ssl">SSL</flux:select.option>
+                        </flux:select>
+
+                        <flux:input label="SMTP Host" wire:model="settings.email.host" placeholder="smtp.mailgun.org" />
+                        <flux:input label="SMTP Port" type="number" wire:model="settings.email.port" placeholder="587" />
+                        <flux:input label="Username" wire:model="settings.email.username" placeholder="postmaster@example.com" />
+                        <flux:input label="Password" type="password" wire:model="settings.email.password" placeholder="••••••••" />
+
                         <div>
-                            <flux:input
-                                label="From Address"
-                                type="email"
-                                wire:model="settings.email.from_address"
-                                placeholder="noreply@example.com"
-                            />
+                            <flux:input label="From Address" type="email" wire:model="settings.email.from_address" placeholder="noreply@example.com" />
                             <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Default sender email address</p>
                         </div>
 
                         <div>
-                            <flux:input
-                                label="From Name"
-                                wire:model="settings.email.from_name"
-                                placeholder="Application Name"
-                            />
+                            <flux:input label="From Name" wire:model="settings.email.from_name" placeholder="Application Name" />
                             <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Default sender display name</p>
                         </div>
+                    </div>
+
+                    <flux:separator variant="subtle" />
+
+                    {{-- Send a test email using the values above (saved or not) to verify delivery. --}}
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div class="flex-1">
+                            <flux:input label="Send test email to" type="email" wire:model="testRecipient" placeholder="you@example.com" />
+                        </div>
+                        <flux:button type="button" variant="ghost" wire:click="sendTestMail"
+                            wire:loading.attr="disabled" wire:target="sendTestMail">
+                            <span wire:loading.remove wire:target="sendTestMail">Send test</span>
+                            <span wire:loading wire:target="sendTestMail">Sending…</span>
+                        </flux:button>
                     </div>
 
                     <div class="flex justify-end gap-2">

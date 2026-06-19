@@ -111,3 +111,11 @@ select:focus[data-flux-control] {
         flex-direction: column;
     }
 }
+
+/* Long sidebar menu labels truncate with an ellipsis instead of clipping.
+   Flux's navlist label cell is a flex child; without min-width:0 it can't
+   shrink below its content, so the inner `truncate` never engages. This lets
+   every level (top-level, nested sub-groups, leaf items) ellipsize. */
+[data-flux-navlist-item] [data-content] {
+    min-width: 0;
+}

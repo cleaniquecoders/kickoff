@@ -87,6 +87,12 @@ class AppServiceProvider extends ServiceProvider
 
             $mail = app(MailSettings::class);
             config([
+                'mail.default' => $mail->mailer,
+                'mail.mailers.smtp.host' => $mail->host,
+                'mail.mailers.smtp.port' => $mail->port,
+                'mail.mailers.smtp.username' => $mail->username !== '' ? $mail->username : null,
+                'mail.mailers.smtp.password' => $mail->password !== '' ? $mail->password : null,
+                'mail.mailers.smtp.encryption' => $mail->encryption !== '' ? $mail->encryption : null,
                 'mail.from.address' => $mail->from_address,
                 'mail.from.name' => $mail->from_name,
             ]);
