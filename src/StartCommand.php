@@ -378,6 +378,7 @@ class StartCommand extends Command
                 'cleaniquecoders/laravel-config-webhook',
                 'cleaniquecoders/laravel-mcp-kit',
                 'cleaniquecoders/laravel-media-secure',
+                'cleaniquecoders/mailhistory',
                 'cleaniquecoders/traitify',
                 'diglactic/laravel-breadcrumbs',
                 'dragon-code/laravel-deploy-operations',

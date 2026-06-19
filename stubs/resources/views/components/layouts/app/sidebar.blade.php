@@ -34,13 +34,15 @@
 
             <flux:navlist variant="outline">
                 <x-menu menu-builder="sidebar" />
-                <x-menu menu-builder="user-management" />
                 <x-menu menu-builder="media-management" />
-                <x-menu menu-builder="settings" />
-                <x-menu menu-builder="audit-monitoring" />
+                <x-menu menu-builder="administration" />
             </flux:navlist>
 
             <flux:spacer />
+
+            <flux:navlist variant="outline">
+                <x-menu menu-builder="sidebar-footer" />
+            </flux:navlist>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block sidebar-expanded-only" position="bottom" align="start">

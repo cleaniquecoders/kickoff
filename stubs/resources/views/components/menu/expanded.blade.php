@@ -1,7 +1,7 @@
 {{-- Expanded sidebar variant — included by components/menu.blade.php.
-     Expects: $menu, $menuItems, $heading, $hasActiveItem --}}
+     Expects: $menu, $menuItems, $heading, $headingIcon, $hasActiveItem --}}
 {{-- Groups collapse by default; the group containing the current page stays open. --}}
-<flux:navlist.group :heading="$heading" :expandable="filled($heading)" :expanded="$hasActiveItem" class="grid">
+<flux:navlist.group :heading="$heading" :icon="$headingIcon ?? null" :expandable="filled($heading)" :expanded="$hasActiveItem" class="grid">
     @foreach ($menuItems as $menuItem)
         @continue(! data_get($menuItem, 'visible', true))
 

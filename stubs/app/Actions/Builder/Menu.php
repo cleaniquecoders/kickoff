@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Actions\Builder;
 
-use App\Actions\Builder\Menu\AuditMonitoring;
+use App\Actions\Builder\Menu\Administration;
 use App\Actions\Builder\Menu\MediaManagement;
-use App\Actions\Builder\Menu\Settings;
 use App\Actions\Builder\Menu\Sidebar;
-use App\Actions\Builder\Menu\UserManagement;
+use App\Actions\Builder\Menu\SidebarFooter;
 use App\Exceptions\ContractException;
 use CleaniqueCoders\Traitify\Contracts\Builder;
 use CleaniqueCoders\Traitify\Contracts\Menu as ContractsMenu;
@@ -24,10 +23,9 @@ class Menu
     {
         $class = match ($builder) {
             'sidebar' => Sidebar::class,
-            'user-management' => UserManagement::class,
             'media-management' => MediaManagement::class,
-            'settings' => Settings::class,
-            'audit-monitoring' => AuditMonitoring::class,
+            'administration' => Administration::class,
+            'sidebar-footer' => SidebarFooter::class,
             default => Sidebar::class,
         };
 
