@@ -140,7 +140,7 @@ class Administration extends Base
             ->setVisible(fn () => (Route::has('admin.settings.index') && Gate::allows('manage.settings'))
                 || (Route::has('admin.mail-history.index') && Gate::allows('admin.view.mail-history'))
                 || (Route::has('mailhistory.index') && Gate::allows('admin.view.mail-history')))
-            ->addChild($this->child('Settings', 'admin.settings.index', 'cog', 'manage.settings', 'Mail / SMTP configuration'))
+            ->addChild($this->child('Settings', 'admin.settings.show', 'cog', 'manage.settings', 'Mail / SMTP configuration', false, ['section' => 'email']))
             ->addChild($this->child('History', ['admin.mail-history.index', 'mailhistory.index'], 'history', 'admin.view.mail-history', 'Outbound email audit log'));
     }
 
@@ -162,7 +162,7 @@ class Administration extends Base
     }
 
     /**
-     * Settings — general, authentication, SSO, webhooks.
+     * Settings — general, notifications, SSO, webhooks.
      */
     private function createSettingsMenuGroup(): MenuItem
     {
@@ -171,12 +171,12 @@ class Administration extends Base
             ->setUrl('#')
             ->setIcon('sliders-horizontal')
             ->setTooltip(__('System settings'))
-            ->setDescription(__('General settings, authentication, single sign-on, and webhooks'))
+            ->setDescription(__('General settings, notifications, single sign-on, and webhooks'))
             ->setVisible(fn () => (Route::has('admin.settings.index') && Gate::allows('manage.settings'))
                 || (Route::has('config-sso.admin') && Gate::allows('admin.manage.sso'))
                 || (Route::has('config-webhook.index') && Gate::allows('admin.manage.webhooks')))
-            ->addChild($this->child('General', 'admin.settings.index', 'sliders-horizontal', 'manage.settings', 'Configure system-wide settings'))
-            ->addChild($this->child('Authentication', 'admin.settings.authentication', 'lock-keyhole', 'manage.settings', 'Configure authentication'))
+            ->addChild($this->child('General', 'admin.settings.show', 'sliders-horizontal', 'manage.settings', 'Configure system-wide settings', false, ['section' => 'general']))
+            ->addChild($this->child('Notifications', 'admin.settings.show', 'bell', 'manage.settings', 'Enable notifications and choose delivery channels', false, ['section' => 'notifications']))
             ->addChild($this->child('SSO', 'config-sso.admin', 'key-round', 'admin.manage.sso', 'Configure single sign-on providers'))
             ->addChild($this->child('Webhooks', 'config-webhook.index', 'webhook', 'admin.manage.webhooks', 'Manage outgoing webhooks'));
     }
