@@ -2,6 +2,20 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.27.1 - 2026-06-25
+
+### Fixed
+
+- **Admin settings sidebar links** now deep-link to the correct section instead of the settings hub:
+  - **Mail → Settings** → `/admin/settings/email` (was `/admin/settings`)
+  - **Settings → General** → `/admin/settings/general` (was `/admin/settings`)
+  - **Settings → Notifications** added → `/admin/settings/notifications` (previously missing — replaced a dead `admin.settings.authentication` route that silently hid)
+  
+
+All three settings sections (`general`, `email`, `notifications`) served by `admin.settings.show` are now reachable from the Administration sidebar with correct URLs. Recorded as gotcha #18 in `CLAUDE.md`.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.27.0...1.27.1
+
 ## 1.27.0 - 2026-06-19
 
 ### Fixed
@@ -1043,6 +1057,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1062,6 +1077,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1129,6 +1145,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1309,6 +1326,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1318,6 +1336,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1408,11 +1427,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1499,11 +1520,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1755,11 +1778,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1852,11 +1877,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
