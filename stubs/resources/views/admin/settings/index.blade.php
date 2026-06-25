@@ -24,6 +24,25 @@
         <x-card>
             <x-card.header>
                 <div class="flex items-center">
+                    <x-lucide-lock-keyhole class="h-6 w-6 text-brand-500 me-3" />
+                    <flux:heading size="lg">Authentication</flux:heading>
+                </div>
+            </x-card.header>
+            <x-card.body>
+                <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                    Control how users sign in and whether they can register themselves.
+                </p>
+            </x-card.body>
+            <x-card.footer>
+                <flux:button variant="primary" :href="route('admin.settings.authentication')" wire:navigate>
+                    Configure
+                </flux:button>
+            </x-card.footer>
+        </x-card>
+
+        <x-card>
+            <x-card.header>
+                <div class="flex items-center">
                     <x-lucide-mail class="h-6 w-6 text-brand-500 me-3" />
                     <flux:heading size="lg">Email</flux:heading>
                 </div>

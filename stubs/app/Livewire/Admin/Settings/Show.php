@@ -39,6 +39,7 @@ class Show extends Component
         $this->settings = [
             'general' => [
                 'site_name' => $generalSettings->site_name,
+                'timezone' => $generalSettings->timezone,
             ],
             'email' => [
                 'mailer' => $mailSettings->mailer,
@@ -65,10 +66,12 @@ class Show extends Component
             if ($this->section === 'general') {
                 $this->validate([
                     'settings.general.site_name' => 'required|string|max:255',
+                    'settings.general.timezone' => ['required', 'string', 'timezone'],
                 ]);
 
                 $settings = app(GeneralSettings::class);
                 $settings->site_name = $this->settings['general']['site_name'];
+                $settings->timezone = (string) $this->settings['general']['timezone'];
                 $settings->save();
 
             } elseif ($this->section === 'email') {

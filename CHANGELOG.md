@@ -2,6 +2,15 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.28.0 - 2026-06-25
+
+### New
+
+- **Admin > Settings > Authentication** — a new settings page with a public-registration toggle, now backed by a real `admin.settings.authentication` route + Livewire component (the previously dead reference removed in 1.27.1). When disabled, Fortify's registration routes are dropped (`AppServiceProvider` filters `config('fortify.features')`), the login "Sign up" link hides via `config('admin.public_registration')`, and only administrators can create accounts. The toggle is DB-stored via `AuthenticationSettings` (seeded from the new `REGISTRATION_ENABLED` env default), so admins can flip it at runtime without a redeploy.
+- **General settings: timezone** — `GeneralSettings` gains an admin-editable `timezone` (a select seeded from `config('app.timezone')`). `AppServiceProvider` lays it over `config('app.timezone')` and calls `date_default_timezone_set()` at boot so all date/time functions use it.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.27.1...1.28.0
+
 ## 1.27.1 - 2026-06-25
 
 ### Fixed

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Settings\AuthenticationSettings;
 use App\Settings\GeneralSettings;
 use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
@@ -11,6 +12,7 @@ use CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Fortify\Features;
 use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
@@ -84,6 +86,30 @@ class AppServiceProvider extends ServiceProvider
         try {
             $general = app(GeneralSettings::class);
             config(['app.name' => $general->site_name]);
+
+            // Admin-editable timezone. config() alone doesn't re-apply once the
+            // framework has set the default during boot, so set it explicitly too.
+            if ($general->timezone !== '' && in_array($general->timezone, timezone_identifiers_list(), true)) {
+                config(['app.timezone' => $general->timezone]);
+                date_default_timezone_set($general->timezone);
+            }
+
+            $auth = app(AuthenticationSettings::class);
+            config(['admin.public_registration' => $auth->public_registration_enabled]);
+
+            // When public registration is disabled, drop Fortify's registration
+            // feature so its `register` / `register.store` routes are never
+            // registered (this provider boots before the Fortify package
+            // provider). The login view hides the "Sign up" link via
+            // Route::has('register'), and direct POSTs 404.
+            if (! $auth->public_registration_enabled) {
+                config([
+                    'fortify.features' => array_values(array_filter(
+                        (array) config('fortify.features', []),
+                        fn ($feature) => $feature !== Features::registration(),
+                    )),
+                ]);
+            }
 
             $mail = app(MailSettings::class);
             config([

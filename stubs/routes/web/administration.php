@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Settings\Authentication;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admin-panel'])
@@ -25,6 +26,10 @@ Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admi
             Route::get('settings', function () {
                 return view('admin.settings.index');
             })->name('settings.index');
+
+            // Declared before the {section} catch-all so it isn't swallowed by it.
+            Route::get('settings/authentication', Authentication::class)
+                ->name('settings.authentication');
 
             Route::get('settings/{section}', function ($section) {
                 return view('admin.settings.show', compact('section'));

@@ -14,6 +14,17 @@
                         />
                     </div>
 
+                    <div>
+                        <flux:select label="Timezone" wire:model="settings.general.timezone">
+                            @foreach (timezone_identifiers_list() as $tz)
+                                <flux:select.option value="{{ $tz }}">{{ $tz }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+                        <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                            The application's default timezone, used by all date and time functions.
+                        </p>
+                    </div>
+
                     <div class="flex justify-end gap-2">
                         <flux:button variant="ghost" :href="route('admin.settings.index')" wire:navigate>
                             Cancel
