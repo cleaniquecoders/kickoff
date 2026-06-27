@@ -2,6 +2,16 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.30.0 - 2026-06-27
+
+### What's new
+
+- **MCP Tokens page** — a self-service page for issuing Sanctum personal access tokens so AI clients (Claude Code, Claude Desktop) can connect to the app's MCP server. Lives under **Administration → Developers → MCP Tokens** as a standalone, container-width page (breadcrumb + heading + token cards), with a gated route, menu item, and feature test.
+- **Consistent breadcrumbs & headings** — added the standard `Dashboard › …` breadcrumb + heading block to the admin index, notifications, `pages/*`, and audit-trail views. User/account settings keep their vertical sidebar; Administration pages stay on the container layout.
+- **Menu fix** — the Developers → MCP item now points at the browsable tokens page instead of the POST MCP server endpoint.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.29.1...1.30.0
+
 ## 1.29.1 - 2026-06-27
 
 ### Fixed
@@ -1091,6 +1101,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1110,6 +1121,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1178,6 +1190,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1360,6 +1373,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1369,6 +1383,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1461,11 +1476,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1554,11 +1571,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1812,11 +1831,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1911,11 +1932,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
