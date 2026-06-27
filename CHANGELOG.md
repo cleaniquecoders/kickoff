@@ -2,6 +2,18 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.29.0 - 2026-06-27
+
+### New
+
+- **`composer share`** — a new script that exposes the local app on a temporary **public** URL so a teammate can test it without deploying. `bin/share` builds the frontend assets, removes `public/hot` (so Blade serves the built `/build` assets instead of the localhost-only Vite dev server), starts `php artisan serve`, then opens a Cloudflare (preferred, free, no account) or ngrok tunnel and prints the public URL. The tunnel lives only while the command runs. Supports `PORT=9000 composer share`.
+
+### Fixed
+
+- **Trust the reverse proxy / tunnel** — `bootstrap/app.php` now calls `$middleware->trustProxies(at: '*')` so `X-Forwarded-Proto` is honoured. Without it, behind an HTTPS proxy/tunnel that forwards to plain-HTTP `php artisan serve`, `request()->isSecure()` is `false` and Livewire/Flux emit `http://` script URLs → mixed-content blocks. This makes `composer share` (and any reverse-proxy deploy) work out of the box.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.28.0...1.29.0
+
 ## 1.28.0 - 2026-06-25
 
 ### New

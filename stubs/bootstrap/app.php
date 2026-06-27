@@ -16,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Trust the reverse proxy / tunnel (load balancer, ngrok, cloudflared) so
+        // X-Forwarded-Proto is honoured. Without this, behind an HTTPS proxy that
+        // forwards to plain-HTTP `php artisan serve`, request()->isSecure() is
+        // false and Livewire/Flux emit http:// script URLs → mixed-content blocks.
+        $middleware->trustProxies(at: '*');
+
         $middleware->append(SecurityHeaders::class);
 
         $middleware->appendToGroup('web', EnsureUserIsNotSuspended::class);

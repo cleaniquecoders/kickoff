@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# composer share — expose the local app on a temporary PUBLIC url so a teammate
+# can test it without deploying anywhere. It:
+#   1. builds the frontend assets,
+#   2. disables Vite hot mode (so the tester loads the built assets, not the
+#      Vite dev server on YOUR localhost),
+#   3. starts `php artisan serve`,
+#   4. opens a Cloudflare (or ngrok) tunnel and prints the public URL.
+#
+# The tunnel lives only while this command runs. Press Ctrl+C to stop.
+#
+# Usage:   composer share          # port 8000
+#          PORT=9000 composer share
+#
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+PORT="${PORT:-8000}"
+
+note() { printf '\033[36m▸ %s\033[0m\n' "$1"; }
+warn() { printf '\033[33m! %s\033[0m\n' "$1"; }
+
+note "Building frontend assets (npm run build)…"
+npm run build
+
+# With `composer dev` running, @vite points at the Vite dev server on your own
+# localhost — a remote tester can't reach it (broken CSS/JS). Removing public/hot
+# makes Blade serve the freshly built /build assets instead.
+rm -f public/hot
+
+# Pick an available tunnel tool (Cloudflare preferred — free, no account).
+if command -v cloudflared >/dev/null 2>&1; then
+    TUNNEL=(cloudflared tunnel --url "http://localhost:${PORT}")
+elif command -v ngrok >/dev/null 2>&1; then
+    TUNNEL=(ngrok http "${PORT}")
+else
+    warn "No tunnel tool found. Install one of:"
+    echo "    brew install cloudflared      # free, no account (recommended)"
+    echo "    brew install ngrok            # needs a free account + authtoken"
+    echo "    composer global require beyondcode/expose   # then: expose share http://localhost:${PORT}"
+    exit 1
+fi
+
+note "Starting Laravel server on http://localhost:${PORT}…"
+php artisan serve --port="${PORT}" >/tmp/${PROJECT_NAME}-share-serve.log 2>&1 &
+SERVE_PID=$!
+cleanup() { echo; note "Stopping share…"; kill "${SERVE_PID}" 2>/dev/null || true; rm -f public/hot; }
+trap cleanup EXIT INT TERM
+sleep 2
+
+note "Opening public tunnel — share the https://… URL printed below with your tester."
+warn "If a tester sees 419 / Page Expired, set APP_URL to that URL in .env then run: php artisan config:clear"
+echo
+"${TUNNEL[@]}"
