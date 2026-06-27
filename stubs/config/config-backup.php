@@ -100,7 +100,7 @@ return [
         'prefix' => env('CONFIG_BACKUP_ROUTE_PREFIX', 'admin/config-backup'),
         'name' => 'config-backup.index',
         'middleware' => ['web', 'auth'],
-        'layout' => env('CONFIG_BACKUP_LAYOUT', 'components.layouts.app'),
+        'layout' => env('CONFIG_BACKUP_LAYOUT', 'components.layouts.app-breadcrumbs'),
     ],
 
     /*

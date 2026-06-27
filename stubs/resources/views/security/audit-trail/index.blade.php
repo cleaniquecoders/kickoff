@@ -1,8 +1,5 @@
 <x-layouts.app title="Audit Trail">
-    <flux:breadcrumbs class="mb-6">
-        <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>{{ __('Audit Trail') }}</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+    <x-breadcrumbs class="mb-6" />
 
     <div class="mb-6 flex items-center justify-between">
         <div>

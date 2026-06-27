@@ -22,6 +22,8 @@ abstract class Base implements AuthorizedMenuBuilder, Builder, HeadingMenuBuilde
 
     protected ?string $headingIcon = null;
 
+    protected ?string $headingUrl = null;
+
     /** @var callable|string|bool|null */
     protected $authorization = null;
 
@@ -102,6 +104,30 @@ abstract class Base implements AuthorizedMenuBuilder, Builder, HeadingMenuBuilde
     public function getHeadingIcon(): ?string
     {
         return $this->headingIcon;
+    }
+
+    public function hasHeadingUrl(): bool
+    {
+        return ! empty($this->headingUrl);
+    }
+
+    /**
+     * Set the URL the heading links to (used by the breadcrumb builder so the
+     * group heading — e.g. "Administration" — is clickable back to its hub).
+     */
+    public function setHeadingUrl(?string $headingUrl): self
+    {
+        $this->headingUrl = $headingUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get the URL the heading links to.
+     */
+    public function getHeadingUrl(): ?string
+    {
+        return $this->headingUrl;
     }
 
     public function setAuthorization(callable|string|bool $authorization): self

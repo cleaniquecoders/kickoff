@@ -1,11 +1,5 @@
 <x-layouts.app title="Role Details">
-    <div class="mb-6">
-        <flux:breadcrumbs>
-            <flux:breadcrumbs.item :href="route('admin.index')" wire:navigate>Administration</flux:breadcrumbs.item>
-            <flux:breadcrumbs.item :href="route('admin.roles.index')" wire:navigate>Roles</flux:breadcrumbs.item>
-            <flux:breadcrumbs.item>Role Details</flux:breadcrumbs.item>
-        </flux:breadcrumbs>
-    </div>
+    <x-breadcrumbs class="mb-6" for="admin.roles.index" leaf="Role Details" />
 
     <flux:heading size="xl" class="mb-6">Role Details</flux:heading>
 

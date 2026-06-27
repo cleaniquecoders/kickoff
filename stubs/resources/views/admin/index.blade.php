@@ -1,9 +1,6 @@
 <x-layouts.app title="Administration">
     <div class="mx-auto max-w-4xl">
-        <flux:breadcrumbs class="mb-6">
-            <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:breadcrumbs.item>
-            <flux:breadcrumbs.item>{{ __('Administration') }}</flux:breadcrumbs.item>
-        </flux:breadcrumbs>
+        <x-breadcrumbs class="mb-6" :items="[['label' => __('Administration')]]" />
 
         <flux:heading size="xl" level="1" class="mb-6">Administration</flux:heading>
 

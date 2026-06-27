@@ -1,8 +1,5 @@
 <x-layouts.app title="Manage Roles">
-    <flux:breadcrumbs class="mb-6">
-        <flux:breadcrumbs.item href="{{ route('dashboard') }}">{{ __('Dashboard') }}</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>{{ __('Roles') }}</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+    <x-breadcrumbs class="mb-6" />
     <div class="flex items-end justify-between">
         <div>
             <flux:heading size="xl" level="1">{{ __('Roles Management') }}</flux:heading>

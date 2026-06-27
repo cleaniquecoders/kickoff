@@ -1,8 +1,5 @@
 <x-layouts.app :title="__('Notifications')">
-    <flux:breadcrumbs class="mb-6">
-        <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>{{ __('Notifications') }}</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+    <x-breadcrumbs class="mb-6" />
 
     <div class="mb-6">
         <flux:heading size="xl" level="1">

@@ -1,9 +1,7 @@
 <div>
-    <flux:breadcrumbs class="mb-6">
-        <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>Dashboard</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item :href="route('admin.settings.index')" wire:navigate>Settings</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>Authentication</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+    {{-- Full-page Livewire component: pin the route so the trail survives wire updates
+         (request()->url() would be /livewire/update on re-render). --}}
+    <x-breadcrumbs class="mb-6" for="admin.settings.authentication" />
 
     <div class="flex items-end justify-between">
         <div>

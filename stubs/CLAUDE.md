@@ -496,7 +496,7 @@ padding (content too narrow).
 ```blade
 {{-- DO: content sits directly under the layout --}}
 <x-layouts.app title="Products">
-    <flux:breadcrumbs class="mb-6">...</flux:breadcrumbs>
+    <x-breadcrumbs class="mb-6" />
     {{-- page content --}}
 </x-layouts.app>
 
@@ -511,10 +511,7 @@ padding (content too narrow).
 All pages should follow this consistent header structure:
 
 ```blade
-<flux:breadcrumbs class="mb-6">
-    <flux:breadcrumbs.item href="{{ route('dashboard') }}">Dashboard</flux:breadcrumbs.item>
-    <flux:breadcrumbs.item>Products</flux:breadcrumbs.item>
-</flux:breadcrumbs>
+<x-breadcrumbs class="mb-6" />
 <div class="flex items-end justify-between">
     <div>
         <flux:heading size="xl" level="1">Products</flux:heading>
@@ -526,6 +523,58 @@ All pages should follow this consistent header structure:
 </div>
 <flux:separator variant="subtle" class="my-6" />
 ```
+
+### Breadcrumbs — derived from the menu (`<x-breadcrumbs>`)
+
+**Never hand-write `<flux:breadcrumbs>` in a page.** Use the `<x-breadcrumbs>` component,
+which derives the trail from the SAME menu tree that renders the sidebar
+(`app/Actions/Builder/Menu/*` via `App\Actions\Builder\Breadcrumb`). This keeps breadcrumbs
+and navigation in lock-step — e.g. a page registered under `Administration > Settings` in the
+menu automatically gets `Dashboard > Administration > Settings > General` as its trail. The
+trail always roots at Dashboard, and the **last crumb is the current page** (rendered without
+a link). Group headings (url `#`) render as plain text.
+
+Three usage forms cover every page:
+
+```blade
+{{-- 1. The page IS a menu leaf → fully automatic (matches the current route by URL) --}}
+<x-breadcrumbs class="mb-6" />
+
+{{-- 2. A detail page that is NOT a menu leaf → resolve its parent, append a leaf --}}
+<x-breadcrumbs class="mb-6" for="admin.roles.index" leaf="Role Details" />
+
+{{-- 3. A hub / non-menu page → give the trail explicitly (Dashboard auto-prepended) --}}
+<x-breadcrumbs class="mb-6" :items="[['label' => __('Administration')]]" />
+```
+
+For a brand-new section, **add it to the menu builder first** (`Administration.php` etc.);
+the breadcrumb then resolves automatically — no per-page breadcrumb markup needed. The
+component injects no margin of its own, so pass `class="mb-6"` (or rely on a `gap-*` flex
+wrapper) for spacing.
+
+> **Gotcha:** The breadcrumb trail is matched by **URL** against the menu. If a leaf's route
+> doesn't exist or its gate fails for the current user, the item is absent from the menu and
+> `<x-breadcrumbs />` resolves to an empty trail (renders nothing). Pages that are hubs or
+> not in any menu (e.g. the Administration index itself) must use the `:items` form.
+
+> **Gotcha:** In a **full-page Livewire component** (`Route::livewire(...)` or
+> `Route::get(..., Component::class)`), the breadcrumb lives inside the component root and is
+> re-rendered on every Livewire update — at which point `request()->url()` is `/livewire/update`,
+> not the page URL, so bare `<x-breadcrumbs />` (which uses `Breadcrumb::current()`) would
+> resolve to nothing after the first interaction. Pin the route instead:
+> `<x-breadcrumbs for="settings.mcp-tokens.show" />`. The `for`/`:items` forms don't depend on
+> the request URL, so they're stable across wire updates. (Pages whose breadcrumb sits in the
+> outer `x-layouts.app` blade — i.e. anything rendered via `Route::view`/a controller that only
+> *embeds* Livewire with `@livewire(...)` — are unaffected and can use bare `<x-breadcrumbs />`.)
+
+> **Gotcha:** **Vendor** full-page Livewire screens (config-backup, config-sso, config-webhook)
+> render their own view, so you can't add `<x-breadcrumbs>` to it. Instead they render into a
+> host layout set via config (`config-backup.route.layout`, `config-sso.admin.layout`,
+> `config-webhook.ui.layout`), all pointed at `components.layouts.app-breadcrumbs` — a thin
+> wrapper around `x-layouts.app` that injects `<x-breadcrumbs />`. The breadcrumb lives in the
+> layout (rendered once on GET, not on wire updates), so `current()` matches the real page URL
+> and the trail comes straight from the menu. To give a new vendor admin screen breadcrumbs,
+> point its layout config at `components.layouts.app-breadcrumbs` and add the page to the menu.
 
 ### Mail — Always Queued
 

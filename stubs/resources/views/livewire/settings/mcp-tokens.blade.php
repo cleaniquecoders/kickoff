@@ -1,9 +1,7 @@
 <div>
-    <flux:breadcrumbs class="mb-6">
-        <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item :href="route('admin.index')" wire:navigate>{{ __('Administration') }}</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>{{ __('MCP Tokens') }}</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+    {{-- Full-page Livewire component: pin the route so the trail survives wire updates
+         (request()->url() would be /livewire/update on re-render). --}}
+    <x-breadcrumbs class="mb-6" for="settings.mcp-tokens.show" />
 
     <div class="flex items-end justify-between">
         <div>

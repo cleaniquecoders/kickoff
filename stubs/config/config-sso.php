@@ -138,7 +138,7 @@ return [
         'middleware' => ['web', 'auth'],
         'component' => SsoProviders::class,
         // Render the SSO admin UI inside the application layout.
-        'layout' => env('CONFIG_SSO_ADMIN_LAYOUT', 'components.layouts.app'),
+        'layout' => env('CONFIG_SSO_ADMIN_LAYOUT', 'components.layouts.app-breadcrumbs'),
     ],
 
 ];

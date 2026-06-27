@@ -155,7 +155,7 @@ return [
     */
     'ui' => [
         // Render the admin UI inside the application layout.
-        'layout' => 'components.layouts.app',
+        'layout' => 'components.layouts.app-breadcrumbs',
         'per_page' => 15,
     ],
 

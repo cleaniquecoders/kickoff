@@ -1,8 +1,5 @@
 <x-layouts.app title="Mail History">
-    <flux:breadcrumbs class="mb-6">
-        <flux:breadcrumbs.item :href="route('admin.index')" wire:navigate>Administration</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>Mail History</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+    <x-breadcrumbs class="mb-6" />
 
     <div class="flex items-end justify-between">
         <div>

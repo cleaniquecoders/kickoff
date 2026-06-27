@@ -384,7 +384,6 @@ class StartCommand extends Command
                 'cleaniquecoders/laravel-media-secure',
                 'cleaniquecoders/mailhistory',
                 'cleaniquecoders/traitify',
-                'diglactic/laravel-breadcrumbs',
                 'dragon-code/laravel-deploy-operations',
                 'lab404/laravel-impersonate',
                 'laravel/horizon',

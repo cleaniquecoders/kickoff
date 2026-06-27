@@ -1,8 +1,5 @@
 <x-layouts.app title="User Management">
-    <flux:breadcrumbs class="mb-6">
-        <flux:breadcrumbs.item href="{{ route('dashboard') }}">{{ __('Dashboard') }}</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>{{ __('Users') }}</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+    <x-breadcrumbs class="mb-6" />
     <div class="flex items-end justify-between">
         <div>
             <flux:heading size="xl" level="1">{{ __('User Management') }}</flux:heading>

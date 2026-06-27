@@ -28,6 +28,7 @@ class Administration extends Base
     {
         $this->setHeadingLabel(__('Administration'))
             ->setHeadingIcon('settings')
+            ->setHeadingUrl(Route::has('admin.index') ? route('admin.index') : null)
             ->setAuthorization(fn () => Gate::any([
                 'access.user-management',
                 'access.media-management',
