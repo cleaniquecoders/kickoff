@@ -2,6 +2,34 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.31.0 - 2026-06-27
+
+### Menu-derived breadcrumbs
+
+Replaces inconsistent, hand-written per-page `<flux:breadcrumbs>` (and a dead `diglactic/laravel-breadcrumbs` global include that had no definitions) with a single **`Breadcrumb` builder** that derives the trail from the same menu tree the sidebar renders, plus an **`<x-breadcrumbs>`** component. Breadcrumbs now always match navigation — e.g. `Dashboard > Administration > Settings > General`.
+
+#### Added
+
+- `App\Actions\Builder\Breadcrumb` — resolves the trail by matching the active URL against the `administration` / `media-management` / `sidebar-footer` / `sidebar` menus (`current()` / `for()` / `manual()` / `push()`).
+- `<x-breadcrumbs>` component (auto / `for`+`leaf` / `:items` forms); last crumb is the current page, group nodes render as plain text.
+- `Menu\Base::setHeadingUrl()` so the "Administration" crumb links to the admin hub.
+- `components.layouts.app-breadcrumbs` wrapper layout so **vendor** full-page Livewire screens get breadcrumbs without forking their views.
+- Pest test + CLAUDE.md documentation (root + stubs).
+
+#### Fixed
+
+- All app pages converted to `<x-breadcrumbs>` with correct hierarchy (Users, Roles, Audit Trail, Mail History, Settings sections, etc.).
+- Full-page Livewire pages (MCP Tokens, Authentication) pinned to `for="…"` so the trail survives wire updates.
+- Vendor pages now show breadcrumbs: media-manager (published view) and config-backup / config-sso / config-webhook (via `app-breadcrumbs` layout config).
+
+#### Removed
+
+- Unused `diglactic/laravel-breadcrumbs` dependency from `StartCommand`.
+
+Closes #48
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.30.0...1.31.0
+
 ## 1.30.0 - 2026-06-27
 
 ### What's new
@@ -1102,6 +1130,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1121,6 +1150,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1190,6 +1220,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1374,6 +1405,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1383,6 +1415,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1477,11 +1510,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1572,11 +1607,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1832,11 +1869,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1933,11 +1972,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
