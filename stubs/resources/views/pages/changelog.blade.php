@@ -1,13 +1,18 @@
 <x-layouts.app :title="__('Changelog')">
     <div class="flex h-full w-full flex-1 flex-col gap-6 rounded-xl">
+        <flux:breadcrumbs>
+            <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item>{{ __('Changelog') }}</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
+
         <div class="space-y-2">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            <flux:heading size="xl" level="1">
                 <x-icon name="newspaper" class="inline-block h-8 w-8 mr-2" />
                 {{ __('Changelog') }}
-            </h1>
-            <p class="text-gray-600 dark:text-gray-400">
+            </flux:heading>
+            <flux:text>
                 {{ __('Stay up to date with the latest updates, improvements, and bug fixes') }}
-            </p>
+            </flux:text>
         </div>
 
         <!-- Latest Version -->

@@ -1,13 +1,18 @@
 <x-layouts.app :title="__('Documentation')">
     <div class="flex h-full w-full flex-1 flex-col gap-6 rounded-xl">
+        <flux:breadcrumbs>
+            <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item>{{ __('Documentation') }}</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
+
         <div class="space-y-2">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            <flux:heading size="xl" level="1">
                 <x-icon name="book-open" class="inline-block h-8 w-8 mr-2" />
                 {{ __('Documentation') }}
-            </h1>
-            <p class="text-gray-600 dark:text-gray-400">
+            </flux:heading>
+            <flux:text>
                 {{ __('Comprehensive guides and documentation for using the application') }}
-            </p>
+            </flux:text>
         </div>
 
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

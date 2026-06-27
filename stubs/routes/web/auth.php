@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Settings\McpTokens;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -29,4 +30,7 @@ Route::middleware(['auth', 'verified', 'throttle:60,1'])->group(function () {
             ),
         )
         ->name('settings.two-factor.show');
+
+    Route::livewire('settings/mcp-tokens', McpTokens::class)
+        ->name('settings.mcp-tokens.show');
 });

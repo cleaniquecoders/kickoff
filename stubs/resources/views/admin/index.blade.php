@@ -1,6 +1,11 @@
 <x-layouts.app title="Administration">
     <div class="mx-auto max-w-4xl">
-        <flux:heading size="xl" class="mb-6">Administration</flux:heading>
+        <flux:breadcrumbs class="mb-6">
+            <flux:breadcrumbs.item :href="route('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item>{{ __('Administration') }}</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
+
+        <flux:heading size="xl" level="1" class="mb-6">Administration</flux:heading>
 
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @can('manage.roles')
