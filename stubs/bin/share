@@ -6,9 +6,12 @@
 #   2. disables Vite hot mode (so the tester loads the built assets, not the
 #      Vite dev server on YOUR localhost),
 #   3. starts `php artisan serve`,
-#   4. opens a Cloudflare (or ngrok) tunnel and prints the public URL.
+#   4. opens a Cloudflare (or ngrok) tunnel, and
+#   5. points APP_URL + ASSET_URL at the public url so links and assets resolve
+#      (no 419 / no mixed-content), restoring your .env verbatim on exit.
 #
-# The tunnel lives only while this command runs. Press Ctrl+C to stop.
+# The tunnel lives only while this command runs. Press Ctrl+C to stop — your
+# original .env is restored automatically.
 #
 # Usage:   composer share          # port 8000
 #          PORT=9000 composer share
@@ -18,9 +21,24 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PORT="${PORT:-8000}"
+ENV_FILE=".env"
 
 note() { printf '\033[36m▸ %s\033[0m\n' "$1"; }
 warn() { printf '\033[33m! %s\033[0m\n' "$1"; }
+
+# Set (replace, or append) a KEY=value line in .env. Handles a commented
+# `# KEY=` line too. Uses '#' as the sed delimiter so https:// values are safe.
+set_env() {
+    local key="$1" value="$2" tmp
+    tmp="$(mktemp)"
+    if grep -qE "^[#[:space:]]*${key}=" "$ENV_FILE"; then
+        sed -E "s#^[#[:space:]]*${key}=.*#${key}=${value}#" "$ENV_FILE" > "$tmp"
+    else
+        cat "$ENV_FILE" > "$tmp"
+        printf '%s=%s\n' "$key" "$value" >> "$tmp"
+    fi
+    mv "$tmp" "$ENV_FILE"
+}
 
 note "Building frontend assets (npm run build)…"
 npm run build
@@ -32,9 +50,11 @@ rm -f public/hot
 
 # Pick an available tunnel tool (Cloudflare preferred — free, no account).
 if command -v cloudflared >/dev/null 2>&1; then
+    TUNNEL_KIND="cloudflared"
     TUNNEL=(cloudflared tunnel --url "http://localhost:${PORT}")
 elif command -v ngrok >/dev/null 2>&1; then
-    TUNNEL=(ngrok http "${PORT}")
+    TUNNEL_KIND="ngrok"
+    TUNNEL=(ngrok http "${PORT}" --log=stdout)
 else
     warn "No tunnel tool found. Install one of:"
     echo "    brew install cloudflared      # free, no account (recommended)"
@@ -43,14 +63,69 @@ else
     exit 1
 fi
 
+# Back up .env so we can restore it verbatim on exit — the tunnel url is throwaway.
+ENV_BACKUP="$(mktemp)"
+cp "$ENV_FILE" "$ENV_BACKUP"
+TUNNEL_LOG="$(mktemp)"
+
+cleanup() {
+    echo
+    note "Stopping share…"
+    [ -n "${TAIL_PID:-}" ]   && kill "$TAIL_PID"   2>/dev/null || true
+    [ -n "${TUNNEL_PID:-}" ] && kill "$TUNNEL_PID" 2>/dev/null || true
+    [ -n "${SERVE_PID:-}" ]  && kill "$SERVE_PID"  2>/dev/null || true
+    rm -f public/hot
+    # Restore the original .env and drop the cached config that pointed at the url.
+    if [ -f "$ENV_BACKUP" ]; then
+        cp "$ENV_BACKUP" "$ENV_FILE"
+        rm -f "$ENV_BACKUP"
+        php artisan config:clear >/dev/null 2>&1 || true
+        note "Restored your .env (APP_URL / ASSET_URL)."
+    fi
+    rm -f "$TUNNEL_LOG"
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM
+
 note "Starting Laravel server on http://localhost:${PORT}…"
 php artisan serve --port="${PORT}" >/tmp/${PROJECT_NAME}-share-serve.log 2>&1 &
 SERVE_PID=$!
-cleanup() { echo; note "Stopping share…"; kill "${SERVE_PID}" 2>/dev/null || true; rm -f public/hot; }
-trap cleanup EXIT INT TERM
 sleep 2
 
-note "Opening public tunnel — share the https://… URL printed below with your tester."
-warn "If a tester sees 419 / Page Expired, set APP_URL to that URL in .env then run: php artisan config:clear"
+note "Opening public tunnel via ${TUNNEL_KIND}…"
+"${TUNNEL[@]}" >"$TUNNEL_LOG" 2>&1 &
+TUNNEL_PID=$!
+
+# Wait for the public url to appear, then point APP_URL + ASSET_URL at it so the
+# tester loads assets from the tunnel (not your localhost) and avoids 419s.
+note "Waiting for the public URL…"
+PUBLIC_URL=""
+for _ in $(seq 1 30); do
+    if [ "$TUNNEL_KIND" = "ngrok" ]; then
+        PUBLIC_URL="$(curl -fsS http://127.0.0.1:4040/api/tunnels 2>/dev/null \
+            | grep -oE 'https://[a-zA-Z0-9.-]+\.ngrok[a-zA-Z0-9.-]*' | head -1 || true)"
+    else
+        PUBLIC_URL="$(grep -oE 'https://[a-zA-Z0-9.-]+\.trycloudflare\.com' "$TUNNEL_LOG" | head -1 || true)"
+    fi
+    [ -n "$PUBLIC_URL" ] && break
+    kill -0 "$TUNNEL_PID" 2>/dev/null || break   # tunnel died — stop waiting
+    sleep 1
+done
+
+if [ -n "$PUBLIC_URL" ]; then
+    set_env APP_URL   "$PUBLIC_URL"
+    set_env ASSET_URL "$PUBLIC_URL"
+    php artisan config:clear >/dev/null 2>&1 || true
+    echo
+    note "Public URL: ${PUBLIC_URL}"
+    note "APP_URL + ASSET_URL set to it — share this link with your tester."
+else
+    warn "Couldn't auto-detect the public URL. Read it from the tunnel output below,"
+    warn "then set APP_URL and ASSET_URL to it in .env and run: php artisan config:clear"
+fi
+
 echo
-"${TUNNEL[@]}"
+# Stream the tunnel output and keep running until it exits (or Ctrl+C).
+tail -n +1 -f "$TUNNEL_LOG" &
+TAIL_PID=$!
+wait "$TUNNEL_PID"

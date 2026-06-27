@@ -164,6 +164,23 @@ npm run build
 composer update
 ```
 
+**share** (run via `composer share`):
+
+```bash
+# Expose the local app on a temporary PUBLIC url for teammate testing.
+# Builds assets, removes public/hot, starts `php artisan serve`, opens a
+# Cloudflare (or ngrok) tunnel, then points APP_URL + ASSET_URL at the public
+# url so links/assets resolve (no 419, no mixed-content). On Ctrl+C it restores
+# your original .env and runs `php artisan config:clear`.
+composer share              # port 8000
+PORT=9000 composer share    # custom port
+```
+
+Requires a tunnel tool on PATH — `cloudflared` (free, no account, preferred) or
+`ngrok`. The public url is detected automatically (cloudflared from the tunnel
+banner, ngrok from its local `:4040` API) and written into `.env`; the change is
+reverted when the command stops.
+
 ### Custom Artisan Stubs (stubs/)
 
 **model.stub**:

@@ -80,6 +80,7 @@ Modifies target project's `composer.json`:
 - Enables Pest plugin in allow-plugins
 - Injects custom Composer scripts:
   - `dev`: Concurrent server/queue/logs/vite
+  - `share`: Expose the app on a temporary public tunnel URL (`bin/share`)
   - `analyse`: PHPStan analysis
   - `test`: Pest tests
   - `format`: Laravel Pint formatting

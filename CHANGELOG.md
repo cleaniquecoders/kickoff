@@ -2,6 +2,18 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.29.1 - 2026-06-27
+
+### Fixed
+
+- **`composer share` now points `APP_URL` + `ASSET_URL` at the tunnel** — without this, the tester loaded assets from your localhost (broken CSS/JS) and could hit 419 / Page Expired. `bin/share` now auto-detects the public URL (cloudflared from the tunnel banner, ngrok from its local `:4040` API), writes both keys into `.env`, and runs `php artisan config:clear`. Your original `.env` is backed up and **restored verbatim on exit** (Ctrl+C), since the tunnel URL is throwaway. If auto-detection fails it falls back to printing manual instructions.
+
+### Docs
+
+- Documented `composer share` in `docs/01-architecture/02-bootstrap-process.md` (injected Composer scripts) and `docs/01-architecture/03-stubs-system.md` (utility scripts), including the tunnel-tool requirement and the `APP_URL`/`ASSET_URL` behaviour.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.29.0...1.29.1
+
 ## 1.29.0 - 2026-06-27
 
 ### New
