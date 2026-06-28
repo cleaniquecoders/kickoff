@@ -2,6 +2,14 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.31.1 - 2026-06-28
+
+### Fixed
+
+- **Sidebar:** the brand logo is now centred in the collapsed rail. Previously the collapsed header became a column but the logo sat off-centre — the content area is ~72px yet `.app-logo` kept its width plus a leftover `space-x` margin, pushing the mark left of the nav icons. The logo + toggle are now full-width with centred content, `.app-logo` is `width:100%` with zero padding, and its children's margins are zeroed so the mark lands dead-centre with the rail icons. Verified in-browser (mark centre == sidebar centre).
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.31.0...1.31.1
+
 ## 1.31.0 - 2026-06-27
 
 ### Menu-derived breadcrumbs
@@ -1131,6 +1139,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1150,6 +1159,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1220,6 +1230,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1406,6 +1417,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1415,6 +1427,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1511,11 +1524,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1608,11 +1623,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -1870,11 +1887,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -1973,11 +1992,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
