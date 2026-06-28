@@ -1,4 +1,4 @@
-<div class="flex items-center space-x-3 px-2">
+<div class="app-logo flex items-center space-x-3 px-2">
     {{-- Kickoff Logo --}}
     <div class="flex-shrink-0">
         <x-kickoff-logo class="h-10 w-10" />

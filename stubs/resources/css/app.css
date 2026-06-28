@@ -109,6 +109,28 @@ select:focus[data-flux-control] {
 
     [data-flux-sidebar][data-collapsed] .sidebar-header {
         flex-direction: column;
+        align-items: stretch;
+        gap: 0.625rem;
+    }
+
+    /* Collapsed rail: make the logo + toggle full-width and centre their content
+       so the brand mark lines up with the nav icons below. */
+    [data-flux-sidebar][data-collapsed] .sidebar-header > a,
+    [data-flux-sidebar][data-collapsed] .sidebar-header > button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    [data-flux-sidebar][data-collapsed] .sidebar-header .app-logo {
+        width: 100%;
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* Kill the leftover space-x margin so the logo isn't pushed off-centre. */
+    [data-flux-sidebar][data-collapsed] .sidebar-header .app-logo > * {
+        margin: 0;
     }
 }
 
