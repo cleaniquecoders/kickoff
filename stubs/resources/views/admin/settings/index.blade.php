@@ -43,6 +43,25 @@
         <x-card>
             <x-card.header>
                 <div class="flex items-center">
+                    <x-lucide-life-buoy class="h-6 w-6 text-brand-500 me-3" />
+                    <flux:heading size="lg">Support</flux:heading>
+                </div>
+            </x-card.header>
+            <x-card.body>
+                <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                    Embed the g8desk support widget for your users.
+                </p>
+            </x-card.body>
+            <x-card.footer>
+                <flux:button variant="primary" :href="route('admin.settings.g8desk')" wire:navigate>
+                    Configure
+                </flux:button>
+            </x-card.footer>
+        </x-card>
+
+        <x-card>
+            <x-card.header>
+                <div class="flex items-center">
                     <x-lucide-mail class="h-6 w-6 text-brand-500 me-3" />
                     <flux:heading size="lg">Email</flux:heading>
                 </div>

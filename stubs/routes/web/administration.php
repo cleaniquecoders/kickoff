@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Admin\Settings\Authentication;
+use App\Livewire\Admin\Settings\G8Desk;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admin-panel'])
@@ -30,6 +31,9 @@ Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admi
             // Declared before the {section} catch-all so it isn't swallowed by it.
             Route::get('settings/authentication', Authentication::class)
                 ->name('settings.authentication');
+
+            Route::get('settings/g8desk', G8Desk::class)
+                ->name('settings.g8desk');
 
             Route::get('settings/{section}', function ($section) {
                 return view('admin.settings.show', compact('section'));

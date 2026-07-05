@@ -104,6 +104,9 @@
         @endif
 
         @fluxScripts
+
+        {{-- Native, SDK-free g8desk support widget (renders only when enabled + configured). --}}
+        <x-g8desk-support-widget />
     </body>
 @else
 

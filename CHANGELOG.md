@@ -2,6 +2,21 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## Unreleased
+
+### g8desk Support integration (native, SDK-free)
+
+Adds a native g8desk support-widget integration to the generated project — no vendor JS SDK, no npm package, roughly five lines of markup.
+
+#### Added
+
+- `App\Settings\G8DeskSettings` (group `g8desk`) — DB-stored `enabled`, `base_url`, `public_key`, and an **encrypted** `widget_secret`, plus its settings migration (`2026_06_25_000200_create_g8desk_settings.php`, ships disabled).
+- `App\Livewire\Admin\Settings\G8Desk` + `resources/views/livewire/admin/settings/g8desk.blade.php` — a dedicated **Admin → Settings → g8desk Support** page (gated by `manage.settings`) mirroring the Authentication settings page.
+- `<x-g8desk-support-widget />` anonymous Blade component — renders the g8desk intake widget for authenticated users only, with an HMAC-SHA256 identity signature over the canonical `ref|email|name|exp` string (the widget secret never reaches the browser). Included once before `</body>` in the authenticated app layout.
+- Dedicated route `admin.settings.g8desk`, an Administration → Settings nav child, and a Settings hub card — all pointing at the same route name.
+- Pest test (`tests/Feature/Settings/G8DeskSettingsTest.php`) covering save/persist, enabled-validation, and widget rendering (signed for authed users, empty for guests / when disabled).
+- Documentation (`docs/02-development/16-g8desk-support.md`).
+
 ## 1.31.1 - 2026-06-28
 
 ### Fixed
