@@ -15,9 +15,9 @@ use Spatie\LaravelSettings\Settings;
  * in-app. `.env` keeps no g8desk keys — everything is admin-editable here and
  * seeded by the settings migration.
  *
- * @property bool   $enabled       Whether the support widget is embedded for authenticated users.
- * @property string $base_url      g8desk base URL (e.g. https://g8desk.com); the widget script loads from {base_url}/intake/widget.js.
- * @property string $public_key    The pk_… data-key from g8desk → channel → Widget → Generate embed.
+ * @property bool $enabled Whether the support widget is embedded for authenticated users.
+ * @property string $base_url g8desk base URL (e.g. https://g8desk.com); the widget script loads from {base_url}/intake/widget.js.
+ * @property string $public_key The pk_… data-key from g8desk → channel → Widget → Generate embed.
  * @property string $widget_secret The g8wi_… identity secret used to HMAC-sign the payload; stored encrypted, never sent to the browser.
  */
 class G8DeskSettings extends Settings
