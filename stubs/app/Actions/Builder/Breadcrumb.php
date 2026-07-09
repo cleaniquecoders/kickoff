@@ -33,13 +33,6 @@ use Illuminate\Support\Facades\Route;
  */
 class Breadcrumb
 {
-    /**
-     * Menu builders searched (in order) when resolving the active URL.
-     *
-     * @var array<int, string>
-     */
-    private const SOURCES = ['administration', 'media-management', 'sidebar-footer', 'sidebar'];
-
     /** @var array<int, array{label: string, url: ?string}> */
     private array $items = [];
 
@@ -120,11 +113,28 @@ class Breadcrumb
     }
 
     /**
+     * Menu builders searched (in order) when resolving the active URL. Derived
+     * from config/menu.php so the breadcrumb sources and the sidebar (sections +
+     * footer + globals) can never drift. Sections are searched first so a
+     * section leaf wins over a same-URL global.
+     *
+     * @return array<int, string>
+     */
+    private static function sources(): array
+    {
+        return array_values(array_unique(array_merge(
+            (array) config('menu.sections', ['administration', 'media-management']),
+            (array) config('menu.footer', ['sidebar-footer']),
+            (array) config('menu.globals', ['sidebar']),
+        )));
+    }
+
+    /**
      * Resolve the trail by matching $url against each menu builder's tree.
      */
     private function resolveByUrl(string $url): bool
     {
-        foreach (self::SOURCES as $source) {
+        foreach (self::sources() as $source) {
             $menu = menu($source);
 
             $path = $this->search($menu->menus()->all(), $url);
