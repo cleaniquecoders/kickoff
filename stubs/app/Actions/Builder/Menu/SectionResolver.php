@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Builder\Menu;
 
+use Illuminate\Support\Collection;
+
 /**
  * Resolves the sidebar "sections" for the section switcher.
  *
@@ -23,8 +25,8 @@ class SectionResolver
 {
     /**
      * @return array{
-     *     sections: array<int, array{key: string, label: string, icon: string, items: \Illuminate\Support\Collection, landing: string, matchLen: int, owns: bool}>,
-     *     active: array{key: string, label: string, icon: string, items: \Illuminate\Support\Collection, landing: string, matchLen: int, owns: bool}|null
+     *     sections: array<int, array{key: string, label: string, icon: string, items: Collection, landing: string, matchLen: int, owns: bool}>,
+     *     active: array{key: string, label: string, icon: string, items: Collection, landing: string, matchLen: int, owns: bool}|null
      * }
      */
     public static function resolve(): array
