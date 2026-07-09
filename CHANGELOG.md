@@ -2,6 +2,27 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.33.0 — Sidebar section switcher - 2026-07-09
+
+### Sidebar section switcher
+
+Replaces the flat stacked menu groups with a **section switcher**: one dropdown names the active section and the sidebar shows only that section's items. Picking a section navigates (`wire:navigate`) to its landing; the active section is derived from the current route by longest URL-prefix match. `config/menu.php` becomes the single source of truth for the sidebar **and** the (already menu-derived) breadcrumbs, so they can never drift.
+
+#### Added
+
+- `config/menu.php` — the sidebar registry: ordered `globals` / `sections` / `footer` menu-builder keys.
+- `App\Actions\Builder\Menu\SectionResolver` — builds the switcher sections: drops unauthorized/empty ones, takes each section's label/icon/landing from its builder heading (`getHeadingLabel` / `getHeadingIcon` / `getHeadingUrl`) with a first-real-leaf-URL fallback, and marks the active section by longest URL-prefix match (so sub-pages keep the right section).
+- `<x-section-switcher>` component (dropdown + active-section items + collapsed-rail flyouts) and `components/menu/section-items.blade.php` (headingless item renderer).
+- Pest test (`tests/Feature/SectionResolverTest.php`).
+
+#### Changed
+
+- `resources/views/components/layouts/app/sidebar.blade.php` — renders `globals` → `<x-section-switcher>` → `footer`, all driven by `config/menu.php` (no hand-edited builder list).
+- `App\Actions\Builder\Breadcrumb` — the menu SOURCES are now derived from `config/menu.php` (`sections` + `footer` + `globals`) instead of a hardcoded list; it resolves to the same order, so breadcrumb behaviour is unchanged.
+- `docs/02-development/09-sidebar.md` — rewritten to document the switcher, the registry, and breadcrumb derivation (and corrected a stale builder list).
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.32.0...1.33.0
+
 ## 1.32.0 — g8desk Support (native, SDK-free) - 2026-07-05
 
 ### g8desk Support integration (native, SDK-free)
