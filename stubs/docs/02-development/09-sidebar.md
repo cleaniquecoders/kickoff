@@ -28,57 +28,95 @@ This layout is wrapped by `resources/views/components/layouts/app.blade.php` whi
 
 The sidebar layout includes:
 - Flux sidebar component with sticky/stashable configuration
-- Navigation using `<x-menu>` components for each menu builder
+- Global items (`<x-menu>`), the section switcher (`<x-section-switcher>`), and footer items
 - Desktop and mobile user menu dropdowns
 - Toast notification system
 - Session message to toast conversion
 - `@auth` / `@else` guard for unauthenticated users
 
-### Menu Builders in the Sidebar
+### Sidebar composition — `config/menu.php`
 
-The sidebar renders these menu builders in order:
+`config/menu.php` is the **single source of truth** for how the sidebar is
+composed. Every value is a menu-builder key (resolved by `app/Actions/Builder/Menu.php`):
+
+```php
+return [
+    'globals'  => ['sidebar'],                             // pinned on top (no heading)
+    'sections' => ['administration', 'media-management'],  // shown one-at-a-time via the switcher
+    'footer'   => ['sidebar-footer'],                      // pinned to the bottom
+];
+```
+
+The layout renders globals, then the section switcher, then the footer:
 
 ```blade
 <flux:navlist variant="outline">
-    <x-menu menu-builder="sidebar" />
-    <x-menu menu-builder="user-management" />
-    <x-menu menu-builder="media-management" />
-    <x-menu menu-builder="settings" />
-    <x-menu menu-builder="audit-monitoring" />
+    @foreach (config('menu.globals') as $builder)
+        <x-menu :menu-builder="$builder" />
+    @endforeach
+</flux:navlist>
+
+<x-section-switcher />
+
+<flux:spacer />
+
+<flux:navlist variant="outline">
+    @foreach (config('menu.footer') as $builder)
+        <x-menu :menu-builder="$builder" />
+    @endforeach
 </flux:navlist>
 ```
 
-### Menu Builder Classes
+The breadcrumb builder (`app/Actions/Builder/Breadcrumb.php`) reads this **same**
+list, so navigation and breadcrumbs can never drift.
+
+### Section switcher
+
+`sections` are **not** stacked as groups. A single dropdown
+(`resources/views/components/section-switcher.blade.php`) names the active
+section; the sidebar shows only that section's items. Picking a section
+navigates (`wire:navigate`) to its landing page.
+
+`App\Actions\Builder\Menu\SectionResolver` builds the sections. For each key in
+`config('menu.sections')` it:
+
+- drops the section if the user can't see it (unauthorized or empty);
+- takes its **label / icon / landing** from the builder heading
+  (`getHeadingLabel` / `getHeadingIcon` / `getHeadingUrl`) — no duplicated
+  metadata — falling back to the first item's URL for the landing;
+- marks the **active** section by longest URL-prefix match, so a sub-page like
+  `/admin/roles/42/edit` keeps Administration selected even though no menu item
+  matches that exact URL.
+
+In the collapsed rail each section becomes a flyout icon (shared
+`components/menu/collapsed.blade.php`). When no section is authorized the
+switcher renders nothing.
+
+### Menu builder classes
 
 Located in `app/Actions/Builder/Menu/`:
 
-| Class | Builder Key | Heading | Items |
-|-------|-------------|---------|-------|
-| `Base.php` | — | — | Abstract base class |
-| `Sidebar.php` | `sidebar` | *(none)* | Dashboard, Notifications |
-| `UserManagement.php` | `user-management` | User Management | Users, Roles |
-| `MediaManagement.php` | `media-management` | Media | Media Library |
-| `Settings.php` | `settings` | Settings | General |
-| `AuditMonitoring.php` | `audit-monitoring` | Audit & Monitoring | Audit Trail, Telescope, Horizon |
+| Class | Builder key | Role | Heading |
+|-------|-------------|------|---------|
+| `Base.php` | — | Abstract base class | — |
+| `Sidebar.php` | `sidebar` | Global (pinned top) | *(none)* — Dashboard, Notifications |
+| `Administration.php` | `administration` | Section | Administration → `admin.index` |
+| `MediaManagement.php` | `media-management` | Section | Media |
+| `SidebarFooter.php` | `sidebar-footer` | Footer (pinned bottom) | Resources |
+| `SectionResolver.php` | — | Resolves sections for the switcher | — |
 
-### Menu Router
+### Menu router
 
 `app/Actions/Builder/Menu.php` routes builder keys to classes:
 
 ```php
-public function build(string $builder): Builder|ContractsMenu
-{
-    $class = match ($builder) {
-        'sidebar' => Sidebar::class,
-        'user-management' => UserManagement::class,
-        'media-management' => MediaManagement::class,
-        'settings' => Settings::class,
-        'audit-monitoring' => AuditMonitoring::class,
-        default => Sidebar::class,
-    };
-
-    return (new $class)->build();
-}
+$class = match ($builder) {
+    'sidebar' => Sidebar::class,
+    'administration' => Administration::class,
+    'media-management' => MediaManagement::class,
+    'sidebar-footer' => SidebarFooter::class,
+    default => Sidebar::class,
+};
 ```
 
 ## Base Menu Builder
@@ -257,11 +295,15 @@ class Reports extends Base
 'reports' => Reports::class,
 ```
 
-3. Add to the sidebar layout:
+3. Add the key to `config/menu.php` — as a `sections` entry (offered in the
+   switcher) or a `globals`/`footer` entry (pinned). Set `setHeadingUrl()` on the
+   builder so the switcher and breadcrumb use the right landing page:
 
-```blade
-<x-menu menu-builder="reports" />
+```php
+'sections' => ['administration', 'media-management', 'reports'],
 ```
+
+That's the only wiring step — the sidebar and breadcrumbs both read `config/menu.php`.
 
 ## Menu Component
 
@@ -335,4 +377,15 @@ in collapsed mode. Without it, the rail falls back to a generic `circle` icon.
 
 ### Adding Menu to Sidebar
 
-Always add `<x-menu menu-builder="your-key" />` inside the `<flux:navlist>` block in `resources/views/components/layouts/app/sidebar.blade.php`.
+Register the builder in `app/Actions/Builder/Menu.php`, then add its key to
+`config/menu.php` (`sections`, `globals`, or `footer`). Do **not** hand-edit the
+sidebar layout — it renders whatever `config/menu.php` lists.
+
+### Section Not Selectable / Wrong Section Highlighted
+
+1. Confirm the key is in `config('menu.sections')` and the builder is authorized.
+2. The switcher's landing comes from the builder's `setHeadingUrl()`, falling
+   back to its first item — a section whose items are all sub-groups (url `#`)
+   needs a heading URL or a first real leaf, or it will land on `#`.
+3. Active detection is longest URL-prefix — ensure the section's item URLs share
+   a distinct path segment from other sections.

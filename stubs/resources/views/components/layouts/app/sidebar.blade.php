@@ -32,15 +32,21 @@
             </div>
 
             <flux:navlist variant="outline">
-                <x-menu menu-builder="sidebar" />
-                <x-menu menu-builder="media-management" />
-                <x-menu menu-builder="administration" />
+                @foreach (config('menu.globals', ['sidebar']) as $builder)
+                    <x-menu :menu-builder="$builder" />
+                @endforeach
             </flux:navlist>
+
+            {{-- Sections (Administration, Media, …) are chosen via a single switcher;
+                 the sidebar shows one section at a time. See config/menu.php. --}}
+            <x-section-switcher />
 
             <flux:spacer />
 
             <flux:navlist variant="outline">
-                <x-menu menu-builder="sidebar-footer" />
+                @foreach (config('menu.footer', ['sidebar-footer']) as $builder)
+                    <x-menu :menu-builder="$builder" />
+                @endforeach
             </flux:navlist>
 
             <!-- Desktop User Menu -->
