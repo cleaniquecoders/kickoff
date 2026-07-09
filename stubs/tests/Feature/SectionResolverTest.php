@@ -18,7 +18,7 @@ test('resolve() returns the authorized sections with heading metadata', function
 
     $sections = collect(SectionResolver::resolve()['sections']);
 
-    expect($sections->pluck('key')->all())->toContain('administration', 'media-management')
+    expect($sections->pluck('key')->all())->toContain('administration')
         ->and($sections->firstWhere('key', 'administration')['label'])->toBe('Administration')
         ->and($sections->firstWhere('key', 'administration')['landing'])->toBe(route('admin.index'));
 });

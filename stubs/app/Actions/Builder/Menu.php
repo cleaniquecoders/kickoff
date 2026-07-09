@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Actions\Builder;
 
 use App\Actions\Builder\Menu\Administration;
-use App\Actions\Builder\Menu\MediaManagement;
 use App\Actions\Builder\Menu\Sidebar;
 use App\Actions\Builder\Menu\SidebarFooter;
 use App\Exceptions\ContractException;
@@ -23,7 +22,6 @@ class Menu
     {
         $class = match ($builder) {
             'sidebar' => Sidebar::class,
-            'media-management' => MediaManagement::class,
             'administration' => Administration::class,
             'sidebar-footer' => SidebarFooter::class,
             default => Sidebar::class,

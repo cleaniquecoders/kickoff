@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 /**
  * Administration menu — a single g8stack-style group that nests the common
- * admin areas as sub-groups: Identity, Mail, Backups, Settings, Developers.
+ * admin areas as sub-groups: Identity, Mail, Media Library, Backups, Settings,
+ * Developers.
  *
  * Every leaf is route-guarded (Route::has(...) ? route(...) : '#') and gated, so
  * an item only appears when its feature/package is installed in the host app —
@@ -52,6 +53,7 @@ class Administration extends Base
         return [
             fn () => $this->createIdentityMenuGroup(),
             fn () => $this->createMailMenuGroup(),
+            fn () => $this->createMediaLibraryMenuItem(),
             fn () => $this->createBackupsMenuGroup(),
             fn () => $this->createSettingsMenuGroup(),
             fn () => $this->createDeveloperMenuGroup(),
@@ -143,6 +145,24 @@ class Administration extends Base
                 || (Route::has('mailhistory.index') && Gate::allows('admin.view.mail-history')))
             ->addChild($this->child('Settings', 'admin.settings.show', 'cog', 'manage.settings', 'Mail / SMTP configuration', false, ['section' => 'email']))
             ->addChild($this->child('History', ['admin.mail-history.index', 'mailhistory.index'], 'history', 'admin.view.mail-history', 'Outbound email audit log'));
+    }
+
+    /**
+     * Media Library — a single leaf (not a sub-group) folded into Administration
+     * right after Mail. It used to be its own top-level "Media" section/switcher
+     * entry, which was wasteful for one link. Route-guarded so it only appears
+     * when the media manager is installed, and gated by manage.media (which
+     * access.media-management, already in the group's Gate::any(), covers).
+     */
+    private function createMediaLibraryMenuItem(): MenuItem
+    {
+        return (new MenuItem)
+            ->setLabel(__('Media Library'))
+            ->setUrl(Route::has('media-manager.index') ? route('media-manager.index') : '#')
+            ->setIcon('photo')
+            ->setTooltip(__('Manage media files'))
+            ->setDescription(__('Browse, upload and manage media files'))
+            ->setVisible(fn () => Route::has('media-manager.index') && Gate::allows('manage.media'));
     }
 
     /**

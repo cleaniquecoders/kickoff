@@ -20,12 +20,14 @@
 @if ($active)
     {{-- Expanded sidebar: switcher control + the active section's items --}}
     <div class="sidebar-expanded-only">
-        <flux:dropdown position="bottom" align="start" class="mt-2 w-full">
-            <flux:button variant="ghost" size="sm" icon="{{ $active['icon'] }}"
-                class="w-full justify-between text-left" data-tippy-content="{{ __('Switch section') }}">
-                <span class="min-w-0 flex-1 truncate">{{ $active['label'] }}</span>
+        <flux:dropdown position="bottom" align="start" class="w-full">
+            <button type="button"
+                class="mt-2 flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700/60"
+                data-tippy-content="{{ __('Switch section') }}">
+                <flux:icon :icon="$active['icon']" class="size-4 shrink-0 text-zinc-500 dark:text-zinc-400" />
+                <span class="min-w-0 flex-1 truncate text-left">{{ $active['label'] }}</span>
                 <flux:icon.chevron-down class="size-4 shrink-0 text-zinc-400" />
-            </flux:button>
+            </button>
 
             <flux:menu class="min-w-56">
                 @foreach ($sections as $section)

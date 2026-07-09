@@ -123,7 +123,7 @@ class Breadcrumb
     private static function sources(): array
     {
         return array_values(array_unique(array_merge(
-            (array) config('menu.sections', ['administration', 'media-management']),
+            (array) config('menu.sections', ['administration']),
             (array) config('menu.footer', ['sidebar-footer']),
             (array) config('menu.globals', ['sidebar']),
         )));
