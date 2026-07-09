@@ -20,7 +20,7 @@ test('administrator can suspend and activate a user', function () {
 
     Livewire::actingAs($this->admin)
         ->test(Index::class)
-        ->call('performSuspend', [$user->uuid]);
+        ->call('suspend', $user->uuid);
 
     expect($user->refresh()->isSuspended())->toBeTrue();
 

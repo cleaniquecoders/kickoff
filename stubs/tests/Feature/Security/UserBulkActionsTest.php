@@ -21,7 +21,7 @@ test('bulk delete removes selected users but skips self and superadmins', functi
     Livewire::actingAs($this->admin)
         ->test(Index::class)
         ->set('selected', [$userA->uuid, $userB->uuid, $superadmin->uuid, $this->admin->uuid])
-        ->call('performBulkDelete');
+        ->call('bulkDelete');
 
     expect($userA->refresh()->trashed())->toBeTrue()
         ->and($userB->refresh()->trashed())->toBeTrue()

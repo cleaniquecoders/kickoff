@@ -60,7 +60,7 @@ test('protected roles cannot be deleted', function () {
 
     Livewire::actingAs($this->admin)
         ->test(RolesIndex::class)
-        ->call('performDelete', [$role->uuid]);
+        ->call('delete', $role->uuid);
 
     expect(Role::where('name', 'user')->exists())->toBeTrue();
 });
@@ -71,7 +71,7 @@ test('roles assigned to users cannot be deleted', function () {
 
     Livewire::actingAs($this->admin)
         ->test(RolesIndex::class)
-        ->call('performDelete', [$role->uuid]);
+        ->call('delete', $role->uuid);
 
     expect(Role::where('name', 'editor')->exists())->toBeTrue();
 });
@@ -81,7 +81,7 @@ test('unassigned custom roles can be deleted', function () {
 
     Livewire::actingAs($this->admin)
         ->test(RolesIndex::class)
-        ->call('performDelete', [$role->uuid]);
+        ->call('delete', $role->uuid);
 
     expect(Role::where('name', 'editor')->exists())->toBeFalse();
 });

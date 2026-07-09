@@ -230,7 +230,7 @@ already enforce `app/Contracts/` contains only interfaces and `app/Concerns/` co
 ```text
 app/
 ├── Actions/        # Single-purpose action classes (Builder/Menu already included)
-├── Concerns/       # Traits (InteractsWithLivewireConfirm, HasMedia, etc.)
+├── Concerns/       # Traits (InteractsWithLivewireForm, HasMedia, etc.)
 ├── Console/        # Artisan commands (24+ included: seeders, cache, code generation)
 ├── Contracts/      # Interfaces (HeadingMenuBuilder, AuthorizedMenuBuilder)
 ├── Enums/          # Status/type enums
@@ -329,25 +329,30 @@ From Alpine.js directly:
 
 ### Confirmations
 
+Use Livewire's native `wire:confirm` on the triggering element. The browser shows the
+dialog client-side and, on confirm, calls the wired method directly — no separate modal
+component to mount.
+
+```blade
+<flux:menu.item icon="trash-2" variant="danger"
+    wire:click="delete('{{ $item->uuid }}')"
+    wire:confirm="{{ __('Are you sure you want to delete :name?', ['name' => $item->name]) }}">
+    {{ __('Delete') }}
+</flux:menu.item>
+```
+
 ```php
-use App\Concerns\InteractsWithLivewireConfirm;
-
-class MyComponent extends Component
+public function delete(string $uuid): void
 {
-    use InteractsWithLivewireConfirm;
+    $item = Item::where('uuid', $uuid)->firstOrFail();
+    $this->authorize('delete', $item);
 
-    public function delete($id)
-    {
-        $this->confirm(
-            'Delete Item',
-            'Are you sure?',
-            'my-component',
-            'performDelete',
-            $id
-        );
-    }
+    $item->delete();
+    $this->dispatch('toast', type: 'success', message: __('Deleted.'));
 }
 ```
+
+> For destructive confirmations that need typed input (GitHub-style), use a `flux:modal`.
 
 ### Flyout vs Modal vs Dedicated Page — when to use which
 

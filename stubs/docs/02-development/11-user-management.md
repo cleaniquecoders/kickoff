@@ -107,12 +107,13 @@ Roles (Admin → Roles) support create/edit via flyout, enable/disable, and dele
 - Roles assigned to users cannot be deleted
 - Disabled roles cannot be assigned
 
-## Convention: Confirmations Never Open From Flyouts
+## Confirmations
 
-Destructive actions (delete, suspend, bulk delete) are only triggered from the row 3-dot
-dropdown or the bulk action bar — never from inside a flyout. This keeps the global
-`<livewire:confirm />` modal from stacking on top of a flyout panel. Flyouts contain only
-save/cancel and toggle actions.
+Destructive actions (delete, suspend, bulk delete) confirm via Livewire's native
+`wire:confirm` on the triggering element — the browser shows the dialog client-side,
+then calls the worker method directly. This works from the row 3-dot dropdown, the bulk
+action bar, and inside flyouts alike (there is no modal to stack), so no special "never
+confirm from a flyout" rule is needed.
 
 ## Bulk Actions
 
@@ -123,9 +124,9 @@ Select rows via checkboxes (header checkbox selects the visible page). The bulk 
 
 ## Extending: Adding a Row Action
 
-1. Add a method to `Security\Users\Index` that loads the user by uuid and authorizes a policy
-   ability. For destructive actions, call `$this->confirm(...)` and handle the
-   `#[On('perform...')]` listener (note: the listener receives its params as an array).
-2. Add a `flux:menu.item` to the row dropdown, wrapped in `@can`.
+1. Add a method to `Security\Users\Index` that loads the user by uuid, authorizes a policy
+   ability, then performs the action directly (dispatch a `toast` for feedback).
+2. Add a `flux:menu.item` to the row dropdown, wrapped in `@can`. For destructive actions,
+   add `wire:confirm="..."` alongside the `wire:click`.
 3. Add the policy method + permission to `config/access-control.php` if a new ability is needed.
 4. Cover it in `tests/Feature/Security/`.

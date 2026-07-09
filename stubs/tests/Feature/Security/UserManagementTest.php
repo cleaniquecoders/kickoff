@@ -123,7 +123,7 @@ test('administrator can delete and restore a user', function () {
 
     Livewire::actingAs($this->admin)
         ->test(Index::class)
-        ->call('performDelete', [$user->uuid]);
+        ->call('delete', $user->uuid);
 
     expect($user->refresh()->trashed())->toBeTrue();
 

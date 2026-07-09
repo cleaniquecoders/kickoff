@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Roles;
 
-use App\Concerns\InteractsWithLivewireConfirm;
 use App\Models\Role;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
@@ -15,7 +14,6 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use AuthorizesRequests;
-    use InteractsWithLivewireConfirm;
     use WithPagination;
 
     public ?string $detailUuid = null;
@@ -48,25 +46,6 @@ class Index extends Component
         if ($role->users()->exists()) {
             $this->dispatch('toast', type: 'error', message: __('Cannot delete a role that is assigned to users.'));
 
-            return;
-        }
-
-        $this->confirm(
-            __('Delete Role'),
-            __('Are you sure you want to delete :role?', ['role' => $role->display_name]),
-            'admin.roles.index',
-            'performDelete',
-            $uuid
-        );
-    }
-
-    #[On('performDelete')]
-    public function performDelete(array $params): void
-    {
-        $role = Role::where('uuid', $params[0])->firstOrFail();
-        $this->authorize('delete', $role);
-
-        if ($role->isProtected() || $role->users()->exists()) {
             return;
         }
 

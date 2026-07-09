@@ -62,7 +62,9 @@
                     </flux:button>
                 @endcan
                 @can('users.delete.account')
-                    <flux:button size="sm" variant="danger" icon="trash-2" wire:click="bulkDelete" class="cursor-pointer">
+                    <flux:button size="sm" variant="danger" icon="trash-2" wire:click="bulkDelete"
+                        wire:confirm="{{ __('Delete :count selected user(s)? Protected accounts will be skipped. Deleted accounts can be restored later.', ['count' => count($selected)]) }}"
+                        class="cursor-pointer">
                         {{ __('Delete') }}
                     </flux:button>
                 @endcan
@@ -186,14 +188,16 @@
                                                     {{ __('Activate') }}
                                                 </flux:menu.item>
                                             @else
-                                                <flux:menu.item icon="user-x" wire:click="suspend('{{ $user->uuid }}')">
+                                                <flux:menu.item icon="user-x" wire:click="suspend('{{ $user->uuid }}')"
+                                                    wire:confirm="{{ __(':name will no longer be able to sign in. Continue?', ['name' => $user->name]) }}">
                                                     {{ __('Suspend') }}
                                                 </flux:menu.item>
                                             @endif
                                         @endcan
                                         @can('delete', $user)
                                             <flux:menu.item icon="trash-2" variant="danger"
-                                                wire:click="delete('{{ $user->uuid }}')">
+                                                wire:click="delete('{{ $user->uuid }}')"
+                                                wire:confirm="{{ __('Are you sure you want to delete :name? The account can be restored later.', ['name' => $user->name]) }}">
                                                 {{ __('Delete') }}
                                             </flux:menu.item>
                                         @endcan
@@ -286,11 +290,15 @@
                             @if ($u->isSuspended())
                                 <flux:button size="sm" variant="ghost" icon="user-check" wire:click="activate('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Activate') }}</flux:button>
                             @else
-                                <flux:button size="sm" variant="ghost" icon="user-x" wire:click="suspend('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Suspend') }}</flux:button>
+                                <flux:button size="sm" variant="ghost" icon="user-x" wire:click="suspend('{{ $u->uuid }}')"
+                                    wire:confirm="{{ __(':name will no longer be able to sign in. Continue?', ['name' => $u->name]) }}"
+                                    class="cursor-pointer">{{ __('Suspend') }}</flux:button>
                             @endif
                         @endcan
                         @can('delete', $u)
-                            <flux:button size="sm" variant="danger" icon="trash-2" wire:click="delete('{{ $u->uuid }}')" class="cursor-pointer">{{ __('Delete') }}</flux:button>
+                            <flux:button size="sm" variant="danger" icon="trash-2" wire:click="delete('{{ $u->uuid }}')"
+                                wire:confirm="{{ __('Are you sure you want to delete :name? The account can be restored later.', ['name' => $u->name]) }}"
+                                class="cursor-pointer">{{ __('Delete') }}</flux:button>
                         @endcan
                     @endif
                 </div>

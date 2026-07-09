@@ -77,7 +77,8 @@
                                                     @endcan
                                                     @can('delete', $role)
                                                         <flux:menu.item icon="trash-2" variant="danger"
-                                                            wire:click="delete('{{ $role->uuid }}')">
+                                                            wire:click="delete('{{ $role->uuid }}')"
+                                                            wire:confirm="{{ __('Are you sure you want to delete :role?', ['role' => $role->display_name]) }}">
                                                             {{ __('Delete') }}
                                                         </flux:menu.item>
                                                     @endcan

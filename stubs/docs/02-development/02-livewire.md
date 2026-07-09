@@ -13,21 +13,34 @@ $this->dispatch('toast', type: 'success', message: 'Operation completed successf
 
 Toast types: `success`, `error`, `warning`, `info`. The `<x-toast />` component is included in the sidebar layout.
 
-## Confirm Component
+## Confirmations
 
-Use the `InteractsWithLivewireConfirm` trait for confirmation dialogs (uses Flux UI modal):
+Use Livewire's native `wire:confirm` on the triggering element for destructive
+actions. The browser shows the confirmation dialog client-side and, on confirm,
+calls the wired method directly — no extra component to mount:
+
+```blade
+<flux:menu.item icon="trash-2" variant="danger"
+    wire:click="delete('{{ $record->uuid }}')"
+    wire:confirm="{{ __('Are you sure you want to delete :name?', ['name' => $record->name]) }}">
+    {{ __('Delete') }}
+</flux:menu.item>
+```
 
 ```php
-use App\Concerns\InteractsWithLivewireConfirm;
+// The worker method performs the action directly — authorize, then act.
+public function delete(string $uuid): void
+{
+    $record = Record::where('uuid', $uuid)->firstOrFail();
+    $this->authorize('delete', $record);
 
-$this->confirm(
-    'Delete Connection',
-    'Are you sure?',
-    'connection-form',
-    'destroyConnection',
-    $uuid
-);
+    $record->delete();
+    $this->dispatch('toast', type: 'success', message: __('Deleted.'));
+}
 ```
+
+> For destructive confirmations that need typed input (GitHub-style "type the
+> name to confirm"), use a `flux:modal` instead.
 
 For datatables, see the [Datatable documentation](05-datatable.md) for examples using native Livewire 4 with pagination, sorting, and filtering.
 

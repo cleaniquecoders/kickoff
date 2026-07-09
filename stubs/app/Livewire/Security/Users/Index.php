@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\Security\Users;
 
-use App\Concerns\InteractsWithLivewireConfirm;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -22,7 +21,6 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use AuthorizesRequests;
-    use InteractsWithLivewireConfirm;
     use WithPagination;
 
     #[Url]
@@ -149,21 +147,6 @@ class Index extends Component
         $user = $this->findUser($uuid);
         $this->authorize('delete', $user);
 
-        $this->confirm(
-            __('Delete User'),
-            __('Are you sure you want to delete :name? The account can be restored later.', ['name' => $user->name]),
-            'security.users.index',
-            'performDelete',
-            $uuid
-        );
-    }
-
-    #[On('performDelete')]
-    public function performDelete(array $params): void
-    {
-        $user = $this->findUser($params[0]);
-        $this->authorize('delete', $user);
-
         $user->delete();
         $this->clearSelection();
         $this->dispatch('toast', type: 'success', message: __(':name deleted.', ['name' => $user->name]));
@@ -181,21 +164,6 @@ class Index extends Component
     public function suspend(string $uuid): void
     {
         $user = $this->findUser($uuid);
-        $this->authorize('suspend', $user);
-
-        $this->confirm(
-            __('Suspend User'),
-            __(':name will no longer be able to sign in. Continue?', ['name' => $user->name]),
-            'security.users.index',
-            'performSuspend',
-            $uuid
-        );
-    }
-
-    #[On('performSuspend')]
-    public function performSuspend(array $params): void
-    {
-        $user = $this->findUser($params[0]);
         $this->authorize('suspend', $user);
 
         $user->suspend();
@@ -245,17 +213,6 @@ class Index extends Component
     */
 
     public function bulkDelete(): void
-    {
-        $this->confirm(
-            __('Delete Selected Users'),
-            __('Delete :count selected user(s)? Protected accounts will be skipped.', ['count' => count($this->selected)]),
-            'security.users.index',
-            'performBulkDelete'
-        );
-    }
-
-    #[On('performBulkDelete')]
-    public function performBulkDelete(): void
     {
         $deleted = 0;
         $skipped = 0;

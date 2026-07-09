@@ -57,19 +57,23 @@ public function someMethod()
 
 **Example Livewire Confirm:**
 
-```php
-// In a Livewire component, use the InteractsWithLivewireConfirm trait
-use App\Concerns\InteractsWithLivewireConfirm;
+```blade
+{{-- Use Livewire's native wire:confirm on the trigger; the worker method acts directly --}}
+<flux:menu.item icon="trash-2" variant="danger"
+    wire:click="deleteItem('{{ $item->uuid }}')"
+    wire:confirm="{{ __('Are you sure you want to delete this item?') }}">
+    {{ __('Delete') }}
+</flux:menu.item>
+```
 
-public function deleteItem($id)
+```php
+public function deleteItem(string $uuid): void
 {
-    $this->confirm(
-        'Delete Item',
-        'Are you sure you want to delete this item?',
-        'your-component-name',
-        'confirmDelete',
-        $id
-    );
+    $item = Item::where('uuid', $uuid)->firstOrFail();
+    $this->authorize('delete', $item);
+
+    $item->delete();
+    $this->dispatch('toast', type: 'success', message: __('Deleted.'));
 }
 ```
 
@@ -327,32 +331,31 @@ class MyComponent extends Component
 
 Toast types: `success`, `error`, `warning`, `info`. The `<x-toast />` component is already included in the sidebar layout.
 
-**InteractsWithLivewireConfirm (for confirmation dialogs):**
+**Confirmations (native `wire:confirm`):**
+
+```blade
+<flux:menu.item icon="trash-2" variant="danger"
+    wire:click="deleteItem('{{ $item->uuid }}')"
+    wire:confirm="{{ __('Are you sure? This action cannot be undone.') }}">
+    {{ __('Delete') }}
+</flux:menu.item>
+```
 
 ```php
-use App\Concerns\InteractsWithLivewireConfirm;
-
 class MyComponent extends Component
 {
-    use InteractsWithLivewireConfirm;
-
-    public function deleteItem($id)
+    public function deleteItem(string $uuid): void
     {
-        $this->confirm(
-            'Delete Item',
-            'Are you sure? This action cannot be undone.',
-            'my-component', // Component name
-            'performDelete', // Listener method
-            $id // Additional parameters
-        );
-    }
+        $item = Item::where('uuid', $uuid)->firstOrFail();
+        $this->authorize('delete', $item);
 
-    public function performDelete($id)
-    {
-        // Actually delete the item
+        $item->delete();
+        $this->dispatch('toast', type: 'success', message: __('Deleted.'));
     }
 }
 ```
+
+> For destructive confirmations that need typed input (GitHub-style), use a `flux:modal`.
 
 ---
 
