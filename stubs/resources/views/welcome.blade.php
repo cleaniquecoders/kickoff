@@ -4,6 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white antialiased dark:bg-zinc-900">
+        @include('partials.analytics-noscript')
         {{-- Navigation --}}
         <nav class="fixed top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

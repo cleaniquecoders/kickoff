@@ -8,6 +8,7 @@ use App\Settings\AuthenticationSettings;
 use App\Settings\GeneralSettings;
 use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
+use App\Settings\SeoSettings;
 use CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -127,6 +128,23 @@ class AppServiceProvider extends ServiceProvider
             config([
                 'notification.enabled' => $notification->enabled,
                 'notification.default' => $notification->channels,
+            ]);
+
+            $seo = app(SeoSettings::class);
+            config([
+                'seo.meta.title' => $seo->meta_title,
+                'seo.meta.description' => $seo->meta_description,
+                'seo.meta.keywords' => $seo->meta_keywords,
+                'seo.canonical' => $seo->canonical_enabled,
+                'seo.og_image' => $seo->og_image,
+                'seo.twitter_site' => $seo->twitter_site,
+                'seo.google.analytics_id' => $seo->google_analytics_id,
+                'seo.google.tag_manager_id' => $seo->google_tag_manager_id,
+                'seo.google.site_verification' => $seo->google_site_verification,
+                'seo.robots_txt' => $seo->robots_txt,
+                'seo.organization.name' => $seo->organization_name,
+                'seo.organization.logo' => $seo->organization_logo,
+                'seo.organization.same_as' => $seo->organization_same_as,
             ]);
         } catch (\Throwable) {
             // Settings table may not exist yet (fresh install, migrations pending).

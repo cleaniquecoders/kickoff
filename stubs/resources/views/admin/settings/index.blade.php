@@ -81,6 +81,25 @@
         <x-card>
             <x-card.header>
                 <div class="flex items-center">
+                    <x-lucide-search class="h-6 w-6 text-brand-500 me-3" />
+                    <flux:heading size="lg">SEO &amp; Analytics</flux:heading>
+                </div>
+            </x-card.header>
+            <x-card.body>
+                <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                    Search engine defaults, structured data, robots.txt, and Google Analytics.
+                </p>
+            </x-card.body>
+            <x-card.footer>
+                <flux:button variant="primary" :href="route('admin.settings.seo')" wire:navigate>
+                    Configure
+                </flux:button>
+            </x-card.footer>
+        </x-card>
+
+        <x-card>
+            <x-card.header>
+                <div class="flex items-center">
                     <x-lucide-bell class="h-6 w-6 text-brand-500 me-3" />
                     <flux:heading size="lg">Notifications</flux:heading>
                 </div>

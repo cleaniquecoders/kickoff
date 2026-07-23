@@ -199,6 +199,7 @@ class Administration extends Base
             ->addChild($this->child('General', 'admin.settings.show', 'sliders-horizontal', 'manage.settings', 'Configure system-wide settings', false, ['section' => 'general']))
             ->addChild($this->child('Authentication', 'admin.settings.authentication', 'lock-keyhole', 'manage.settings', 'Control sign-in and public registration'))
             ->addChild($this->child('Support', 'admin.settings.g8desk', 'life-buoy', 'manage.settings', 'Embed the g8desk support widget'))
+            ->addChild($this->child('SEO & Analytics', 'admin.settings.seo', 'search', 'manage.settings', 'Search engine defaults, robots.txt and analytics'))
             ->addChild($this->child('Notifications', 'admin.settings.show', 'bell', 'manage.settings', 'Enable notifications and choose delivery channels', false, ['section' => 'notifications']))
             ->addChild($this->child('SSO', 'config-sso.admin', 'key-round', 'admin.manage.sso', 'Configure single sign-on providers'))
             ->addChild($this->child('Webhooks', 'config-webhook.index', 'webhook', 'admin.manage.webhooks', 'Manage outgoing webhooks'));

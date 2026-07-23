@@ -2,6 +2,26 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.35.0 — SEO & Analytics baseline - 2026-07-23
+
+Generated projects now ship a full SEO/analytics surface, admin-editable at **Admin > Settings > SEO & Analytics** — no deploy needed to change meta defaults, crawl rules, or tracking IDs. ([#50](https://github.com/cleaniquecoders/kickoff/issues/50))
+
+### Added
+
+- **`App\Settings\SeoSettings`** (+ settings migration, `config/seo.php`, `AppServiceProvider` overlay): meta title/description/keywords, canonical toggle, Open Graph share image, X/Twitter handle, GA4 Measurement ID, GTM container ID, Search Console verification, robots.txt content, and Organization schema fields (name, logo, sameAs).
+- **Admin UI**: new `Livewire\Admin\Settings\Seo` full-page component at `admin/settings/seo` (route registered before the `{section}` catch-all), settings hub card, and an **SEO & Analytics** item in the Administration > Settings menu group (new `search` flux icon).
+- **Head partials**: `partials/seo.blade.php` (meta/OG/Twitter/canonical/site-verification + auto JSON-LD `Organization`/`WebSite`) and `partials/analytics.blade.php` (GA4 gtag + GTM, rendered **only when an ID is set**) included by the shared `partials/head.blade.php`; GTM `<noscript>` iframe injected after `<body>` in all document layouts. Layouts now forward a per-page `:description` prop alongside `:title`.
+- **Structured data helpers** (`support/seo.php`): `seo_schema()` plus `seo_schema_{organization,website,webpage,breadcrumb,faq,article,product,course,event}()` covering all rich-result types; null-stripping and list-safe JSON-LD encoding.
+- **Crawling endpoints** (`routes/web/seo.php`): dynamic `/robots.txt` (admin-editable, `Sitemap:` line auto-appended) and `/sitemap.xml` (public routes on the fly; a crawled `public/sitemap.xml` takes precedence). New `seo:generate-sitemap` command via **spatie/laravel-sitemap** (added to `StartCommand` requires).
+- **Docs & conventions**: `docs/02-development/17-seo.md` guide (incl. Core Web Vitals/performance checklist), `stubs/CLAUDE.md` SEO conventions, `.env.example` seeds (`GOOGLE_ANALYTICS_ID`, `GOOGLE_TAG_MANAGER_ID`, `GOOGLE_SITE_VERIFICATION` — first-migrate defaults only).
+- **Tests**: `SeoSettingsTest` (save/validation/normalization) and `SeoTest` (robots/sitemap routes, conditional GA/GTM rendering, meta/OG/canonical tags, JSON-LD helpers).
+
+### Changed
+
+- `StartCommand` now deletes the framework's static `public/robots.txt` after copying stubs so the dynamic route is reachable.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
 ## 1.34.1 - 2026-07-09
 
 ### Fixed

@@ -152,6 +152,7 @@ Application-level settings are stored in the **database** via `spatie/laravel-se
 - `GeneralSettings` — `site_name`
 - `MailSettings` — `from_address`, `from_name`
 - `NotificationSettings` — `enabled`, `channels`
+- `SeoSettings` — meta defaults, Open Graph, canonical toggle, robots.txt, GA4/GTM IDs, organization schema
 
 **How it works**: `AppServiceProvider::boot()` reads from DB and overrides `config()` values, so all existing `config('app.name')`, `config('mail.from.*')`, `config('notification.*')` calls automatically use DB values.
 
@@ -173,6 +174,15 @@ $settings->save();
 **What stays in .env**: Infrastructure settings (`APP_ENV`, `APP_DEBUG`, SMTP credentials, DB, Redis).
 
 > **Gotcha:** Never write to `.env` at runtime. Use Spatie Settings for any value that admins should be able to change from the UI.
+
+### SEO & Analytics
+
+All SEO surface is admin-editable at **Admin > Settings > SEO & Analytics** (`SeoSettings`, overlaid onto `config('seo.*')` at boot). See `docs/02-development/17-seo.md` for the full guide.
+
+- Meta/OG/Twitter/canonical tags render from `partials/seo.blade.php` (included by `partials/head.blade.php` in every layout). Per-page override: `<x-layouts.app :title="..." :description="...">`.
+- GA4/GTM snippets (`partials/analytics.blade.php` + `analytics-noscript.blade.php`) render **only when an ID is set** — never hardcode tracking snippets in views.
+- `/robots.txt` and `/sitemap.xml` are routes in `routes/web/seo.php` — do NOT create static `public/robots.txt`/`public/sitemap.xml` by hand (a static file shadows the route). For big sites, schedule `php artisan seo:generate-sitemap`.
+- Structured data: `Organization` + `WebSite` schemas render automatically; page-level schemas use the `seo_schema_*()` helpers in `support/seo.php` (breadcrumb, faq, article, product, course, event, webpage). Do NOT hand-write `<script type="application/ld+json">` in views.
 
 ### Deploy Operations (post-deploy data tasks)
 
@@ -717,6 +727,7 @@ Before committing:
 
 - **spatie/laravel-permission**: Roles and permissions
 - **spatie/laravel-settings**: Application settings stored in database
+- **spatie/laravel-sitemap**: Sitemap generation (`seo:generate-sitemap` + on-the-fly `/sitemap.xml`)
 - **spatie/laravel-medialibrary**: File/media management
 - **owen-it/laravel-auditing**: Audit trail
 - **cleaniquecoders/traitify**: Common traits and contracts

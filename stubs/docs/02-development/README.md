@@ -34,6 +34,8 @@ This project is built with:
 9. [Configuration Backup](13-config-backup.md) - Encrypted, portable config backup/restore
 10. [Single Sign-On](14-sso.md) - Database-backed SSO providers via Socialite
 11. [Artisan Runner](15-artisan-runner.md) - Run allowlisted Artisan commands from the browser (superadmin only)
+12. [g8desk Support](16-g8desk-support.md) - Embedded support-ticket widget
+13. [SEO & Analytics](17-seo.md) - Meta tags, structured data, sitemap, robots.txt, GA4/GTM
 
 ## Development Workflow
 

@@ -8,6 +8,7 @@
 @auth
 
     <body class="min-h-screen bg-white dark:bg-zinc-800">
+        @include('partials.analytics-noscript')
         @php
             // Plain cookie (see bootstrap/app.php encryptCookies exception) so the
             // collapsed rail renders server-side under wire:navigate without flicker.
