@@ -2,6 +2,28 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.36.0 — Claude Toolkit dev roster - 2026-08-03
+
+Generated projects — and Kickoff itself — now ship a curated Claude Code dev roster (agents, skills, commands), sourced from [nasrulhazim/claude](https://github.com/nasrulhazim/claude). No installer changes: `stubs/` is mirrored recursively, so the assets land in every scaffolded app automatically.
+
+### Added
+
+- **`stubs/.claude/` (into every generated project)** — a full Laravel dev-lifecycle roster:
+  - **12 agents**: api-engineer, code-reviewer, database-engineer, devops-engineer, laravel-developer, performance-engineer, qa-engineer, security-analyst, software-architect, tech-writer, ui-designer, upgrade-specialist
+  - **17 skills**: project-laravel, livewire-flux, pest-testing, code-quality, php-best-practices, design-patterns, project-api, project-ddd, git-workflow, gh-workflow, ci-cd-pipeline, kickoff-patch, log-monitor, project-conventions, project-docs, project-roadmap, project-faq
+  - **3 commands**: upgrade-laravel, upgrade-livewire, docs
+  
+- **`.claude/` (for developing Kickoff itself)** — 5 agents (code-reviewer, qa-engineer, package-maintainer, devops-engineer, tech-writer) and 8 skills (package-dev, code-quality, php-best-practices, pest-testing, git-workflow, gh-workflow, project-conventions, project-docs); the existing `sandbox-testing` skill and local settings are preserved.
+- **`bin/sync-claude-assets`** — idempotent script that refreshes both sets from the toolkit source of truth (default `~/Packages/claude`, override with an argument). Curated lists live at the top of the script.
+
+### Notes
+
+- Agents are thin role personas that load the bundled skills as their playbook; read-only roles (code-reviewer, security-analyst) ship a restricted tool allowlist.
+- `boost:install --skills` still runs during scaffolding and writes package-named skills alongside these; re-run `bin/sync-claude-assets` if a name ever collides.
+- The bundle is a snapshot — refresh it each release via `bin/sync-claude-assets`.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
 ## 1.35.0 — SEO & Analytics baseline - 2026-07-23
 
 Generated projects now ship a full SEO/analytics surface, admin-editable at **Admin > Settings > SEO & Analytics** — no deploy needed to change meta defaults, crawl rules, or tracking IDs. ([#50](https://github.com/cleaniquecoders/kickoff/issues/50))
@@ -1242,6 +1264,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1261,6 +1284,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1335,6 +1359,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1529,6 +1554,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1538,6 +1564,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1642,11 +1669,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1747,11 +1776,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -2017,11 +2048,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -2128,11 +2161,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
