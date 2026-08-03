@@ -199,7 +199,16 @@ The `stubs/` directory contains a **complete Laravel project structure** that ge
 
 - `stubs/CLAUDE.md`: Primary conventions guide for generated projects — models, enums, Livewire patterns, gotchas, DO/DON'T rules. This is the most critical file for AI-assisted development in generated projects.
 - `stubs/.claude/settings.local.json`: Claude Code local settings for generated projects
+- `stubs/.claude/agents/`, `skills/`, `commands/`: bundled Claude Toolkit dev roster (see below)
 - `stubs/.github/copilot-instructions.md`: GitHub Copilot guide (models, Livewire, routes, testing)
+
+**Claude Toolkit Assets** (bundled from [`nasrulhazim/claude`](https://github.com/nasrulhazim/claude), the source of truth):
+
+- `stubs/.claude/`: ships into **every generated project** — 12 agents (api-engineer, code-reviewer, database-engineer, devops-engineer, laravel-developer, performance-engineer, qa-engineer, security-analyst, software-architect, tech-writer, ui-designer, upgrade-specialist), 17 skills (project-laravel, livewire-flux, pest-testing, code-quality, php-best-practices, design-patterns, project-api, project-ddd, git-workflow, gh-workflow, ci-cd-pipeline, kickoff-patch, log-monitor, project-conventions, project-docs, project-roadmap, project-faq), and 3 commands (upgrade-laravel, upgrade-livewire, docs). Copied verbatim by `copyRecursively`, so they land in each scaffolded app automatically.
+- `.claude/` (this package): dev roster for maintaining Kickoff itself — 5 agents (code-reviewer, qa-engineer, package-maintainer, devops-engineer, tech-writer), 8 skills (package-dev, code-quality, php-best-practices, pest-testing, git-workflow, gh-workflow, project-conventions, project-docs), plus the local `sandbox-testing` skill.
+- **These are snapshots.** To refresh from the toolkit source of truth: `bin/sync-claude-assets` (defaults to `~/Packages/claude`; override with `bin/sync-claude-assets /path/to/claude`). The two curated lists live at the top of that script — edit there to change what ships.
+- A few bundled agents reference skills not in the bundled set (e.g. `web-design-guidelines`, `soc-analyst`, `repo-research`); those are optional "load first" hints that degrade gracefully when the skill is absent.
+- Note: `boost:install --skills` (run during scaffolding, after the stub copy) also writes `.claude/skills/` with package-named skills; re-run `bin/sync-claude-assets` if a name ever collides.
 
 **GitHub Resources** (`stubs/.github/`):
 

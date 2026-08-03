@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+#
+# sync-claude-assets — refresh the bundled Claude Toolkit agents, skills and
+# commands in this Kickoff package from the source-of-truth toolkit repo.
+#
+# Source of truth: nasrulhazim/claude (local clone, default ~/Packages/claude).
+#
+# Two curated sets are maintained:
+#   - STUBS set  -> stubs/.claude/{agents,skills,commands}  (ships into every scaffolded app)
+#   - PKG set    -> .claude/{agents,skills}                 (for developing Kickoff itself)
+#
+# Usage:
+#   bin/sync-claude-assets [CLAUDE_REPO]
+#   CLAUDE_REPO=/path/to/claude bin/sync-claude-assets
+#
+# Bash 3.2 compatible (macOS default). Idempotent: safe to re-run.
+
+set -euo pipefail
+
+# --- Resolve paths ---
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+KICKOFF_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+CLAUDE_REPO="${1:-${CLAUDE_REPO:-$HOME/Packages/claude}}"
+
+if [ ! -d "$CLAUDE_REPO/agents" ] || [ ! -d "$CLAUDE_REPO/skills" ]; then
+    echo "Error: Claude Toolkit repo not found at: $CLAUDE_REPO" >&2
+    echo "Clone it or pass the path: bin/sync-claude-assets /path/to/claude" >&2
+    exit 1
+fi
+
+# --- Curated sets (edit these lists to change what ships) ---
+
+# Agents bundled into every scaffolded app (stubs/.claude/agents)
+STUBS_AGENTS="api-engineer code-reviewer database-engineer devops-engineer \
+laravel-developer performance-engineer qa-engineer security-analyst \
+software-architect tech-writer ui-designer upgrade-specialist"
+
+# Skills bundled into every scaffolded app (stubs/.claude/skills)
+STUBS_SKILLS="project-laravel livewire-flux pest-testing code-quality \
+php-best-practices design-patterns project-api project-ddd git-workflow \
+gh-workflow ci-cd-pipeline kickoff-patch log-monitor project-conventions \
+project-docs project-roadmap project-faq"
+
+# Commands bundled into every scaffolded app (stubs/.claude/commands)
+STUBS_COMMANDS="upgrade-laravel upgrade-livewire docs"
+
+# Agents for developing Kickoff itself (.claude/agents)
+PKG_AGENTS="code-reviewer qa-engineer package-maintainer devops-engineer tech-writer"
+
+# Skills for developing Kickoff itself (.claude/skills)
+PKG_SKILLS="package-dev code-quality php-best-practices pest-testing \
+git-workflow gh-workflow project-conventions project-docs"
+
+# --- Helpers ---
+copy_agent() { # <name> <dest_dir>
+    cp "$CLAUDE_REPO/agents/$1.md" "$2/$1.md"
+}
+copy_command() { # <name> <dest_dir>
+    cp "$CLAUDE_REPO/commands/$1.md" "$2/$1.md"
+}
+copy_skill() { # <name> <dest_dir>
+    rm -rf "${2:?}/$1"
+    cp -R "$CLAUDE_REPO/skills/$1" "$2/$1"
+}
+
+sync_set() { # <label> <items> <src_kind> <dest_dir>
+    local label="$1" items="$2" kind="$3" dest="$4" n=0
+    mkdir -p "$dest"
+    for item in $items; do
+        case "$kind" in
+            agent)   copy_agent "$item" "$dest" ;;
+            command) copy_command "$item" "$dest" ;;
+            skill)   copy_skill "$item" "$dest" ;;
+        esac
+        n=$((n + 1))
+    done
+    echo "  $label: $n"
+}
+
+echo "Syncing Claude Toolkit assets"
+echo "  from: $CLAUDE_REPO"
+echo "  into: $KICKOFF_DIR"
+echo ""
+
+echo "stubs/.claude (scaffolded apps):"
+sync_set "agents"   "$STUBS_AGENTS"   agent   "$KICKOFF_DIR/stubs/.claude/agents"
+sync_set "skills"   "$STUBS_SKILLS"   skill   "$KICKOFF_DIR/stubs/.claude/skills"
+sync_set "commands" "$STUBS_COMMANDS" command "$KICKOFF_DIR/stubs/.claude/commands"
+
+echo ""
+echo ".claude (Kickoff package dev):"
+sync_set "agents" "$PKG_AGENTS" agent "$KICKOFF_DIR/.claude/agents"
+sync_set "skills" "$PKG_SKILLS" skill "$KICKOFF_DIR/.claude/skills"
+
+echo ""
+echo "Done. Source of truth: https://github.com/nasrulhazim/claude"
