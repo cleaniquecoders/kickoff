@@ -16,14 +16,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Testing
 
 ```bash
-# Run tests (uses Pest)
+# Run tests (Pest 5 in TIA mode — only tests impacted by your changes)
 composer test
 
-# Run tests with coverage
-composer test-coverage
-
-# Run PHPUnit directly
+# Run the full suite without TIA
 vendor/bin/pest
+
+# Run tests with coverage (full run)
+vendor/bin/pest --coverage
 ```
 
 ### Code Quality
@@ -61,7 +61,7 @@ cd test-output/sandbox
 1. **The Package Itself** (`src/`, `support/`, `bin/kickoff`):
    - Symfony Console application that does the bootstrapping
    - Helper functions for CLI operations (step, runCommand, copyRecursively)
-   - Tests use **PHPUnit** (not Pest)
+   - Tests use **Pest** syntax
 
 2. **The Stubs** (`stubs/` directory):
    - Complete Laravel project template that gets copied to target projects
@@ -111,22 +111,26 @@ These are CLI utilities for the kickoff package itself:
 
 ### Testing Strategy
 
-Tests are located in `tests/` and use **PHPUnit** (not Pest):
+Tests are located in `tests/` and use **Pest** syntax:
 
 - `tests/StartCommandTest.php`: Tests command configuration and execution
 - Uses mocking to test file-system heavy operations
 - Focus on command configuration validation and method accessibility
 
-**Important**: The package itself uses PHPUnit; generated projects use Pest.
+**Important**: Both the package and generated projects use Pest syntax, and both run
+`composer test` with `--tia` (Test Impact Analysis) by default — only tests impacted by
+your changes execute. TIA refuses to run PHPUnit-class-style tests, so never add new
+tests as PHPUnit classes. Use plain `vendor/bin/pest` when you need the full suite
+(CI does this).
 
 ## Development Conventions
 
 ### Code Style
 
-- **PHP Version**: 8.3+
+- **PHP Version**: 8.4+
 - **Formatting**: Laravel Pint (`composer lint`)
 - **Static Analysis**: PHPStan (`composer analyse`)
-- **Testing**: PHPUnit (via Pest test runner, but not Pest syntax in this package)
+- **Testing**: Pest 5 (Pest syntax; TIA mode requires it)
 
 ### File Organization
 

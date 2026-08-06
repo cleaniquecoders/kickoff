@@ -8,6 +8,13 @@ if (file_exists(__DIR__.'/../../../autoload.php')) {
 }
 
 $app = new Symfony\Component\Console\Application('Kickoff', '1.0.0');
-$app->add(new \CleaniqueCoders\Kickoff\Console\StartCommand());
+$command = new \CleaniqueCoders\Kickoff\Console\StartCommand();
+
+// Application::add() was removed in Symfony Console 8 in favour of addCommand().
+if (method_exists($app, 'addCommand')) {
+    $app->addCommand($command);
+} else {
+    $app->add($command);
+}
 
 $app->run();

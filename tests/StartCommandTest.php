@@ -1,136 +1,106 @@
 <?php
 
-namespace CleaniqueCoders\Kickoff\Tests;
-
 use CleaniqueCoders\Kickoff\Console\StartCommand;
-use PHPUnit\Framework\TestCase;
 
-class StartCommandTest extends TestCase
-{
-    public function test_it_can_kickoff_project()
-    {
-        $command = $this->getMockBuilder(StartCommand::class)
-            ->onlyMethods(['execute', 'getProjectName', 'getProjectPath', 'getProjectOwner'])
-            ->getMock();
+test('it can kickoff project', function () {
+    $command = $this->getMockBuilder(StartCommand::class)
+        ->onlyMethods(['execute', 'getProjectName', 'getProjectPath', 'getProjectOwner'])
+        ->getMock();
 
-        $command->expects($this->once())
-            ->method('getProjectOwner')
-            ->willReturn('nasrulhazim');
+    $command->expects($this->once())
+        ->method('getProjectOwner')
+        ->willReturn('nasrulhazim');
 
-        $command->expects($this->once())
-            ->method('getProjectName')
-            ->willReturn('demo-project');
+    $command->expects($this->once())
+        ->method('getProjectName')
+        ->willReturn('demo-project');
 
-        $command->expects($this->once())
-            ->method('getProjectPath')
-            ->willReturn('/tmp/demo-project');
+    $command->expects($this->once())
+        ->method('getProjectPath')
+        ->willReturn('/tmp/demo-project');
 
-        $this->assertEquals('nasrulhazim', $command->getProjectOwner());
-        $this->assertEquals('demo-project', $command->getProjectName());
-        $this->assertEquals('/tmp/demo-project', $command->getProjectPath());
-    }
+    expect($command->getProjectOwner())->toBe('nasrulhazim')
+        ->and($command->getProjectName())->toBe('demo-project')
+        ->and($command->getProjectPath())->toBe('/tmp/demo-project');
+});
 
-    public function test_configure_sets_arguments()
-    {
-        $command = new StartCommand;
-        $definition = $command->getDefinition();
+test('configure sets arguments', function () {
+    $command = new StartCommand;
+    $definition = $command->getDefinition();
 
-        $this->assertTrue($definition->hasArgument('owner'));
-        $this->assertTrue($definition->hasArgument('name'));
-        $this->assertTrue($definition->hasArgument('path'));
+    expect($definition->hasArgument('owner'))->toBeTrue()
+        ->and($definition->hasArgument('name'))->toBeTrue()
+        ->and($definition->hasArgument('path'))->toBeTrue()
+        ->and($definition->getArgument('owner')->isRequired())->toBeTrue()
+        ->and($definition->getArgument('name')->isRequired())->toBeTrue()
+        ->and($definition->getArgument('path')->isRequired())->toBeFalse()
+        ->and($definition->hasOption('dry-run'))->toBeTrue()
+        ->and($definition->hasOption('skip-packages'))->toBeTrue()
+        ->and($definition->hasOption('skip-npm'))->toBeTrue();
+});
 
-        $this->assertTrue($definition->getArgument('owner')->isRequired());
-        $this->assertTrue($definition->getArgument('name')->isRequired());
-        $this->assertFalse($definition->getArgument('path')->isRequired());
+test('get project name and path', function () {
+    $command = new StartCommand;
+    $reflection = new ReflectionClass($command);
 
-        $this->assertTrue($definition->hasOption('dry-run'));
-        $this->assertTrue($definition->hasOption('skip-packages'));
-        $this->assertTrue($definition->hasOption('skip-npm'));
-    }
+    $reflection->getProperty('projectOwner')->setValue($command, 'nasrulhazim');
+    $reflection->getProperty('projectName')->setValue($command, 'my-app');
+    $reflection->getProperty('projectPath')->setValue($command, '/tmp/my-app');
 
-    public function test_get_project_name_and_path()
-    {
-        $command = new StartCommand;
-        $reflection = new \ReflectionClass($command);
+    expect($command->getProjectOwner())->toBe('nasrulhazim')
+        ->and($command->getProjectName())->toBe('my-app')
+        ->and($command->getProjectPath())->toBe('/tmp/my-app');
+});
 
-        $ownerProp = $reflection->getProperty('projectOwner');
-        $ownerProp->setAccessible(true);
-        $ownerProp->setValue($command, 'nasrulhazim');
+test('command name is start', function () {
+    $command = new StartCommand;
+    expect($command->getName())->toBe('start');
+});
 
-        $nameProp = $reflection->getProperty('projectName');
-        $nameProp->setAccessible(true);
-        $nameProp->setValue($command, 'my-app');
+test('command has description', function () {
+    $command = new StartCommand;
+    expect($command->getDescription())->not->toBeEmpty();
+});
 
-        $pathProp = $reflection->getProperty('projectPath');
-        $pathProp->setAccessible(true);
-        $pathProp->setValue($command, '/tmp/my-app');
+test('get database name converts to snake case', function () {
+    $command = new StartCommand;
+    $reflection = new ReflectionClass($command);
 
-        $this->assertEquals('nasrulhazim', $command->getProjectOwner());
-        $this->assertEquals('my-app', $command->getProjectName());
-        $this->assertEquals('/tmp/my-app', $command->getProjectPath());
-    }
+    $method = $reflection->getMethod('getDatabaseName');
+    $nameProp = $reflection->getProperty('projectName');
 
-    public function test_command_name_is_start()
-    {
-        $command = new StartCommand;
-        $this->assertEquals('start', $command->getName());
-    }
+    // Hyphenated name
+    $nameProp->setValue($command, 'my-cool-project');
+    expect($method->invoke($command))->toBe('my_cool_project');
 
-    public function test_command_has_description()
-    {
-        $command = new StartCommand;
-        $this->assertNotEmpty($command->getDescription());
-    }
+    // Already snake_case
+    $nameProp->setValue($command, 'simple_app');
+    expect($method->invoke($command))->toBe('simple_app');
 
-    public function test_get_database_name_converts_to_snake_case()
-    {
-        $command = new StartCommand;
-        $reflection = new \ReflectionClass($command);
+    // PascalCase
+    $nameProp->setValue($command, 'MyApp');
+    expect($method->invoke($command))->toBe('myapp');
 
-        $method = $reflection->getMethod('getDatabaseName');
-        $method->setAccessible(true);
+    // Multiple special chars
+    $nameProp->setValue($command, 'my--app..name');
+    expect($method->invoke($command))->toBe('my_app_name');
+});
 
-        $nameProp = $reflection->getProperty('projectName');
-        $nameProp->setAccessible(true);
+test('placeholder constants', function () {
+    expect(StartCommand::PLACEHOLDER_PROJECT_NAME)->toBe('${PROJECT_NAME}')
+        ->and(StartCommand::PLACEHOLDER_OWNER)->toBe('${OWNER}');
+});
 
-        // Hyphenated name
-        $nameProp->setValue($command, 'my-cool-project');
-        $this->assertEquals('my_cool_project', $method->invoke($command));
+test('normalize path collapses mixed separators to native', function () {
+    $sep = DIRECTORY_SEPARATOR;
 
-        // Already snake_case
-        $nameProp->setValue($command, 'simple_app');
-        $this->assertEquals('simple_app', $method->invoke($command));
+    expect(normalizePath('C:\\Users\\USER/myapp'))->toBe("C:{$sep}Users{$sep}USER{$sep}myapp")
+        ->and(normalizePath('/tmp/demo'))->toBe("{$sep}tmp{$sep}demo")
+        ->and(normalizePath('a\\b/c'))->toBe("a{$sep}b{$sep}c");
+});
 
-        // PascalCase
-        $nameProp->setValue($command, 'MyApp');
-        $this->assertEquals('myapp', $method->invoke($command));
+test('is windows matches php os family', function () {
+    $method = new ReflectionClass(StartCommand::class)->getMethod('isWindows');
 
-        // Multiple special chars
-        $nameProp->setValue($command, 'my--app..name');
-        $this->assertEquals('my_app_name', $method->invoke($command));
-    }
-
-    public function test_placeholder_constants()
-    {
-        $this->assertEquals('${PROJECT_NAME}', StartCommand::PLACEHOLDER_PROJECT_NAME);
-        $this->assertEquals('${OWNER}', StartCommand::PLACEHOLDER_OWNER);
-    }
-
-    public function test_normalize_path_collapses_mixed_separators_to_native()
-    {
-        $sep = DIRECTORY_SEPARATOR;
-
-        $this->assertEquals("C:{$sep}Users{$sep}USER{$sep}myapp", normalizePath('C:\\Users\\USER/myapp'));
-        $this->assertEquals("{$sep}tmp{$sep}demo", normalizePath('/tmp/demo'));
-        $this->assertEquals("a{$sep}b{$sep}c", normalizePath('a\\b/c'));
-    }
-
-    public function test_is_windows_matches_php_os_family()
-    {
-        $reflection = new \ReflectionClass(StartCommand::class);
-        $method = $reflection->getMethod('isWindows');
-        $method->setAccessible(true);
-
-        $this->assertSame(PHP_OS_FAMILY === 'Windows', $method->invoke(null));
-    }
-}
+    expect($method->invoke(null))->toBe(PHP_OS_FAMILY === 'Windows');
+});

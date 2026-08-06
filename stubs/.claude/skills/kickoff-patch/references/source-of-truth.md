@@ -203,6 +203,7 @@ barryvdh/laravel-debugbar
 cleaniquecoders/laravel-db-doc
 driftingly/rector-laravel
 laravel/boost
+laravel/doctor
 larastan/larastan
 pestphp/pest-plugin-arch
 ```

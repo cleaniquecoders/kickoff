@@ -56,8 +56,8 @@ This project relies on several dependencies to function. Below is a list of key 
 - **Mockery/Mockery**: `^1.4.4`
 - **Nuno Maduro (Collision)**: `^8.1`
 - **Overtrue/PHPLint**: `^9.4`
-- **PestPHP/Pest**: `^3.0`
-- **PestPHP/Pest Plugin for Laravel**: `^3.0`
+- **PestPHP/Pest**: `^5.0`
+- **PestPHP/Pest Plugin for Laravel**: `^5.0`
 - **Rector/Rector**: `^1.2`
 - **Spatie (Laravel Ignition)**: `^2.0`
 

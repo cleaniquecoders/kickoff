@@ -28,9 +28,10 @@ npm run dev               # Vite dev server with HMR
 npm run build             # Build production assets
 
 # Testing
-composer test             # Run all tests
+composer test             # Run tests in TIA mode (only tests impacted by your changes)
+vendor/bin/pest           # Run the full suite without TIA
 composer test-arch        # Run architecture tests only
-composer test-coverage    # Run tests with coverage
+composer test-coverage    # Run tests with coverage (full run)
 
 # Code Quality
 composer format           # Format code with Laravel Pint
@@ -260,6 +261,11 @@ config/             # Custom configs (access-control, admin, audit, horizon, etc
 ```
 
 ## Testing with Pest
+
+`composer test` runs Pest 5 in **TIA mode** (`--tia`, Test Impact Analysis) by default —
+only tests impacted by your uncommitted changes execute, so the feedback loop stays fast.
+Run plain `vendor/bin/pest` for the full suite (CI always runs the full suite). TIA
+refuses PHPUnit-class-style tests — always write tests in Pest syntax.
 
 Use Pest syntax (not PHPUnit):
 
@@ -738,6 +744,7 @@ Before committing:
 - **laravel/telescope**: Debugging (access via /telescope)
 - **laravel/horizon**: Queue monitoring (access via /horizon)
 - **barryvdh/laravel-debugbar**: Debug toolbar
+- **laravel/doctor**: First-party diagnostics — `php artisan doctor` runs health checks (`--fix` auto-repairs, `--format=github` for CI); scaffold custom checks with `php artisan make:diagnostic`
 
 ### Frontend
 
@@ -920,6 +927,17 @@ php artisan operations:status            # Show ran/pending operations
 > **Gotcha:** When adding fields to a 2-column `sm:grid-cols-2` form, always maintain proper
 > left-right pairing. An odd field inserted in the middle shifts all subsequent fields and
 > breaks visual alignment. Place new fields to preserve existing pairs.
+
+### Rate Limiting in Tests
+
+> **Gotcha:** `$middleware->throttleWithRedis()` makes throttling talk straight to Redis,
+> bypassing the `CACHE_STORE=array` override in `phpunit.xml` — rate-limit state then leaks
+> across test runs and even from the dev server, causing intermittent 429s (TIA mode makes
+> this visible fast because it re-runs the same tests in tight loops). `bootstrap/app.php`
+> therefore only enables Redis throttling outside the `testing` environment, reading
+> `$_SERVER['APP_ENV']` directly — the middleware callback runs before the container's env
+> binding exists, and `env()` is reserved for `config/` by the architecture tests. Keep that
+> guard when touching middleware config.
 
 ### Horizon & Queues
 

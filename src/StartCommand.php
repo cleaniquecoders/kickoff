@@ -249,6 +249,15 @@ class StartCommand extends Command
             if (file_exists($staticRobots)) {
                 unlink($staticRobots);
             }
+
+            // The starter kit's placeholder example tests add no value once the
+            // stub test suite is in place — remove them.
+            foreach (['tests/Unit/ExampleTest.php', 'tests/Feature/ExampleTest.php'] as $exampleTest) {
+                $path = $this->getProjectPath().'/'.$exampleTest;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
         }, $output, $verbose);
     }
 
@@ -286,7 +295,7 @@ class StartCommand extends Command
                     'bin/share',
                 ],
                 'analyse' => '@php vendor/bin/phpstan analyse',
-                'test' => '@php vendor/bin/pest',
+                'test' => '@php vendor/bin/pest --tia',
                 'test-arch' => '@php vendor/bin/pest tests/Feature/ArchitectureTest.php',
                 'test-coverage' => 'vendor/bin/pest --coverage',
                 'format' => '@php vendor/bin/pint',
@@ -414,6 +423,7 @@ class StartCommand extends Command
                 'cleaniquecoders/laravel-db-doc',
                 'driftingly/rector-laravel',
                 'laravel/boost',
+                'laravel/doctor',
                 'larastan/larastan',
                 'pestphp/pest-plugin-arch',
             ];

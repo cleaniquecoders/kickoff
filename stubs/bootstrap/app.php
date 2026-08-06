@@ -35,7 +35,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
-        $middleware->throttleWithRedis();
+        // Redis-backed throttling is shared state across processes — in tests it
+        // ignores the array cache override, so rate-limit hits leak between runs
+        // (TIA re-runs the same tests in tight loops and gets 429s). Keep the
+        // default cache-based throttle in the testing environment. Read the process
+        // env directly: this callback runs before the container's env binding
+        // exists, and env() is reserved for config/ by the architecture tests.
+        if (($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null) !== 'testing') {
+            $middleware->throttleWithRedis();
+        }
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
