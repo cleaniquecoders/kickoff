@@ -2,6 +2,32 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.37.0 - 2026-08-06
+
+### What's Changed
+
+#### Pest 5 Upgrade
+
+- Upgraded `pestphp/pest` to `^5.0` (built on PHPUnit 13) — PHP floor is now `^8.4`, Symfony Console/Process `^8.0` allowed
+- Fixed `bin/kickoff` for Symfony Console 8 (`Application::add()` removed — now uses `addCommand()` with fallback)
+- Package test suite converted to Pest syntax; removed placeholder example tests
+
+#### TIA Mode by Default
+
+- `composer test` now runs `vendor/bin/pest --tia` (Test Impact Analysis) in both the package and every generated project — only tests impacted by your changes execute; CI keeps running the full suite
+- Starter kit example tests are removed during scaffolding, and the starter kit's PHPUnit-class tests (Email Verification, Password Confirmation, Password Reset, Registration, Dashboard) are replaced with Pest conversions shipped in the stubs, so TIA works out of the box
+- Fixed rate-limiter state leaking across test runs: the stub `bootstrap/app.php` now enables `throttleWithRedis()` only outside the `testing` environment (Redis-backed throttle bypassed the array cache override and caused intermittent 429s on repeated runs)
+
+#### New: Laravel Doctor
+
+- Generated projects now include [`laravel/doctor`](https://laravel-news.com/laravel-doctor-first-party-diagnostics-for-your-application) — first-party diagnostics via `php artisan doctor` (with `--fix`, `--format=github` for CI, and `make:diagnostic` for custom checks)
+
+#### Docs
+
+- Refreshed Pest version references across stub docs, `upgrade-laravel` command, and bundled `package-dev` skill; new TIA and rate-limiting guidance in CLAUDE.md files
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.36.0...1.37.0
+
 ## 1.36.0 — Claude Toolkit dev roster - 2026-08-03
 
 Generated projects — and Kickoff itself — now ship a curated Claude Code dev roster (agents, skills, commands), sourced from [nasrulhazim/claude](https://github.com/nasrulhazim/claude). No installer changes: `stubs/` is mirrored recursively, so the assets land in every scaffolded app automatically.
@@ -9,12 +35,15 @@ Generated projects — and Kickoff itself — now ship a curated Claude Code dev
 ### Added
 
 - **`stubs/.claude/` (into every generated project)** — a full Laravel dev-lifecycle roster:
+  
   - **12 agents**: api-engineer, code-reviewer, database-engineer, devops-engineer, laravel-developer, performance-engineer, qa-engineer, security-analyst, software-architect, tech-writer, ui-designer, upgrade-specialist
   - **17 skills**: project-laravel, livewire-flux, pest-testing, code-quality, php-best-practices, design-patterns, project-api, project-ddd, git-workflow, gh-workflow, ci-cd-pipeline, kickoff-patch, log-monitor, project-conventions, project-docs, project-roadmap, project-faq
   - **3 commands**: upgrade-laravel, upgrade-livewire, docs
   
 - **`.claude/` (for developing Kickoff itself)** — 5 agents (code-reviewer, qa-engineer, package-maintainer, devops-engineer, tech-writer) and 8 skills (package-dev, code-quality, php-best-practices, pest-testing, git-workflow, gh-workflow, project-conventions, project-docs); the existing `sandbox-testing` skill and local settings are preserved.
+  
 - **`bin/sync-claude-assets`** — idempotent script that refreshes both sets from the toolkit source of truth (default `~/Packages/claude`, override with an argument). Curated lists live at the top of the script.
+  
 
 ### Notes
 
@@ -1265,6 +1294,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1284,6 +1314,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1359,6 +1390,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1555,6 +1587,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1564,6 +1597,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1670,11 +1704,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1777,11 +1813,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -2049,11 +2087,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -2162,11 +2202,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
