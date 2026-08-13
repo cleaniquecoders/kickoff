@@ -56,6 +56,12 @@
             "@php vendor/bin/phpstan analyse --verbose --ansi"
         ],
         "test": [
+            "@putenv XDEBUG_MODE=off",
+            "@php vendor/bin/pest"
+        ],
+        "test-tia": [
+            "Composer\\Config::disableProcessTimeout",
+            "@putenv XDEBUG_MODE=off",
             "@php vendor/bin/pest --tia"
         ]
     }

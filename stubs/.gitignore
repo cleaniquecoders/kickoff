@@ -22,3 +22,8 @@ _ide_helper_models.php
 .phplint.cache
 draft.yaml
 phpstan*
+
+# Claude Code agent worktrees — transient nested checkouts, never committed.
+# Left untracked these accumulate fast: a working project was found carrying
+# 100k+ files here.
+/.claude/worktrees/

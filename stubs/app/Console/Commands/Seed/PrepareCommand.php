@@ -14,11 +14,19 @@ class PrepareCommand extends Command
 
     /**
      * Execute the console command.
+     *
+     * `--force` is forwarded unconditionally and deliberately. This is the
+     * production install path (bin/install, bin/deploy), so it runs unattended
+     * with no TTY — and without --force `db:seed` prints the "APPLICATION IN
+     * PRODUCTION" prompt, cancels, and still exits 0. Run after migrate:fresh
+     * that leaves a migrated but *unseeded* database: no roles, no superadmin,
+     * no way to log in, and a caller that believes it succeeded.
      */
-    public function handle(): void
+    public function handle(): int
     {
-        $this->call('db:seed', [
+        return $this->call('db:seed', [
             '--class' => '\Database\Seeders\PrepareSeeder',
+            '--force' => true,
             '--quiet' => true,
         ]);
     }

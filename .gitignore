@@ -2,4 +2,3 @@
 .phpunit.result.cache
 
 todo.md
-!stubs/todo.md

@@ -36,10 +36,13 @@ laravel-developer performance-engineer qa-engineer security-analyst \
 software-architect tech-writer ui-designer upgrade-specialist"
 
 # Skills bundled into every scaffolded app (stubs/.claude/skills)
-STUBS_SKILLS="project-laravel livewire-flux pest-testing code-quality \
+# deploy-app is included because every Kickoff app ships bin/deploy.
+# project-status is deliberately NOT: it reads a workspace-level
+# documentation/03-planning tree that lives above the app repo.
+STUBS_SKILLS="project-laravel livewire-flux kickoff-pest-testing code-quality \
 php-best-practices design-patterns project-api project-ddd git-workflow \
 gh-workflow ci-cd-pipeline kickoff-patch log-monitor project-conventions \
-project-docs project-roadmap project-faq"
+project-docs project-roadmap project-faq deploy-app"
 
 # Commands bundled into every scaffolded app (stubs/.claude/commands)
 STUBS_COMMANDS="upgrade-laravel upgrade-livewire docs"
@@ -48,7 +51,7 @@ STUBS_COMMANDS="upgrade-laravel upgrade-livewire docs"
 PKG_AGENTS="code-reviewer qa-engineer package-maintainer devops-engineer tech-writer"
 
 # Skills for developing Kickoff itself (.claude/skills)
-PKG_SKILLS="package-dev code-quality php-best-practices pest-testing \
+PKG_SKILLS="package-dev code-quality php-best-practices kickoff-pest-testing \
 git-workflow gh-workflow project-conventions project-docs"
 
 # --- Helpers ---
@@ -91,6 +94,37 @@ echo ""
 echo ".claude (Kickoff package dev):"
 sync_set "agents" "$PKG_AGENTS" agent "$KICKOFF_DIR/.claude/agents"
 sync_set "skills" "$PKG_SKILLS" skill "$KICKOFF_DIR/.claude/skills"
+
+# --- Laravel Boost collision check ---
+#
+# `boost:install --skills` writes .claude/skills/ with package-named skills of
+# its own, AFTER the stub copy during scaffolding. Same directory, same naming
+# scheme — so a toolkit skill sharing a name is silently overwritten in every
+# generated project and nobody finds out. This has already happened once:
+# Boost's `pest-testing` replaced the Kickoff one in a live product, and the
+# loss was invisible until the two were diffed — which is why the toolkit skill
+# is now called `kickoff-pest-testing`.
+#
+# Kickoff's answer is to not ship a skill under a name Boost owns. If this
+# fires, rename the toolkit skill (in nasrulhazim/claude) rather than hoping
+# the copy order holds.
+BOOST_OWNED_SKILLS="pest-testing laravel-best-practices livewire-development \
+fluxui-development tailwindcss-development configuring-horizon"
+
+collisions=""
+for boost_skill in $BOOST_OWNED_SKILLS; do
+    for shipped in $STUBS_SKILLS; do
+        [ "$boost_skill" = "$shipped" ] && collisions="$collisions $boost_skill"
+    done
+done
+
+if [ -n "$collisions" ]; then
+    echo ""
+    echo "!! Laravel Boost skill-name collision:$collisions"
+    echo "   boost:install --skills runs after the stub copy and will overwrite"
+    echo "   these in every scaffolded app. Rename the toolkit skill, or drop it"
+    echo "   from STUBS_SKILLS and let Boost own the name."
+fi
 
 echo ""
 echo "Done. Source of truth: https://github.com/nasrulhazim/claude"

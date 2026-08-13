@@ -48,6 +48,17 @@
     }
 }
 
+/*
+ * x-cloak is only an attribute Alpine *removes* on init — the hiding is
+ * entirely this rule. Without it every `x-show="false"` element renders
+ * visible on first paint and disappears a moment later (2FA challenges,
+ * tab panels, disclosure bodies all flash their hidden state). Nothing
+ * errors, so no test catches it. Do not remove.
+ */
+[x-cloak] {
+    display: none !important;
+}
+
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
 }

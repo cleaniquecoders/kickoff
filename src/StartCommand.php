@@ -295,9 +295,51 @@ class StartCommand extends Command
                     'bin/share',
                 ],
                 'analyse' => '@php vendor/bin/phpstan analyse',
-                'test' => '@php vendor/bin/pest --tia',
-                'test-arch' => '@php vendor/bin/pest tests/Feature/ArchitectureTest.php',
-                'test-coverage' => 'vendor/bin/pest --coverage',
+                // XDEBUG_MODE is pinned on every test script so a machine with
+                // xdebug.mode=coverage in its php.ini cannot silently impose a
+                // ~3x tax. Use the array + @putenv form, never an inline
+                // `VAR=x` prefix: @putenv keeps @php (so Composer picks the PHP
+                // binary), works on Windows, and still forwards extra CLI args.
+                // Note `-d` flags do NOT work here — ParaTest spawns its
+                // workers without them, so only an environment variable
+                // reaches them. See build/php-ini/README.md.
+                'test' => [
+                    '@putenv XDEBUG_MODE=off',
+                    '@php vendor/bin/pest',
+                ],
+                'test-parallel' => [
+                    '@putenv XDEBUG_MODE=off',
+                    '@php vendor/bin/pest --parallel',
+                ],
+                'test-arch' => [
+                    '@putenv XDEBUG_MODE=off',
+                    '@php vendor/bin/pest tests/Feature/ArchitectureTest.php',
+                ],
+                // TIA records per-test coverage, so it needs a coverage driver
+                // and is opt-in rather than the default: under Xdebug a cold
+                // record runs to ~90 minutes and Composer's 300s process
+                // timeout kills it part way, leaving an unusable graph that is
+                // re-recorded from scratch on every subsequent run. Install
+                // pcov (build/php-ini/README.md) before using these.
+                'test-tia' => [
+                    'Composer\\Config::disableProcessTimeout',
+                    '@putenv XDEBUG_MODE=off',
+                    '@putenv PHP_INI_SCAN_DIR=build/php-ini',
+                    '@php vendor/bin/pest --parallel --tia',
+                ],
+                'test-tia-fresh' => [
+                    'Composer\\Config::disableProcessTimeout',
+                    '@putenv XDEBUG_MODE=off',
+                    '@putenv PHP_INI_SCAN_DIR=build/php-ini',
+                    '@php build/reset-tia.php',
+                    '@php vendor/bin/pest --parallel --tia',
+                ],
+                'test-coverage' => [
+                    'Composer\\Config::disableProcessTimeout',
+                    '@putenv XDEBUG_MODE=off',
+                    '@putenv PHP_INI_SCAN_DIR=build/php-ini',
+                    '@php vendor/bin/pest --coverage',
+                ],
                 'format' => '@php vendor/bin/pint',
                 'lint' => '@php vendor/bin/phplint',
                 'rector' => 'vendor/bin/rector process',

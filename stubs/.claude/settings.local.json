@@ -13,10 +13,13 @@
       "Bash(ls:*)",
       "Bash(markdownlint:*)",
       "Bash(mkdir:*)",
+      "Bash(mysql:*)",
       "Bash(node:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(php:*)",
+      "Bash(python3:*)",
+      "Bash(redis-cli:*)",
       "Bash(tree:*)",
       "Bash(wc:*)",
       "Bash(xargs:*)",
@@ -29,7 +32,12 @@
       "WebFetch(domain:packagist.org)",
       "WebFetch(domain:fluxui.dev)",
       "WebFetch(domain:livewire.laravel.com)",
-      "WebSearch"
+      "WebSearch",
+      "mcp__laravel-boost__application-info"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
 }

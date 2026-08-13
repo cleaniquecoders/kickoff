@@ -8,17 +8,22 @@ use Illuminate\Console\Command;
 
 class DevCommand extends Command
 {
-    protected $signature = 'seed:dev';
+    protected $signature = 'seed:dev {--force : Run without the production confirmation prompt}';
 
     protected $description = 'Seed Development Data';
 
     /**
      * Execute the console command.
+     *
+     * Unlike seed:prepare this is NOT a production path, so --force is opt-in.
+     * The exit code is returned rather than swallowed: without a TTY the
+     * underlying prompt cancels and would otherwise report success.
      */
-    public function handle(): void
+    public function handle(): int
     {
-        $this->call('db:seed', [
+        return $this->call('db:seed', [
             '--class' => '\Database\Seeders\DevSeeder',
+            '--force' => (bool) $this->option('force'),
             '--quiet' => true,
         ]);
     }

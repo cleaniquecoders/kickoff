@@ -28,10 +28,12 @@ npm run dev               # Vite dev server with HMR
 npm run build             # Build production assets
 
 # Testing
-composer test             # Run tests in TIA mode (only tests impacted by your changes)
-vendor/bin/pest           # Run the full suite without TIA
-composer test-arch        # Run architecture tests only
-composer test-coverage    # Run tests with coverage (full run)
+composer test             # Run the full suite (Xdebug pinned off)
+composer test-parallel    # Full suite in parallel
+composer test-arch        # Architecture tests only
+composer test-tia         # Fast loop — only tests impacted by your changes (needs pcov)
+composer test-tia-fresh   # Discard the TIA graph and re-record
+composer test-coverage    # Run tests with coverage (needs pcov)
 
 # Code Quality
 composer format           # Format code with Laravel Pint
@@ -262,10 +264,36 @@ config/             # Custom configs (access-control, admin, audit, horizon, etc
 
 ## Testing with Pest
 
-`composer test` runs Pest 5 in **TIA mode** (`--tia`, Test Impact Analysis) by default —
-only tests impacted by your uncommitted changes execute, so the feedback loop stays fast.
-Run plain `vendor/bin/pest` for the full suite (CI always runs the full suite). TIA
-refuses PHPUnit-class-style tests — always write tests in Pest syntax.
+`composer test` runs the full Pest 5 suite with `XDEBUG_MODE` pinned off.
+`composer test-tia` is the opt-in fast loop — Test Impact Analysis, where only tests impacted
+by your uncommitted changes execute. TIA refuses PHPUnit-class-style tests, so always write
+tests in Pest syntax either way. CI always runs the full suite.
+
+> **Gotcha:** **TIA is not free and cannot be the zero-config default.** It records *per-test*
+> coverage before it can skip anything, so it needs a coverage driver. Under Xdebug a cold
+> record of a mid-sized suite runs to ~90 minutes, and Composer's default 300-second process
+> timeout kills it part way through, leaving `worker-edges-*.json` and **no** `graph.json` — an
+> unusable graph, so the next run re-records from scratch and hits the same wall, forever.
+> Under pcov the same record is ~72s and a replay ~5s. Install pcov before using `test-tia`:
+> see `build/php-ini/README.md`.
+
+> **Gotcha:** **Pin `XDEBUG_MODE` in every test script.** A machine with `xdebug.mode=coverage`
+> in its ini pays roughly **3×** on every run. Use the **array + `@putenv`** form in
+> `composer.json`, not an inline `VAR=x` prefix: it keeps `@php` (so Composer picks the PHP
+> binary), works on Windows, and still forwards extra CLI args. And never `php -d` — ParaTest
+> spawns its workers without the parent's `-d` flags, so only an environment variable reaches
+> them. `PHP_INI_SCAN_DIR` is used for the same reason.
+
+> **Gotcha:** The TIA graph lives in `~/.pest/tia/<project-key>/`, **not** in the repo
+> (`pest --baseline` prints the path), so the absence of a `.pest/` directory tells you nothing.
+> `tests/Pest.php` may set `->filtered()` but deliberately **not** `->locally()` or `->always()`
+> — those mark TIA *enabled* and put the record cost on every local run. TIA normalises content,
+> so a comment-only edit correctly yields "No affected tests found"; that is not a bug.
+
+> **Gotcha:** Tests run on **SQLite in-memory** (`phpunit.xml`) — the most permissive engine
+> there is. A green suite is not evidence a migration is portable, and it is not evidence that
+> anything in Alpine or a Flux custom element works. See the Database Portability and Alpine.js
+> gotchas.
 
 Use Pest syntax (not PHPUnit):
 
@@ -890,9 +918,20 @@ php artisan operations:status            # Show ran/pending operations
 
 ### Flux UI
 
-> **Gotcha:** Flux UI `description` prop on `<flux:input>` renders the text **above** the
-> input field, not below. For consistent below-input help text, use a manual
-> `<p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">` after the component instead.
+> **Gotcha:** Flux UI's `description` prop on `<flux:input>` renders the text **above** the
+> input, between label and field, which breaks left/right alignment. Use
+> **`description:trailing`** instead — it renders below the input, which is what you want
+> nearly always. In a multi-column grid row, don't put a description inside a cell at all:
+> the taller cell stretches its neighbour. Render the help as a full-width
+> `<p class="text-sm text-zinc-500 dark:text-zinc-400">` below the row.
+
+> **Gotcha:** **Flux renders `<ui-checkbox>`, not `<input type="checkbox">`** — a custom
+> element carrying `data-flux-checkbox` and `role="checkbox"`. Any JavaScript that counts or
+> queries checkboxes with `input[type=checkbox]` matches **zero elements** and reports a
+> confident, wrong answer forever; `:checked` does not apply either, though the element does
+> expose a `.checked` property. Match `[data-flux-checkbox], input[type=checkbox]` and read
+> `.checked` — and **pin the marker in a test**, so a Flux upgrade fails CI rather than
+> silently returning your count to zero.
 
 > **Gotcha:** `flux:tab.group` / `flux:tabs` is **Flux Pro only** — not available in the free
 > version. Use Alpine.js `x-data`/`x-show` for tabs instead, with `cursor-pointer`, hover/active
@@ -905,6 +944,34 @@ php artisan operations:status            # Show ran/pending operations
 
 > **Gotcha:** TailwindCSS v4 does not add `cursor: pointer` to `<button>` elements by
 > default. Always add `cursor-pointer` class to clickable buttons explicitly.
+
+### Alpine.js
+
+> **Gotcha:** **`x-cloak` does nothing without a CSS rule.** It is only an attribute Alpine
+> *removes* on init; the hiding is entirely `[x-cloak] { display: none !important; }`, which
+> lives in `resources/css/app.css`. Without it every `x-show="false"` element renders
+> **visible on first paint** and disappears a moment later — 2FA challenges, tab panels and
+> disclosure bodies all flashing their hidden state. Nothing errors, so no test catches it.
+> Do not remove that rule.
+
+> **Gotcha:** **A double quote anywhere inside an `x-data` (or any Alpine) attribute ends the
+> attribute.** Blade does not escape what you write there, so a comment containing
+> `role="checkbox"` truncates the expression mid-way, leaves a stray `checkbox"` attribute on
+> the element, and un-Alpines the whole subtree — with **no console error**, just a panel that
+> never reacts. Keep Alpine attributes free of double quotes entirely (single quotes for JS
+> strings; put `{{-- --}}` Blade comments *outside* the tag for anything that needs prose), and
+> prefer `/* */` over `//` inside multi-line attributes, since a line comment swallows the rest
+> if the newlines are ever collapsed.
+
+> **Gotcha:** **A Livewire assertion proves the server rendered a string, never that the
+> browser does anything with it.** `assertSee` passes just as happily for markup whose Alpine
+> expression is broken, whose selector matches nothing, or whose `x-cloak` is inert — all three
+> of the gotchas above shipped green suites and were found only by driving the real page.
+> Anything whose behaviour lives in Alpine or in a Flux-rendered element needs a browser
+> **once**, and then the markup contract it depends on pinned in a test. Related: `wire:model`
+> is **deferred**, so any badge or counter derived from it is a round trip behind what the
+> operator can see — compute it client-side, and seed the initial value from the server so
+> first paint is right.
 
 ### User Suspension vs. Soft Delete
 
@@ -957,6 +1024,164 @@ php artisan operations:status            # Show ran/pending operations
 > **Gotcha:** Deploy operations should be **idempotent where possible**. Even though each
 > operation runs once per environment, a failed run mid-execution can leave partial state.
 > Wrap multi-step changes in transactions or guard with existence checks.
+
+> **Gotcha:** **A deploy operation is not a console command.**
+> `DragonCode\LaravelDeployOperations\Operation` has no `line()`, `info()` or `$this->command`,
+> so a progress message inside one throws — **after** the work it was reporting has already
+> been done. The operation's effects land, the command reports failure, and `bin/deploy` then
+> correctly stops with the application left in **maintenance mode**: production serves 503 over
+> a change that actually succeeded. It hides on a re-run too, because by then the loop has
+> nothing left to process and the throwing line is never reached. Keep operations silent. And
+> note the related rule: `bin/deploy` leaves maintenance mode **on** when an operation fails,
+> deliberately — a half-applied release must not go live — so a failed deploy needs
+> `php artisan up` after the fix.
+
+### Settings vs `.env`
+
+> **Gotcha:** **`.env` is not the source of truth for mail — `App\Settings\MailSettings` is.**
+> The DB-backed settings overlay `config('mail.*')` at boot, so a host with a perfectly correct
+> `MAIL_MAILER=smtp` block still resolves to whatever the settings row says. After
+> `migrate:fresh` that row is the seeded default, `log` — and `app:test-send-mail` then
+> **exits 0 and records a row in `mail_histories` while writing the message to
+> `storage/logs`**. Nothing distinguishes that from a delivered email; the only reliable check
+> is `config('mail.default')`, never `env('MAIL_MAILER')`. The same applies to every other
+> `app/Settings/*` group (SEO, general, notifications). Fix mail through Admin > Settings >
+> Mail or by saving `MailSettings`, and keep `.env` in step so the two never disagree.
+
+> **Gotcha:** Some hosts block outbound SMTP on ports 25, 465 and 587 (DigitalOcean does, on
+> every droplet), so a correctly configured relay fails with *"Connection could not be
+> established … Connection timed out"* there and works everywhere else. SparkPost, Mailgun and
+> SendGrid all publish **2525** for exactly this reason — use it. This is a network-level
+> block, not a firewall rule you can open with `ufw`.
+
+### Seeders
+
+> **Gotcha:** **`db:seed` wraps seeding in `Model::unguarded()`, so a seeder can mass-assign a
+> column that is not `#[Fillable]` — and only there.** `$user->update(['email_verified_at' =>
+> now()])` works through the artisan command and silently drops the column when the same seeder
+> is instantiated directly from a test. Never let seeder logic lean on ambient unguarded state:
+> write the non-fillable column through `forceFill()` or the model's own method
+> (`markEmailAsVerified()`), and instantiate the seeder directly in its test so the difference
+> cannot hide.
+
+> **Gotcha:** **A production confirmation prompt with no TTY is a silent no-op.** `db:seed`
+> called without `--force` prints "APPLICATION IN PRODUCTION", cancels, and **exits 0**. Run
+> after `migrate:fresh` that leaves a migrated but unseeded database — no roles, no superadmin,
+> no way to log in — and a caller that believes it succeeded. `seed:prepare` forwards `--force`
+> unconditionally because it is the production install path; `seed:dev` / `seed:demo` take an
+> opt-in `--force`. Any command that may run unattended in production must forward it.
+
+> **Gotcha:** **A seeder that mixes catalogue data with tenancy cannot be run for either half
+> alone.** One seeder, one layer, runnable on its own — and nothing in the `PrepareSeeder` path
+> that a production operator would have to delete afterwards. Demo deployments, sample orgs and
+> dashboard fodder belong in `seed:dev` / `seed:demo`.
+
+> **Gotcha:** **Never seed from `beforeEach`.** A seeder whose output is identical for every
+> test belongs in `protected $seeder = MySeeder::class;` on `Tests\TestCase`, where
+> `RefreshDatabase` runs it once per process as part of `migrate:fresh`. Because every test
+> still executes inside a transaction that rolls back, the visible state is **identical** either
+> way — the per-test call buys nothing and can cost half the suite's wall clock.
+
+### Models & Traitify
+
+> **Gotcha:** Traitify's `InteractsWithUser` (on `App\Models\Base`) auto-fills any column
+> literally named `user_id` with the authenticated user on create. That is right when `user_id`
+> means "who made this row", but wrong when it is a **scope** column — on an org-scoped table it
+> would silently turn every organisation-wide row into a personal one. Disable it on such models
+> with `protected $user_id_column = '<non-existent column>';` (the trait's `Schema::hasColumn()`
+> check then short-circuits).
+
+> **Gotcha:** **An undefined Eloquent relation resolves to `null`, it does not error.** A guard
+> written against a misnamed relation (`$model->user` where the relation is `owner()`) silently
+> passes everything, and PHPStan cannot see it because dynamic model properties are `mixed`. The
+> same applies to a misspelled attribute. Whenever a guard's whole job is to say "no", write a
+> test that proves it says no: a guard that never fires is indistinguishable from one that never
+> runs.
+
+### Static Analysis (Larastan)
+
+> **Gotcha:** **A class docblock must sit above the PHP attributes, not between them and the
+> class.** `#[Fillable([...])]` followed by `/** @property … */` followed by `class Foo` parses
+> fine and the annotations are **silently ignored** — PHPStan carries on inferring `string` for
+> every cast column, and the errors it then reports point at the *call sites*, not at the model.
+
+> **Gotcha:** **Larastan cannot see casts declared through the `casts()` method**, only the
+> `$casts` property — so an array-cast column with no `@property` annotation is inferred from the
+> column type as `?string`, and `(array) $model->some_json_column` reads as a one-element list
+> where every offset is "non-existent". Annotate any array-cast column before reading keys off it.
+
+> **Gotcha:** Adding a generic annotation (`@return BelongsTo<Foo, $this>`) to a widely-used
+> relation improves inference *at every call site*, which can invalidate `phpstan-baseline.neon`
+> entries elsewhere and fail `composer analyse` with `ignore.unmatched`. Prefer annotating a
+> relation only your new code uses — or regenerate the baseline deliberately. The converse trap
+> is real too: leaving a cast un-annotated to avoid baseline churn makes PHPStan read an enum
+> column as `string` and report every correct `=== Status::Active` as always-false. An annotation
+> that makes correct code look broken is not a saving.
+
+### Authorization & Tenancy
+
+> **Gotcha:** **A capability permission is not a tenancy scope, and `App\Policies\*` does not
+> supply one either.** There are **no global scopes** in the baseline — `create()` on a policy is
+> a bare `$user->can('resource.create.item')` with no organisation check — so every list and
+> every lookup has to scope itself. Passing the policy proves a user may do the *kind* of thing,
+> never that they may do it to *this row*. Route every lookup through one scoped finder so
+> ownership cannot be remembered at five call sites and forgotten at the sixth, and **never
+> resolve a client-supplied uuid with a bare `where('uuid', …)`**.
+
+> **Gotcha:** **`is_default` (and any "exactly one row carries this flag" rule) is per-tenant, so
+> the reset must be too.** `Model::whereKeyNot($id)->update(['is_default' => false])` reads as the
+> obvious singleton guard and is a cross-tenant write: one tenant saving a default silently clears
+> every other organisation's choice. Any uniqueness rule stated as "only one row may carry this
+> flag" needs the scope it is unique *within* written into the query.
+
+> **Gotcha:** **A surface authenticating on a non-default guard must pin the guard it checks
+> permissions against.** Browser routes run on `web`, but an API or MCP surface authenticating on
+> `sanctum` (or Passport) gets a bare `$user->can(...)` evaluated under *that* guard, where the
+> user has no permissions — so everything denies, superadmin included, and the failure looks like
+> a misconfigured role rather than a guard mismatch. Use
+> `$user->hasPermissionTo($ability, 'web')` and fail closed on an unknown permission.
+
+> **Gotcha:** An audited **denial** must be written **outside** the transaction that performs the
+> check. Throwing from inside rolls the audit record back along with the (empty) write set,
+> losing the evidence exactly when it matters.
+
+### Database Portability
+
+> **Gotcha:** **MySQL needs an index whose *leading* column backs each foreign key.** Dropping a
+> unique before creating its replacement fails with errno 1553 — while PostgreSQL and SQLite
+> accept either order. Always **create the replacement index first, then drop the old one** (and
+> reverse it in `down()`). Note it is about the leading column, not about an index merely
+> existing: if the FK column is not leading anywhere, it needs a plain index of its own.
+
+> **Gotcha:** **MySQL and Oracle have no transactional DDL.** A migration that fails halfway
+> leaves the table half-changed *and* unrecorded, so the next `migrate` reports a confusing
+> "Duplicate column" instead of the real error. Guard multi-step migrations with
+> `Schema::hasColumn()` so a partially-applied database recovers on re-run instead of needing
+> manual repair.
+
+> **Gotcha:** **`Schema::hasIndex()` can return false mid-migration for an index that plainly
+> exists**, silently skipping the `dropUnique()` guarded by it — the swap reports DONE and the old
+> index survives. Read `Schema::getIndexes($table)` and match the name yourself
+> (case-insensitively; the drivers disagree on casing).
+
+> **Gotcha:** **`down()` hits errno 1553 where `up()` does not.** A composite unique leading with
+> a foreign-key column becomes the only index backing that constraint, so MySQL refuses to drop it
+> while the FK stands — drop the foreign key first, then the index, then the column. Always run
+> `migrate` → `rollback` → `migrate` **against MySQL**: tests run on SQLite in-memory, the most
+> permissive engine of the lot, and it rebuilds the whole table on ALTER. A green suite is not
+> evidence a migration is portable.
+
+> **Gotcha:** `dropConstrainedForeignId()` guesses the *conventional* constraint name
+> (`{table}_{column}_foreign`). A migration that named its FK explicitly via
+> `constrained(indexName: '…')` must drop it by that name, or MySQL fails with errno 1091.
+
+### Passkeys
+
+> **Gotcha:** **Rotating `APP_KEY` invalidates every registered passkey.**
+> `config/passkeys.php` derives `user_handle_secret` from `config('app.key')`, and the WebAuthn
+> user handle is what binds a credential to an account — change the key and every passkey on file
+> stops resolving to its user, with no error that says so. Set `PASSKEYS_USER_HANDLE_SECRET`
+> explicitly (it is in `.env.example`) before any key rotation.
 
 ### BackedEnum
 
@@ -1055,10 +1280,11 @@ When a correction or preference is identified:
 
 ### 3. Self-Improvement Loop
 
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- After ANY correction from the user: record the pattern in `CLAUDE.md` (gotcha / preference /
+  DO-DON'T) — never in a local `tasks/lessons.md`
 - Write rules for yourself that prevent the same mistake
 - Ruthlessly iterate on these lessons until mistake rate drops
-- Review lessons at session start for relevant project
+- Review `CLAUDE.md` at session start for relevant project
 
 ### 4. Verification Before Done
 
@@ -1083,14 +1309,24 @@ When a correction or preference is identified:
 
 ### Task Management
 
-1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
-2. **Verify Plan**: Check in before starting implementation
-3. **Track Progress**: Mark items complete as you go
-4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section to `tasks/todo.md`
-6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+**All task tracking lives on GitHub.** Do NOT create local tracking files — no `tasks/todo.md`,
+no `tasks/lessons.md`, no `tasks/` directory in the repository at all.
 
-Scale process to task size — simple fixes skip steps 1–2.
+1. **Plan First**: Create a GitHub issue with a `- [ ]` task checklist in the body
+   (`gh issue create`)
+2. **Verify Plan**: Check in before starting implementation
+3. **Track Progress**: Tick checklist items with `gh issue edit` as you go
+4. **Explain Changes**: High-level summary at each step
+5. **Document Results**: Comment the result/review on the issue, then close it
+6. **Capture Lessons**: Record corrections in `CLAUDE.md` (gotchas / preferences), not in a
+   local file
+
+Reference the issue in commit messages and PRs. Scale process to task size — simple fixes skip
+steps 1–2.
+
+> **Gotcha:** A lesson recorded in a local file is a lesson only this checkout has. `CLAUDE.md`
+> is read at the start of every session in every clone; `tasks/lessons.md` is read by nobody.
+> The same applies to plans: an issue is visible to the team and survives a fresh clone.
 
 ### Core Principles
 
