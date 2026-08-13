@@ -2,6 +2,34 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.38.0 - 2026-08-13
+
+Hard-won lessons from a production Kickoff app, folded back into the baseline. Three of these are defects that ship green — a passing test suite proved nothing about any of them.
+
+### Fixed
+
+- **`composer test` no longer defaults to `--tia`.** Test Impact Analysis has to *record* per-test coverage before it can skip anything, so it needs a coverage driver — it is not zero-config. Under Xdebug a cold record of a mid-sized suite runs to ~90 minutes, and Composer's default 300-second process timeout kills it part way through, leaving `worker-edges-*.json` and no `graph.json`: an unusable graph, so the next run re-records from scratch and hits the same wall, forever. TIA moves to opt-in `test-tia` / `test-tia-fresh`, carrying `Composer\Config::disableProcessTimeout` and `PHP_INI_SCAN_DIR=build/php-ini`. Every test script now pins `XDEBUG_MODE` via `@putenv`, so a machine with `xdebug.mode=coverage` cannot silently impose a ~3x tax. Adds `test-parallel`. **Existing projects should patch this even if nothing else in `composer.json` has drifted.**
+- **`[x-cloak] { display: none !important; }` added to `resources/css/app.css`.** `x-cloak` is only an attribute Alpine removes on init — the hiding is entirely that rule. Without it every `x-show="false"` element renders **visible on first paint** and disappears a moment later. 2FA challenges, tab panels and disclosure bodies were all flashing their hidden state; nothing errors, so no test catches it.
+- **`seed:prepare` now forwards `--force`.** It is the production install path and runs unattended with no TTY, where `db:seed` printed the "APPLICATION IN PRODUCTION" prompt, cancelled, and **exited 0** — leaving a migrated but unseeded database (no roles, no superadmin, no way to log in) and a caller that believed it succeeded. `seed:dev` / `seed:demo` take an opt-in `--force` and return the exit code rather than swallowing it.
+
+### Added
+
+- **`build/php-ini/`** — pcov ini, a `build-pcov.sh` that compiles the extension where no build is published for the current PHP, and a README explaining why `PHP_INI_SCAN_DIR` rather than `php -d` (ParaTest spawns its workers without the parent's `-d` flags). Plus `build/reset-tia.php` for `test-tia-fresh`.
+- **`PASSKEYS_USER_HANDLE_SECRET` in `.env.example`.** `config/passkeys.php` derives the WebAuthn user handle from `APP_KEY`, so rotating the key silently invalidates every registered passkey. Pinning the secret decouples the two.
+- **`/.claude/worktrees/` in the stub `.gitignore`.** Agent worktrees are transient nested checkouts; one working project was found carrying over 100,000 files there.
+- **~35 new gotchas in `stubs/CLAUDE.md`**, in new sections: Alpine.js, Settings vs `.env`, Seeders, Models & Traitify, Static Analysis (Larastan), Authorization & Tenancy, Database Portability, and Passkeys.
+- **`deploy-app` skill** bundled into generated projects — every Kickoff app ships `bin/deploy`.
+
+### Changed
+
+- **Bundled skill `pest-testing` renamed to `kickoff-pest-testing`.** Laravel Boost's `boost:install --skills` writes its own `pest-testing` into `.claude/skills/` **after** the stub copy — same path, different content, no warning. It had already replaced the Kickoff one in a live product, found only by diffing the two trees. `bin/sync-claude-assets` now fails loudly if `STUBS_SKILLS` ever names a skill Boost owns.
+- **Task tracking moves to GitHub issues**; corrections go in `CLAUDE.md`. The stub no longer directs work into `tasks/todo.md` / `tasks/lessons.md`, and `stubs/todo.md` is removed — an untracked local file is read by nobody and does not survive a fresh clone.
+- Flux field help text guidance corrected to `description:trailing` (hand-rolling a `<p>` is no longer needed).
+- `stubs/.claude/settings.local.json` allowlist widened (`mysql`, `python3`, `redis-cli`) and the Laravel Boost MCP server pre-enabled.
+- Toolkit assets resynced from [nasrulhazim/claude 2.3.0](https://github.com/nasrulhazim/claude/releases/tag/2.3.0).
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.37.0...1.38.0
+
 ## 1.37.0 - 2026-08-06
 
 ### What's Changed
