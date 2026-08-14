@@ -12,7 +12,7 @@
                     <flux:heading size="lg" class="truncate">{{ $this->user->name }}</flux:heading>
                     <div class="truncate text-sm text-zinc-500 dark:text-zinc-400">{{ $this->user->email }}</div>
                 </div>
-                <flux:badge size="sm" color="{{ $this->user->status()->color() }}">
+                <flux:badge size="sm" color="{{ $this->user->status()->badgeColor() }}">
                     {{ $this->user->status()->label() }}
                 </flux:badge>
             </div>

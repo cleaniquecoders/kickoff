@@ -1,0 +1,1450 @@
+{
+    "version": 1,
+    "generated_by": "bin/build-screen-manifest.php",
+    "summary": {
+        "screen_count": 47,
+        "livewire_class_count": 17,
+        "excluded_view_count": 137,
+        "flux_components": [
+            "badge",
+            "button",
+            "callout",
+            "callout.heading",
+            "callout.text",
+            "checkbox",
+            "dropdown",
+            "field",
+            "fieldset",
+            "heading",
+            "icon",
+            "input",
+            "label",
+            "legend",
+            "link",
+            "menu",
+            "menu.heading",
+            "menu.item",
+            "menu.separator",
+            "modal",
+            "modal.close",
+            "modal.trigger",
+            "radio",
+            "radio.group",
+            "select",
+            "select.option",
+            "separator",
+            "spacer",
+            "subheading",
+            "switch",
+            "text",
+            "textarea"
+        ],
+        "wire_directives": [
+            "wire:admin",
+            "wire:click",
+            "wire:cloak",
+            "wire:confirm",
+            "wire:key",
+            "wire:loading",
+            "wire:model",
+            "wire:model.live",
+            "wire:navigate",
+            "wire:settings",
+            "wire:submit",
+            "wire:target"
+        ],
+        "icons": [
+            "arrow-left",
+            "arrow-path",
+            "bell",
+            "check",
+            "chevron-right",
+            "computer-desktop",
+            "document-duplicate",
+            "ellipsis",
+            "eye",
+            "eye-slash",
+            "key",
+            "key-round",
+            "loading",
+            "lock-closed",
+            "magnifying-glass",
+            "mail-check",
+            "minus-circle",
+            "moon",
+            "pencil",
+            "plus",
+            "qr-code",
+            "rotate-ccw",
+            "shield-check",
+            "shield-exclamation",
+            "sun",
+            "trash",
+            "trash-2",
+            "user-check",
+            "user-x",
+            "x-circle"
+        ]
+    },
+    "screens": [
+        {
+            "path": "stubs/resources/views/admin/index.blade.php",
+            "flux_components": [
+                "button",
+                "heading"
+            ],
+            "wire_directives": [
+                "wire:navigate"
+            ],
+            "icons": [],
+            "routes": [
+                "admin.roles.index",
+                "admin.settings.index"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/admin/mail-history/index.blade.php",
+            "flux_components": [
+                "heading",
+                "separator",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Admin\\MailHistory\\Index"
+        },
+        {
+            "path": "stubs/resources/views/admin/roles/index.blade.php",
+            "flux_components": [
+                "button",
+                "heading",
+                "separator",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [
+                "plus"
+            ],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Admin\\Roles\\Index"
+        },
+        {
+            "path": "stubs/resources/views/admin/roles/show.blade.php",
+            "flux_components": [
+                "heading"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Admin\\Roles\\Show"
+        },
+        {
+            "path": "stubs/resources/views/admin/settings/index.blade.php",
+            "flux_components": [
+                "button",
+                "heading"
+            ],
+            "wire_directives": [
+                "wire:navigate"
+            ],
+            "icons": [],
+            "routes": [
+                "admin.settings.authentication",
+                "admin.settings.g8desk",
+                "admin.settings.seo",
+                "admin.settings.show"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/admin/settings/show.blade.php",
+            "flux_components": [
+                "heading"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [
+                "admin.index",
+                "admin.settings.index"
+            ],
+            "livewire_component": "App\\Livewire\\Admin\\Settings\\Show"
+        },
+        {
+            "path": "stubs/resources/views/auth/confirm-password.blade.php",
+            "flux_components": [
+                "button",
+                "input"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [
+                "password.confirm.store"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/auth/forgot-password.blade.php",
+            "flux_components": [
+                "button",
+                "input",
+                "link"
+            ],
+            "wire_directives": [
+                "wire:navigate"
+            ],
+            "icons": [],
+            "routes": [
+                "login",
+                "password.email"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/auth/login.blade.php",
+            "flux_components": [
+                "button",
+                "checkbox",
+                "input",
+                "link"
+            ],
+            "wire_directives": [
+                "wire:navigate"
+            ],
+            "icons": [],
+            "routes": [
+                "login.store",
+                "password.request",
+                "register"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/auth/register.blade.php",
+            "flux_components": [
+                "button",
+                "input",
+                "link"
+            ],
+            "wire_directives": [
+                "wire:navigate"
+            ],
+            "icons": [],
+            "routes": [
+                "login",
+                "register.store"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/auth/reset-password.blade.php",
+            "flux_components": [
+                "button",
+                "input"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [
+                "password.update",
+                "token"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/auth/two-factor-challenge.blade.php",
+            "flux_components": [
+                "button",
+                "input",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [
+                "two-factor.login.store"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/auth/verify-email.blade.php",
+            "flux_components": [
+                "button",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [
+                "logout",
+                "verification.send"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/dashboard.blade.php",
+            "flux_components": [
+                "button",
+                "heading"
+            ],
+            "wire_directives": [
+                "wire:navigate"
+            ],
+            "icons": [],
+            "routes": [
+                "admin.index",
+                "notifications.index",
+                "security.audit-trail.index",
+                "security.users.index",
+                "settings.profile.edit",
+                "settings.user-password.edit"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/mail-history/index.blade.php",
+            "flux_components": [
+                "badge",
+                "button",
+                "heading",
+                "input",
+                "menu.item",
+                "modal",
+                "select",
+                "select.option",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:model",
+                "wire:model.live"
+            ],
+            "icons": [
+                "eye",
+                "magnifying-glass"
+            ],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Admin\\MailHistory\\Index"
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/roles/index.blade.php",
+            "flux_components": [
+                "badge",
+                "button",
+                "dropdown",
+                "menu",
+                "menu.item"
+            ],
+            "wire_directives": [
+                "wire:admin",
+                "wire:click",
+                "wire:confirm",
+                "wire:key",
+                "wire:model"
+            ],
+            "icons": [
+                "ellipsis",
+                "pencil",
+                "shield-check",
+                "trash-2"
+            ],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Admin\\Roles\\Index"
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/roles/role-form.blade.php",
+            "flux_components": [
+                "button",
+                "heading",
+                "input",
+                "modal",
+                "switch",
+                "text",
+                "textarea"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Admin\\Roles\\RoleForm"
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/roles/show.blade.php",
+            "flux_components": [
+                "button",
+                "heading"
+            ],
+            "wire_directives": [
+                "wire:loading",
+                "wire:model",
+                "wire:navigate",
+                "wire:submit"
+            ],
+            "icons": [],
+            "routes": [
+                "admin.roles.index"
+            ],
+            "livewire_component": "App\\Livewire\\Admin\\Roles\\Show"
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/settings/authentication.blade.php",
+            "flux_components": [
+                "button",
+                "checkbox",
+                "field",
+                "heading",
+                "label",
+                "separator",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [
+                "check"
+            ],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Admin\\Settings\\Authentication"
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/settings/g8desk.blade.php",
+            "flux_components": [
+                "button",
+                "field",
+                "heading",
+                "input",
+                "label",
+                "separator",
+                "switch",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [
+                "check"
+            ],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/settings/seo.blade.php",
+            "flux_components": [
+                "button",
+                "field",
+                "heading",
+                "input",
+                "label",
+                "separator",
+                "switch",
+                "text",
+                "textarea"
+            ],
+            "wire_directives": [
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [
+                "check"
+            ],
+            "routes": [
+                "seo.robots",
+                "seo.sitemap"
+            ],
+            "livewire_component": "App\\Livewire\\Admin\\Settings\\Seo"
+        },
+        {
+            "path": "stubs/resources/views/livewire/admin/settings/show.blade.php",
+            "flux_components": [
+                "button",
+                "heading",
+                "input",
+                "select",
+                "select.option",
+                "separator"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:loading",
+                "wire:model",
+                "wire:navigate",
+                "wire:submit",
+                "wire:target"
+            ],
+            "icons": [],
+            "routes": [
+                "admin.settings.index"
+            ],
+            "livewire_component": "App\\Livewire\\Admin\\Settings\\Show"
+        },
+        {
+            "path": "stubs/resources/views/livewire/notifications/bell.blade.php",
+            "flux_components": [
+                "badge",
+                "button",
+                "dropdown",
+                "menu",
+                "menu.heading",
+                "menu.item",
+                "menu.separator"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:navigate"
+            ],
+            "icons": [
+                "bell",
+                "chevron-right"
+            ],
+            "routes": [
+                "notifications.index"
+            ],
+            "livewire_component": "App\\Livewire\\Notifications\\Bell"
+        },
+        {
+            "path": "stubs/resources/views/livewire/notifications/index.blade.php",
+            "flux_components": [
+                "badge",
+                "button"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:confirm"
+            ],
+            "icons": [
+                "check",
+                "minus-circle",
+                "trash"
+            ],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Notifications\\Index"
+        },
+        {
+            "path": "stubs/resources/views/livewire/security/audit-trail/index.blade.php",
+            "flux_components": [
+                "badge",
+                "heading",
+                "subheading"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:key",
+                "wire:model"
+            ],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Security\\AuditTrail\\Index"
+        },
+        {
+            "path": "stubs/resources/views/livewire/security/role-permissions.blade.php",
+            "flux_components": [],
+            "wire_directives": [
+                "wire:click"
+            ],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Security\\RolePermissions"
+        },
+        {
+            "path": "stubs/resources/views/livewire/security/users/index.blade.php",
+            "flux_components": [
+                "badge",
+                "button",
+                "checkbox",
+                "dropdown",
+                "heading",
+                "input",
+                "menu",
+                "menu.item",
+                "menu.separator",
+                "select",
+                "select.option",
+                "separator",
+                "spacer",
+                "subheading",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:confirm",
+                "wire:key",
+                "wire:model",
+                "wire:model.live"
+            ],
+            "icons": [
+                "ellipsis",
+                "key-round",
+                "magnifying-glass",
+                "mail-check",
+                "pencil",
+                "rotate-ccw",
+                "shield-check",
+                "trash-2",
+                "user-check",
+                "user-x"
+            ],
+            "routes": [
+                "impersonate"
+            ],
+            "livewire_component": "App\\Livewire\\Security\\Users\\Index"
+        },
+        {
+            "path": "stubs/resources/views/livewire/security/users/manage-access.blade.php",
+            "flux_components": [
+                "badge",
+                "button",
+                "heading",
+                "icon",
+                "modal",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:key",
+                "wire:model"
+            ],
+            "icons": [
+                "check"
+            ],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Security\\Users\\ManageAccess"
+        },
+        {
+            "path": "stubs/resources/views/livewire/security/users/user-form.blade.php",
+            "flux_components": [
+                "button",
+                "checkbox",
+                "fieldset",
+                "heading",
+                "input",
+                "legend",
+                "modal",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Security\\Users\\UserForm"
+        },
+        {
+            "path": "stubs/resources/views/livewire/settings/appearance.blade.php",
+            "flux_components": [
+                "radio",
+                "radio.group"
+            ],
+            "wire_directives": [],
+            "icons": [
+                "computer-desktop",
+                "moon",
+                "sun"
+            ],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/livewire/settings/delete-user-form.blade.php",
+            "flux_components": [
+                "button",
+                "heading",
+                "input",
+                "modal",
+                "modal.close",
+                "modal.trigger",
+                "subheading"
+            ],
+            "wire_directives": [
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/livewire/settings/mcp-tokens.blade.php",
+            "flux_components": [
+                "button",
+                "callout",
+                "callout.heading",
+                "callout.text",
+                "heading",
+                "icon",
+                "input",
+                "separator",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:confirm",
+                "wire:key",
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [
+                "key",
+                "trash-2"
+            ],
+            "routes": [
+                "mcp-kit.tasks"
+            ],
+            "livewire_component": "App\\Livewire\\Settings\\McpTokens"
+        },
+        {
+            "path": "stubs/resources/views/livewire/settings/password.blade.php",
+            "flux_components": [
+                "button",
+                "input"
+            ],
+            "wire_directives": [
+                "wire:model",
+                "wire:submit"
+            ],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/livewire/settings/profile.blade.php",
+            "flux_components": [
+                "button",
+                "input",
+                "link",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:model",
+                "wire:settings",
+                "wire:submit"
+            ],
+            "icons": [],
+            "routes": [
+                "dashboard"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/livewire/settings/two-factor.blade.php",
+            "flux_components": [
+                "badge",
+                "button",
+                "callout",
+                "heading",
+                "icon",
+                "modal",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:cloak",
+                "wire:model",
+                "wire:settings"
+            ],
+            "icons": [
+                "check",
+                "document-duplicate",
+                "loading",
+                "qr-code",
+                "shield-check",
+                "shield-exclamation",
+                "x-circle"
+            ],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/livewire/settings/two-factor/recovery-codes.blade.php",
+            "flux_components": [
+                "button",
+                "callout",
+                "heading",
+                "icon",
+                "text"
+            ],
+            "wire_directives": [
+                "wire:click",
+                "wire:cloak",
+                "wire:loading"
+            ],
+            "icons": [
+                "arrow-path",
+                "eye",
+                "eye-slash",
+                "lock-closed",
+                "x-circle"
+            ],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/mail/default-mail.blade.php",
+            "flux_components": [],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/mail/notification.blade.php",
+            "flux_components": [],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/notifications/index.blade.php",
+            "flux_components": [
+                "heading"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Notifications\\Index"
+        },
+        {
+            "path": "stubs/resources/views/pages/changelog.blade.php",
+            "flux_components": [
+                "heading",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/pages/documentation.blade.php",
+            "flux_components": [
+                "heading",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/pages/support.blade.php",
+            "flux_components": [
+                "heading",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/security/audit-trail/_detail.blade.php",
+            "flux_components": [
+                "badge",
+                "heading"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/security/audit-trail/index.blade.php",
+            "flux_components": [
+                "heading",
+                "subheading"
+            ],
+            "wire_directives": [],
+            "icons": [],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Security\\AuditTrail\\Index"
+        },
+        {
+            "path": "stubs/resources/views/security/audit-trail/show.blade.php",
+            "flux_components": [
+                "button",
+                "heading",
+                "subheading"
+            ],
+            "wire_directives": [],
+            "icons": [
+                "arrow-left"
+            ],
+            "routes": [
+                "security.audit-trail.index"
+            ],
+            "livewire_component": null
+        },
+        {
+            "path": "stubs/resources/views/security/users/index.blade.php",
+            "flux_components": [
+                "button",
+                "heading",
+                "separator",
+                "text"
+            ],
+            "wire_directives": [],
+            "icons": [
+                "plus"
+            ],
+            "routes": [],
+            "livewire_component": "App\\Livewire\\Security\\Users\\Index"
+        },
+        {
+            "path": "stubs/resources/views/welcome.blade.php",
+            "flux_components": [],
+            "wire_directives": [
+                "wire:navigate"
+            ],
+            "icons": [],
+            "routes": [
+                "dashboard",
+                "home",
+                "login",
+                "register"
+            ],
+            "livewire_component": null
+        }
+    ],
+    "livewire_components": [
+        {
+            "class": "Authentication",
+            "path": "stubs/app/Livewire/Admin/Settings/Authentication.php",
+            "public_properties": [
+                "publicRegistrationEnabled"
+            ],
+            "actions": [
+                "mount",
+                "render",
+                "save"
+            ],
+            "attributes": [
+                {
+                    "name": "Layout",
+                    "value": "components.layouts.app"
+                }
+            ],
+            "traits": [
+                "AuthenticationSettings"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "Bell",
+            "path": "stubs/app/Livewire/Notifications/Bell.php",
+            "public_properties": [],
+            "actions": [
+                "markAsRead",
+                "recentNotifications",
+                "render",
+                "unreadCount"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                }
+            ],
+            "traits": [
+                "Collection"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "G8Desk",
+            "path": "stubs/app/Livewire/Admin/Settings/G8Desk.php",
+            "public_properties": [
+                "baseUrl",
+                "enabled",
+                "publicKey",
+                "widgetSecret"
+            ],
+            "actions": [
+                "mount",
+                "render",
+                "save"
+            ],
+            "attributes": [
+                {
+                    "name": "Layout",
+                    "value": "components.layouts.app"
+                }
+            ],
+            "traits": [
+                "G8DeskSettings"
+            ],
+            "uses_validate": true
+        },
+        {
+            "class": "Index",
+            "path": "stubs/app/Livewire/Admin/MailHistory/Index.php",
+            "public_properties": [
+                "perPage",
+                "search",
+                "showDetail",
+                "status",
+                "viewingUuid"
+            ],
+            "actions": [
+                "clearFilters",
+                "closeDetail",
+                "render",
+                "updatedPerPage",
+                "updatedSearch",
+                "updatedStatus",
+                "view"
+            ],
+            "attributes": [
+                {
+                    "name": "Url"
+                },
+                {
+                    "name": "Url"
+                }
+            ],
+            "traits": [
+                "MailHistory",
+                "ithPagination"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "Index",
+            "path": "stubs/app/Livewire/Admin/Roles/Index.php",
+            "public_properties": [
+                "detailKey",
+                "detailUuid",
+                "showDetail"
+            ],
+            "actions": [
+                "delete",
+                "openDetail",
+                "refreshList",
+                "render",
+                "toggleEnabled"
+            ],
+            "attributes": [
+                {
+                    "name": "On",
+                    "value": "role-saved"
+                }
+            ],
+            "traits": [
+                "Role",
+                "ithPagination",
+                "uthorizesRequests"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "Index",
+            "path": "stubs/app/Livewire/Notifications/Index.php",
+            "public_properties": [
+                "filter",
+                "sortBy",
+                "sortDirection"
+            ],
+            "actions": [
+                "delete",
+                "markAllAsRead",
+                "markAsRead",
+                "markAsUnread",
+                "render",
+                "setFilter",
+                "setSorting",
+                "totalCount",
+                "unreadCount"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Url"
+                },
+                {
+                    "name": "Url"
+                },
+                {
+                    "name": "Url"
+                }
+            ],
+            "traits": [
+                "Auth",
+                "ithPagination"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "Index",
+            "path": "stubs/app/Livewire/Security/AuditTrail/Index.php",
+            "public_properties": [
+                "detailKey",
+                "detailUuid",
+                "showDetail"
+            ],
+            "actions": [
+                "mount",
+                "openDetail",
+                "render",
+                "selectedAudit"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                }
+            ],
+            "traits": [
+                "Model",
+                "ithPagination",
+                "uthorizesRequests"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "Index",
+            "path": "stubs/app/Livewire/Security/Users/Index.php",
+            "public_properties": [
+                "bulkRole",
+                "detailKey",
+                "detailUuid",
+                "roleFilter",
+                "search",
+                "selectPage",
+                "selected",
+                "showDetail",
+                "statusFilter"
+            ],
+            "actions": [
+                "activate",
+                "assignableRoles",
+                "bulkAssignRole",
+                "bulkDelete",
+                "clearSelection",
+                "delete",
+                "openDetail",
+                "refreshList",
+                "render",
+                "resendVerification",
+                "restore",
+                "roles",
+                "selectedUser",
+                "sendPasswordResetLink",
+                "stats",
+                "suspend",
+                "updatedPage",
+                "updatedRoleFilter",
+                "updatedSearch",
+                "updatedSelectPage",
+                "updatedStatusFilter",
+                "users"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "On",
+                    "value": "user-saved"
+                },
+                {
+                    "name": "Url"
+                },
+                {
+                    "name": "Url"
+                },
+                {
+                    "name": "Url"
+                }
+            ],
+            "traits": [
+                "Role",
+                "ithPagination",
+                "uthorizesRequests"
+            ],
+            "uses_validate": true
+        },
+        {
+            "class": "Logout",
+            "path": "stubs/app/Livewire/Actions/Logout.php",
+            "public_properties": [],
+            "actions": [
+                "__invoke"
+            ],
+            "attributes": [],
+            "traits": [
+                "Auth"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "ManageAccess",
+            "path": "stubs/app/Livewire/Security/Users/ManageAccess.php",
+            "public_properties": [
+                "showing",
+                "userUuid"
+            ],
+            "actions": [
+                "assignableRoles",
+                "close",
+                "inheritedPermissionIds",
+                "inheritedVia",
+                "open",
+                "permissions",
+                "render",
+                "togglePermission",
+                "toggleRole",
+                "user"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "On",
+                    "value": "open-user-access"
+                }
+            ],
+            "traits": [
+                "Permission",
+                "uthorizesRequests"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "McpTokens",
+            "path": "stubs/app/Livewire/Settings/McpTokens.php",
+            "public_properties": [
+                "plainTextToken",
+                "tokenName"
+            ],
+            "actions": [
+                "connectedApps",
+                "createToken",
+                "mount",
+                "render",
+                "revoke",
+                "tokens"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "Layout",
+                    "value": "components.layouts.app"
+                },
+                {
+                    "name": "Title",
+                    "value": "MCP Tokens"
+                }
+            ],
+            "traits": [
+                "View"
+            ],
+            "uses_validate": true
+        },
+        {
+            "class": "RoleForm",
+            "path": "stubs/app/Livewire/Admin/Roles/RoleForm.php",
+            "public_properties": [
+                "description",
+                "displayName",
+                "editingUuid",
+                "isEnabled",
+                "isProtected",
+                "showing"
+            ],
+            "actions": [
+                "close",
+                "open",
+                "render",
+                "save"
+            ],
+            "attributes": [
+                {
+                    "name": "On",
+                    "value": "open-role-form"
+                }
+            ],
+            "traits": [
+                "Role",
+                "uthorizesRequests"
+            ],
+            "uses_validate": true
+        },
+        {
+            "class": "RolePermissions",
+            "path": "stubs/app/Livewire/Security/RolePermissions.php",
+            "public_properties": [
+                "role",
+                "selectedPermissions"
+            ],
+            "actions": [
+                "mount",
+                "permissions",
+                "render",
+                "toggleModule",
+                "togglePermission"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                }
+            ],
+            "traits": [
+                "Permission"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "Seo",
+            "path": "stubs/app/Livewire/Admin/Settings/Seo.php",
+            "public_properties": [
+                "canonicalEnabled",
+                "googleAnalyticsId",
+                "googleSiteVerification",
+                "googleTagManagerId",
+                "metaDescription",
+                "metaKeywords",
+                "metaTitle",
+                "ogImage",
+                "organizationLogo",
+                "organizationName",
+                "organizationSameAs",
+                "robotsTxt",
+                "twitterSite"
+            ],
+            "actions": [
+                "mount",
+                "render",
+                "save"
+            ],
+            "attributes": [
+                {
+                    "name": "Layout",
+                    "value": "components.layouts.app"
+                }
+            ],
+            "traits": [
+                "SeoSettings"
+            ],
+            "uses_validate": true
+        },
+        {
+            "class": "Show",
+            "path": "stubs/app/Livewire/Admin/Roles/Show.php",
+            "public_properties": [
+                "role",
+                "selectedPermissions"
+            ],
+            "actions": [
+                "mount",
+                "permissions",
+                "render",
+                "updatePermissions"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                }
+            ],
+            "traits": [
+                "Permission",
+                "uthorizesRequests"
+            ],
+            "uses_validate": false
+        },
+        {
+            "class": "Show",
+            "path": "stubs/app/Livewire/Admin/Settings/Show.php",
+            "public_properties": [
+                "section",
+                "settings",
+                "testRecipient"
+            ],
+            "actions": [
+                "loadSettings",
+                "mount",
+                "render",
+                "saveSettings",
+                "sendTestMail"
+            ],
+            "attributes": [],
+            "traits": [
+                "DefaultMail"
+            ],
+            "uses_validate": true
+        },
+        {
+            "class": "UserForm",
+            "path": "stubs/app/Livewire/Security/Users/UserForm.php",
+            "public_properties": [
+                "editingUuid",
+                "email",
+                "name",
+                "roles",
+                "sendPasswordSetupLink",
+                "showing"
+            ],
+            "actions": [
+                "assignableRoles",
+                "close",
+                "open",
+                "render",
+                "save"
+            ],
+            "attributes": [
+                {
+                    "name": "Computed"
+                },
+                {
+                    "name": "On",
+                    "value": "open-user-form"
+                }
+            ],
+            "traits": [
+                "Role",
+                "uthorizesRequests"
+            ],
+            "uses_validate": true
+        }
+    ]
+}

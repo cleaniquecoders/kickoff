@@ -71,6 +71,10 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
+        if (! class_exists(Livewire::class)) {
+            return;
+        }
+
         Livewire::addNamespace(
             namespace: 'artisan-runner',
             classNamespace: 'CleaniqueCoders\\ArtisanRunner\\Livewire',

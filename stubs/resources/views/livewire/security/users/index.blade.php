@@ -132,7 +132,7 @@
                             </div>
                         </td>
                         <td class="px-4 py-4">
-                            <flux:badge size="sm" color="{{ $user->status()->color() }}">
+                            <flux:badge size="sm" color="{{ $user->status()->badgeColor() }}">
                                 {{ $user->status()->label() }}
                             </flux:badge>
                         </td>
@@ -240,7 +240,7 @@
                 <dl class="grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
                     <div>
                         <dt class="font-medium text-zinc-500 dark:text-zinc-400">{{ __('Status') }}</dt>
-                        <dd class="mt-1"><flux:badge size="sm" color="{{ $u->status()->color() }}">{{ $u->status()->label() }}</flux:badge></dd>
+                        <dd class="mt-1"><flux:badge size="sm" color="{{ $u->status()->badgeColor() }}">{{ $u->status()->label() }}</flux:badge></dd>
                     </div>
                     <div>
                         <dt class="font-medium text-zinc-500 dark:text-zinc-400">{{ __('Email verified') }}</dt>

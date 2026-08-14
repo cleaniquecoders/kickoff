@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "generated": "2026-08-14",
+  "categories": {
+    "A": {
+      "description": "Frontend-neutral backend. Applied for every frontend target (livewire, react, vue, svelte).",
+      "paths": [
+        ".config/**",
+        ".github/**",
+        ".phpstan/**",
+        "app/Concerns/**",
+        "app/Console/**",
+        "app/Contracts/**",
+        "app/Enums/**",
+        "app/Exceptions/**",
+        "app/Http/**",
+        "app/Listeners/**",
+        "app/Mail/**",
+        "app/Models/**",
+        "app/Notifications/**",
+        "app/Policies/**",
+        "app/Providers/**",
+        "app/Settings/**",
+        "bin/**",
+        "bootstrap/**",
+        "build/**",
+        "config/**",
+        "database/**",
+        "docs/**",
+        "public/**",
+        "routes/web.php",
+        "storage/**",
+        "stubs/**",
+        "support/**",
+        "tests/**",
+        "tinker/**",
+        ".env.example",
+        "docker-compose.yml",
+        "phpunit.xml",
+        "pint.json",
+        "rector.php",
+        "tailwind.config.js"
+      ]
+    },
+    "B": {
+      "description": "Builders: framework-agnostic menu/breadcrumb data-structure classes consumed by the frontend layer.",
+      "paths": [
+        "app/Actions/Builder/**"
+      ]
+    },
+    "C": {
+      "description": "Frontend-coupled screens: Livewire components, Blade views, and view component classes. Skipped/replaced for Inertia (react/vue/svelte) targets.",
+      "paths": [
+        "app/Livewire/**",
+        "app/View/**",
+        "resources/**"
+      ]
+    },
+    "D": {
+      "description": "Route modules. Applied conditionally per route_modules classification below.",
+      "paths": [
+        "routes/web/*.php"
+      ]
+    },
+    "A-meta": {
+      "description": "Root meta files: project documentation, Claude Code assets, and git housekeeping. Frontend-neutral but not application code.",
+      "paths": [
+        ".claude/**",
+        ".gitignore",
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "CODE_OF_CONDUCT.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "SECURITY.md"
+      ]
+    }
+  },
+  "route_modules": {
+    "neutral": [
+      "auth.php",
+      "pages.php",
+      "seo.php",
+      "support.php",
+      "_.php"
+    ],
+    "livewire_only": [
+      "administration.php",
+      "security.php",
+      "media.php",
+      "notifications.php"
+    ]
+  },
+  "exceptions": [
+    {
+      "path": "app/Providers/AppServiceProvider.php",
+      "note": "Category A by directory rule, but contains a Livewire/Flux-coupled registration section. Build tool must strip or guard that section for non-Livewire targets.",
+      "livewire_coupled": true
+    },
+    {
+      "path": "resources/views/mail/default-mail.blade.php",
+      "note": "Mail layout view referenced by backend Mailables (App\\Mail). Category C by directory rule, but required by category A code; keep for non-Livewire targets or replace with an equivalent mail layout.",
+      "livewire_coupled": false
+    },
+    {
+      "path": "resources/views/mail/notification.blade.php",
+      "note": "Notification mail template referenced by backend Notifications. Same keep-or-replace caveat as mail/default-mail.blade.php.",
+      "livewire_coupled": false
+    },
+    {
+      "path": "resources/views/notifications/index.blade.php",
+      "note": "Notifications screen is Livewire-coupled (pairs with routes/web/notifications.php, which is livewire_only). Skip together with that route module.",
+      "livewire_coupled": true
+    },
+    {
+      "path": "resources/views/vendor/media-manager/**",
+      "note": "Published media-manager Livewire views (app-owned browser.blade.php hosts <x-breadcrumbs />). Skip for Inertia targets alongside routes/web/media.php.",
+      "livewire_coupled": true
+    },
+    {
+      "path": "tailwind.config.js",
+      "note": "Classified A (build config, not framework-specific), but its content globs reference resources/views; harmless when views are absent, prune globs if desired.",
+      "livewire_coupled": false
+    }
+  ],
+  "stats": {
+    "total_files": 2202,
+    "covered_files": 2202,
+    "by_category": {
+      "A": 1879,
+      "B": 8,
+      "C": 205,
+      "D": 9,
+      "A-meta": 101
+    }
+  }
+}

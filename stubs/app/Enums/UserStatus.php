@@ -37,9 +37,9 @@ enum UserStatus: string implements Contract
     }
 
     /**
-     * Badge color for flux:badge.
+     * Badge color name for UI display.
      */
-    public function color(): string
+    public function badgeColor(): string
     {
         return match ($this) {
             self::ACTIVE => 'green',

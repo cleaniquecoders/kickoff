@@ -18,6 +18,8 @@ class StartCommand extends Command
 
     protected ?string $projectPath;
 
+    protected string $frontend = 'livewire';
+
     const PLACEHOLDER_PROJECT_NAME = '${PROJECT_NAME}';
 
     const PLACEHOLDER_OWNER = '${OWNER}';
@@ -31,7 +33,20 @@ class StartCommand extends Command
             ->addArgument('path', InputArgument::OPTIONAL, 'The project path.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Preview what would be done without making changes.')
             ->addOption('skip-packages', null, InputOption::VALUE_NONE, 'Skip Composer and NPM package installation.')
-            ->addOption('skip-npm', null, InputOption::VALUE_NONE, 'Skip NPM package installation only.');
+            ->addOption('skip-npm', null, InputOption::VALUE_NONE, 'Skip NPM package installation only.')
+            ->addOption(
+                'frontend',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Frontend stack: livewire, react, vue, svelte, or vendor-kit.',
+                'livewire'
+            )
+            ->addOption(
+                'vendor-kit',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Third-party starter kit (<owner/package>) used with --frontend=vendor-kit.'
+            );
     }
 
     public function getProjectName(): string
@@ -55,6 +70,24 @@ class StartCommand extends Command
         $dryRun = $input->getOption('dry-run');
         $skipPackages = $input->getOption('skip-packages');
         $skipNpm = $input->getOption('skip-npm');
+        $frontend = $input->getOption('frontend');
+        $vendorKit = $input->getOption('vendor-kit');
+
+        $allowed = ['livewire', 'react', 'vue', 'svelte', 'vendor-kit'];
+
+        if (! in_array($frontend, $allowed, true)) {
+            $output->writeln("<error>Invalid --frontend value: $frontend. Allowed: livewire, react, vue, svelte, vendor-kit.</error>");
+
+            return Command::FAILURE;
+        }
+
+        if ($frontend === 'vendor-kit' && empty($vendorKit)) {
+            $output->writeln('<error>--frontend=vendor-kit requires --vendor-kit=<owner/package>.</error>');
+
+            return Command::FAILURE;
+        }
+
+        $this->frontend = $frontend;
 
         $this->projectOwner = $projectOwner = $input->getArgument('owner');
         $this->projectName = $projectName = $input->getArgument('name');
@@ -68,15 +101,33 @@ class StartCommand extends Command
         $this->projectPath = $projectPath = normalizePath($projectPath);
 
         if ($dryRun) {
-            return $this->dryRun($output, $projectOwner, $projectName, $projectPath, $skipPackages, $skipNpm);
+            return $this->dryRun($output, $projectOwner, $projectName, $projectPath, $skipPackages, $skipNpm, $frontend);
         }
 
         // Check if we need to create a new Laravel project
         $needsCreation = ! file_exists($projectPath) || ! file_exists($projectPath.'/composer.json') || ! file_exists($projectPath.'/artisan');
 
         if ($needsCreation) {
-            if (! $this->createLaravelProject($output, $projectPath, $projectName, $verbose)) {
+            if (! $this->createLaravelProject($output, $projectPath, $projectName, $verbose, $frontend, $vendorKit)) {
                 return Command::FAILURE;
+            }
+        } else {
+            // Guard rails — an existing project must not silently mix frontend stacks.
+            $existing = $this->detectFrontendStack($projectPath);
+            $requestedGroup = $frontend === 'livewire' ? 'livewire' : 'inertia';
+
+            if ($existing !== 'unknown' && $existing !== $requestedGroup) {
+                $output->writeln("<error>Existing project uses '$existing' but --frontend=$frontend was requested.</error>");
+                $output->writeln('<error>Aborting to avoid mixing frontend stacks. Create a fresh project or omit --frontend.</error>');
+
+                return Command::FAILURE;
+            }
+
+            if ($existing === 'unknown') {
+                $output->writeln('<comment>Could not detect an existing frontend stack from composer.json — copying only backend-neutral stubs.</comment>');
+                // Unknown stack: copy category A/B only (same excludes as Inertia).
+                $frontend = 'react';
+                $this->frontend = $frontend;
             }
         }
 
@@ -86,13 +137,13 @@ class StartCommand extends Command
 
         $output->writeln("\n🎉 Let's kickoff your <info>$projectOwner/$projectName</info> now!\n");
 
-        $this->copyStubs($output, $verbose);
+        $this->copyStubs($output, $verbose, $frontend);
         $this->setupComposer($output, $verbose);
         $this->setupProjectName($output, $verbose);
         $this->setupEnvironmentFile($output, $verbose);
 
         if (! $skipPackages) {
-            $this->installPackages($output, $verbose, $skipNpm);
+            $this->installPackages($output, $verbose, $skipNpm, $frontend);
         } else {
             $output->writeln("\n⏭️  Skipping package installation (--skip-packages)\n");
         }
@@ -153,27 +204,28 @@ class StartCommand extends Command
         $output->writeln('');
     }
 
-    private function dryRun(OutputInterface $output, string $owner, string $name, string $path, bool $skipPackages, bool $skipNpm): int
+    private function dryRun(OutputInterface $output, string $owner, string $name, string $path, bool $skipPackages, bool $skipNpm, string $frontend): int
     {
         $output->writeln("\n<info>🔍 Dry run — no changes will be made</info>\n");
-        $output->writeln("  Owner:   <comment>$owner</comment>");
-        $output->writeln("  Project: <comment>$name</comment>");
-        $output->writeln("  Path:    <comment>$path</comment>");
-        $output->writeln("  DB name: <comment>{$this->getDatabaseName()}</comment>");
+        $output->writeln("  Owner:    <comment>$owner</comment>");
+        $output->writeln("  Project:  <comment>$name</comment>");
+        $output->writeln("  Path:     <comment>$path</comment>");
+        $output->writeln("  DB name:  <comment>{$this->getDatabaseName()}</comment>");
+        $output->writeln("  Frontend: <comment>$frontend</comment>");
         $output->writeln('');
 
         $exists = file_exists($path) && file_exists($path.'/artisan');
         $output->writeln('  Steps:');
         if (! $exists) {
-            $output->writeln('    1. Create new Laravel project (laravel new)');
+            $output->writeln("    1. Create new Laravel project (laravel new — $frontend stack)");
         }
-        $output->writeln('    '.($exists ? '1' : '2').'. Copy stubs to project');
+        $output->writeln('    '.($exists ? '1' : '2').'. Copy stubs to project'.($frontend === 'livewire' ? '' : ' (excluding Livewire views/components/routes)'));
         $output->writeln('    '.($exists ? '2' : '3').'. Update composer.json (scripts, autoload)');
         $output->writeln('    '.($exists ? '3' : '4').'. Replace placeholders (${PROJECT_NAME}, ${OWNER})');
         $output->writeln('    '.($exists ? '4' : '5').'. Setup .env file');
         if (! $skipPackages) {
-            $output->writeln('    '.($exists ? '5' : '6').'. Install Composer packages (25 require, 6 require-dev)');
-            $output->writeln('    '.($exists ? '6' : '7').'. Publish vendor configs & migrations');
+            $output->writeln('    '.($exists ? '5' : '6').'. Install Composer packages'.($frontend === 'livewire' ? ' (25 require, 6 require-dev)' : ' (Livewire-specific packages skipped)'));
+            $output->writeln('    '.($exists ? '6' : '7').'. Publish vendor configs & migrations'.($frontend === 'livewire' ? '' : ' (Livewire-only publish tags skipped)'));
             if (! $skipNpm) {
                 $output->writeln('    '.($exists ? '7' : '8').'. Install NPM packages (lodash, axios, tippy.js)');
             }
@@ -195,7 +247,7 @@ class StartCommand extends Command
         return true;
     }
 
-    private function createLaravelProject(OutputInterface $output, string $projectPath, string $projectName, bool $verbose): bool
+    private function createLaravelProject(OutputInterface $output, string $projectPath, string $projectName, bool $verbose, string $frontend = 'livewire', ?string $vendorKit = null): bool
     {
         // Check if laravel installer is available (cross-platform)
         $checkCommand = self::isWindows() ? 'where laravel' : 'command -v laravel 2>/dev/null';
@@ -220,12 +272,21 @@ class StartCommand extends Command
         // `cd && …`. Chaining leaks shell-dialect assumptions (cmd vs bash) and forced
         // earlier builds to mix forward and back slashes on Windows, which crashed the
         // installer's mkdir() call.
+        $frontendFlags = match ($frontend) {
+            'react' => ['--react'],
+            'vue' => ['--vue'],
+            'svelte' => ['--svelte'],
+            'vendor-kit' => ['--using='.$vendorKit],
+            default => ['--livewire', '--livewire-class-components'],
+        };
+
         $command = sprintf(
-            'laravel new %s --git --livewire --pest --npm --livewire-class-components --no-interaction',
-            escapeshellarg($projectPath)
+            'laravel new %s %s --git --pest --npm --no-interaction',
+            escapeshellarg($projectPath),
+            implode(' ', $frontendFlags)
         );
 
-        step('Creating Laravel project with Livewire, Pest, and Git', function () use ($command, $verbose) {
+        step("Creating Laravel project with $frontend, Pest, and Git", function () use ($command, $verbose) {
             runCommand($command, $verbose);
         }, $output, $verbose);
 
@@ -238,10 +299,10 @@ class StartCommand extends Command
         return PHP_OS_FAMILY === 'Windows';
     }
 
-    private function copyStubs(OutputInterface $output, bool $verbose)
+    private function copyStubs(OutputInterface $output, bool $verbose, string $frontend = 'livewire')
     {
-        step('Copy application stubs', function () use ($verbose, $output) {
-            copyRecursively(__DIR__.'/../stubs/', $this->getProjectPath(), $verbose, $output);
+        step('Copy application stubs', function () use ($verbose, $output, $frontend) {
+            copyRecursively(__DIR__.'/../stubs/', $this->getProjectPath(), $verbose, $output, $this->stubExcludes($frontend));
 
             // The framework's static public/robots.txt would shadow the stub's
             // dynamic, admin-editable /robots.txt route — remove it.
@@ -259,6 +320,54 @@ class StartCommand extends Command
                 }
             }
         }, $output, $verbose);
+    }
+
+    /**
+     * Stub paths (relative to the stubs root) excluded for non-Livewire stacks.
+     */
+    private function stubExcludes(string $frontend): array
+    {
+        if ($frontend === 'livewire') {
+            return [];
+        }
+
+        return [
+            'app/Livewire',
+            'app/View/Components',
+            'resources/views/livewire',
+            'resources/views/flux',
+            'resources/views/components',
+            'resources/views/layouts',
+            'routes/web/administration.php',
+            'routes/web/security.php',
+            'routes/web/media.php',
+            'routes/web/notifications.php',
+        ];
+    }
+
+    /**
+     * Detect the frontend stack of an existing project from its composer.json.
+     * Returns 'livewire', 'inertia', or 'unknown'.
+     */
+    private function detectFrontendStack(string $projectPath): string
+    {
+        $composerFile = $projectPath.'/composer.json';
+        if (! is_file($composerFile)) {
+            return 'unknown';
+        }
+
+        $composer = json_decode((string) file_get_contents($composerFile), true) ?: [];
+        $require = $composer['require'] ?? [];
+
+        if (array_key_exists('livewire/livewire', $require)) {
+            return 'livewire';
+        }
+
+        if (array_key_exists('inertiajs/inertia-laravel', $require)) {
+            return 'inertia';
+        }
+
+        return 'unknown';
     }
 
     private function setupComposer(OutputInterface $output, bool $verbose)
@@ -424,13 +533,36 @@ class StartCommand extends Command
         }
     }
 
-    private function installPackages(OutputInterface $output, bool $verbose, bool $skipNpm = false)
+    /**
+     * Filter frontend-specific packages out of the require lists for non-Livewire stacks.
+     */
+    private function packagesFor(string $frontend, array $require, array $requireDev): array
+    {
+        if ($frontend === 'livewire') {
+            return [$require, $requireDev];
+        }
+
+        $livewireOnly = [
+            'livewire/livewire',
+            'livewire/flux',
+            'mallardduck/blade-lucide-icons',
+        ];
+
+        $require = array_values(array_filter(
+            $require,
+            fn (string $pkg) => ! in_array(strtolower(strtok($pkg, ':')), $livewireOnly, true)
+        ));
+
+        return [$require, $requireDev];
+    }
+
+    private function installPackages(OutputInterface $output, bool $verbose, bool $skipNpm = false, string $frontend = 'livewire')
     {
         step('Changing to project directory', function () {
             chdir($this->getProjectPath());
         }, $output, $verbose);
 
-        step('Installing required packages', function () use ($verbose) {
+        step('Installing required packages', function () use ($verbose, $frontend) {
             $require = [
                 'laravel/sanctum',
                 'blade-ui-kit/blade-icons',
@@ -469,10 +601,12 @@ class StartCommand extends Command
                 'larastan/larastan',
                 'pestphp/pest-plugin-arch',
             ];
+            [$require, $requireDev] = $this->packagesFor($frontend, $require, $requireDev);
+
             installPackages($require, $requireDev, $this->getProjectPath(), $verbose);
         }, $output, $verbose);
 
-        step('Publishing package configs & migrations', function () use ($verbose) {
+        step('Publishing package configs & migrations', function () use ($verbose, $frontend) {
             $options = [
                 '--provider="OwenIt\\Auditing\\AuditingServiceProvider"',
                 '--provider="Spatie\\Activitylog\\ActivitylogServiceProvider"',
@@ -503,6 +637,20 @@ class StartCommand extends Command
                 '--tag=media-manager-views',
                 '--tag=mailhistory-migrations',
             ];
+
+            // Livewire-only publish tags don't apply to Inertia / vendor-kit stacks.
+            // --tag=media-manager-config is kept: media-manager still installs on
+            // Inertia, only its views are Livewire-specific.
+            if ($frontend !== 'livewire') {
+                $options = array_values(array_diff($options, [
+                    '--tag=livewire:assets',
+                    '--tag=livewire:config',
+                    '--tag=blade-lucide-icons',
+                    '--tag=blade-lucide-icons-config',
+                    '--tag=media-manager-views',
+                ]));
+            }
+
             foreach ($options as $option) {
                 runCommand("php artisan vendor:publish {$option}", $verbose);
             }

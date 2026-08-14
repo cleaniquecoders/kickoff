@@ -114,16 +114,58 @@ function gitCommit(string $message, bool $verbose = false): void
 /**
  * Recursively copy a source directory to a destination using iterators with verbosity.
  */
-function copyRecursively(string $src, string $dst, bool $verbose = false, ?OutputInterface $output = null): void
+function copyRecursively(string $src, string $dst, bool $verbose = false, ?OutputInterface $output = null, array $exclude = []): void
 {
     ensureDir($dst);
 
+    $isExcluded = function (string $subPath) use ($exclude): bool {
+        $subPath = str_replace('\\', '/', $subPath);
+        foreach ($exclude as $prefix) {
+            $prefix = trim(str_replace('\\', '/', $prefix), '/');
+            if ($prefix !== '' && ($subPath === $prefix || str_starts_with($subPath, $prefix.'/'))) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    $directoryIterator = new RecursiveDirectoryIterator($src, RecursiveDirectoryIterator::SKIP_DOTS);
+
+    // Prune excluded directories so their whole subtree is skipped mid-iteration.
+    if ($exclude) {
+        $srcLen = strlen(rtrim($src, '/\\')) + 1;
+        $directoryIterator = new RecursiveCallbackFilterIterator(
+            $directoryIterator,
+            function (SplFileInfo $current) use ($isExcluded, $srcLen, $verbose, $output): bool {
+                if ($isExcluded(substr($current->getPathname(), $srcLen))) {
+                    if ($verbose && $output) {
+                        $output->writeln("<info>Skipped:</info> {$current->getPathname()}");
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+        );
+    }
+
     $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($src, RecursiveDirectoryIterator::SKIP_DOTS),
+        $directoryIterator,
         RecursiveIteratorIterator::SELF_FIRST
     );
 
     foreach ($iterator as $item) {
+        $subPath = str_replace('\\', '/', $iterator->getSubPathName());
+        if ($exclude && $isExcluded($subPath)) {
+            if ($verbose && $output) {
+                $output->writeln("<info>Skipped:</info> {$item->getPathname()}");
+            }
+
+            continue;
+        }
+
         $targetPath = $dst.DIRECTORY_SEPARATOR.$iterator->getSubPathName();
         if ($item->isDir()) {
             ensureDir($targetPath);

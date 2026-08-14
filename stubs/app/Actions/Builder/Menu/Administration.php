@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\Route;
  * an item only appears when its feature/package is installed in the host app —
  * making this one builder safe across projects with different feature sets.
  *
- * Icons are Lucide names; any not already published are imported via
- * `php artisan flux:icon ...` (see the scaffolder / docs).
+ * Icons are Lucide names; see the scaffolder/docs for the import command
+ * of your frontend stack.
  */
 class Administration extends Base
 {

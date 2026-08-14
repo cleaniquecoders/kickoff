@@ -104,3 +104,122 @@ test('is windows matches php os family', function () {
 
     expect($method->invoke(null))->toBe(PHP_OS_FAMILY === 'Windows');
 });
+
+test('configure exposes frontend option with required value and livewire default', function () {
+    $command = new StartCommand;
+    $definition = $command->getDefinition();
+
+    expect($definition->hasOption('frontend'))->toBeTrue();
+
+    $option = $definition->getOption('frontend');
+
+    expect($option->isValueRequired())->toBeTrue()
+        ->and($option->getDefault())->toBe('livewire');
+});
+
+test('configure exposes vendor-kit option with required value and no default', function () {
+    $command = new StartCommand;
+    $definition = $command->getDefinition();
+
+    expect($definition->hasOption('vendor-kit'))->toBeTrue();
+
+    $option = $definition->getOption('vendor-kit');
+
+    expect($option->isValueRequired())->toBeTrue()
+        ->and($option->getDefault())->toBeNull();
+});
+
+test('stub excludes returns empty list for livewire', function () {
+    $command = new StartCommand;
+    $method = (new ReflectionClass($command))->getMethod('stubExcludes');
+    $method->setAccessible(true);
+
+    expect($method->invoke($command, 'livewire'))->toBe([]);
+});
+
+test('stub excludes returns the eleven screen and route entries for non-livewire stacks', function (string $frontend) {
+    $command = new StartCommand;
+    $method = (new ReflectionClass($command))->getMethod('stubExcludes');
+    $method->setAccessible(true);
+
+    $excludes = $method->invoke($command, $frontend);
+
+    expect($excludes)->toBe([
+        'app/Livewire',
+        'app/View/Components',
+        'resources/views/livewire',
+        'resources/views/flux',
+        'resources/views/components',
+        'resources/views/layouts',
+        'routes/web/administration.php',
+        'routes/web/security.php',
+        'routes/web/media.php',
+        'routes/web/notifications.php',
+    ])
+        ->and($excludes)->toHaveCount(10)
+        ->and($excludes)->toContain('routes/web/administration.php')
+        ->and($excludes)->not->toContain('routes/web/_.php');
+})->with(['react', 'vue', 'svelte', 'vendor-kit']);
+
+test('packages for returns inputs unchanged for livewire', function () {
+    $command = new StartCommand;
+    $method = (new ReflectionClass($command))->getMethod('packagesFor');
+    $method->setAccessible(true);
+
+    $require = [
+        'livewire/livewire:^4.0',
+        'livewire/flux',
+        'mallardduck/blade-lucide-icons',
+        'laravel/horizon',
+    ];
+    $requireDev = ['laravel/pint'];
+
+    $result = $method->invoke($command, 'livewire', $require, $requireDev);
+
+    expect($result)->toBe([$require, $requireDev])
+        ->and($result[0])->toContain('livewire/livewire:^4.0')
+        ->and($result[0])->toContain('livewire/flux')
+        ->and($result[0])->toContain('mallardduck/blade-lucide-icons')
+        ->and($result[0])->toContain('laravel/horizon');
+});
+
+test('packages for strips livewire packages including version constraints for react', function () {
+    $command = new StartCommand;
+    $method = (new ReflectionClass($command))->getMethod('packagesFor');
+    $method->setAccessible(true);
+
+    $require = [
+        'livewire/livewire:^4.0',
+        'livewire/flux',
+        'mallardduck/blade-lucide-icons',
+        'laravel/horizon',
+    ];
+    $requireDev = ['laravel/pint'];
+
+    [$filtered, $filteredDev] = $method->invoke($command, 'react', $require, $requireDev);
+
+    expect($filtered)->toBe(['laravel/horizon'])
+        ->and($filtered)->not->toContain('livewire/livewire:^4.0')
+        ->and($filtered)->not->toContain('livewire/flux')
+        ->and($filtered)->not->toContain('mallardduck/blade-lucide-icons')
+        ->and($filteredDev)->toBe($requireDev);
+});
+
+test('detect frontend stack reads composer json', function (array $composer, string $expected) {
+    $projectPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'kickoff-test-'.uniqid();
+    mkdir($projectPath, 0777, true);
+    file_put_contents($projectPath.DIRECTORY_SEPARATOR.'composer.json', json_encode($composer));
+
+    $command = new StartCommand;
+    $method = (new ReflectionClass($command))->getMethod('detectFrontendStack');
+    $method->setAccessible(true);
+
+    expect($method->invoke($command, $projectPath))->toBe($expected);
+
+    unlink($projectPath.DIRECTORY_SEPARATOR.'composer.json');
+    rmdir($projectPath);
+})->with([
+    'livewire installed' => [['require' => ['livewire/livewire' => '^4.0']], 'livewire'],
+    'inertia installed' => [['require' => ['inertiajs/inertia-laravel' => '^2.0']], 'inertia'],
+    'neither installed' => [['require' => ['laravel/framework' => '^12.0']], 'unknown'],
+]);
