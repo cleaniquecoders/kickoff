@@ -26,10 +26,10 @@ class ShowController
     {
         $validated = $request->validate([
             // ported from Livewire $this->validate()
-            
-                    'settings.general.site_name' => 'required|string|max:255',
-                    'settings.general.timezone' => ['required', 'string', 'timezone'],
-                
+
+            'settings.general.site_name' => 'required|string|max:255',
+            'settings.general.timezone' => ['required', 'string', 'timezone'],
+
         ]);
 
         // TODO: port the component's save/action methods here.

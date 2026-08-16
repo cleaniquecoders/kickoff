@@ -13,7 +13,6 @@
  * Companion to bin/port-screens.php (react). Shares controllers/routes
  * via stubs/port/shared/ — do NOT duplicate backend wiring per frontend.
  */
-
 $root = dirname(__DIR__);
 $manifestFile = $root.'/stubs/manifest/screens.json';
 
@@ -40,38 +39,38 @@ if (! in_array($target, ['vue', 'svelte', 'all'], true)) {
  * `name` is resolved per-kit below; `self` = self-closing allowed.
  */
 $fluxMap = [
-    'badge'          => ['vue' => 'Badge',          'svelte' => 'Badge',          'from' => 'badge'],
-    'button'         => ['vue' => 'Button',         'svelte' => 'Button',         'from' => 'button'],
-    'callout'        => ['vue' => 'Alert',          'svelte' => 'Alert',          'from' => 'alert'],
-    'callout.heading'=> ['vue' => 'AlertTitle',     'svelte' => 'AlertTitle',     'from' => 'alert'],
-    'callout.text'   => ['vue' => 'AlertDescription','svelte' => 'AlertDescription','from' => 'alert'],
-    'checkbox'       => ['vue' => 'Checkbox',       'svelte' => 'Checkbox',       'from' => 'checkbox'],
-    'dropdown'       => ['vue' => 'DropdownMenu',   'svelte' => 'DropdownMenu',   'from' => 'dropdown-menu'],
-    'field'          => ['vue' => 'Field',          'svelte' => 'Field',          'from' => 'field'],
-    'fieldset'       => ['vue' => 'Fieldset',       'svelte' => 'Fieldset',       'from' => 'field'],
-    'heading'        => ['vue' => 'Heading',        'svelte' => 'Heading',        'from' => 'heading'],
-    'icon'           => ['vue' => null,             'svelte' => null,             'from' => null], // -> lucide
-    'input'          => ['vue' => 'Input',          'svelte' => 'Input',          'from' => 'input'],
-    'label'          => ['vue' => 'Label',          'svelte' => 'Label',          'from' => 'label'],
-    'legend'         => ['vue' => 'Legend',         'svelte' => 'Legend',         'from' => 'field'],
-    'link'           => ['vue' => 'Link',           'svelte' => 'Link',           'from' => '@inertiajs'],
-    'menu'           => ['vue' => 'DropdownMenuContent','svelte' => 'DropdownMenuContent','from' => 'dropdown-menu'],
-    'menu.heading'   => ['vue' => 'DropdownMenuLabel','svelte' => 'DropdownMenuLabel','from' => 'dropdown-menu'],
-    'menu.item'      => ['vue' => 'DropdownMenuItem','svelte' => 'DropdownMenuItem','from' => 'dropdown-menu'],
-    'menu.separator' => ['vue' => 'DropdownMenuSeparator','svelte' => 'DropdownMenuSeparator','from' => 'dropdown-menu'],
-    'modal'          => ['vue' => 'Dialog',         'svelte' => 'Dialog',         'from' => 'dialog'],
-    'modal.close'    => ['vue' => 'DialogClose',    'svelte' => 'DialogClose',    'from' => 'dialog'],
-    'modal.trigger'  => ['vue' => 'DialogTrigger',  'svelte' => 'DialogTrigger',  'from' => 'dialog'],
-    'radio'          => ['vue' => 'RadioGroupItem', 'svelte' => 'RadioGroupItem', 'from' => 'radio-group'],
-    'radio.group'    => ['vue' => 'RadioGroup',     'svelte' => 'RadioGroup',     'from' => 'radio-group'],
-    'select'         => ['vue' => 'Select',         'svelte' => 'Select',         'from' => 'select'],
-    'select.option'  => ['vue' => 'SelectItem',     'svelte' => 'SelectItem',     'from' => 'select'],
-    'separator'      => ['vue' => 'Separator',      'svelte' => 'Separator',      'from' => 'separator'],
-    'spacer'         => ['vue' => null,             'svelte' => null,             'from' => null], // -> <div class="flex-1" />
-    'subheading'     => ['vue' => 'Subheading',     'svelte' => 'Subheading',     'from' => 'heading'],
-    'switch'         => ['vue' => 'Switch',         'svelte' => 'Switch',         'from' => 'switch'],
-    'text'           => ['vue' => 'Text',           'svelte' => 'Text',           'from' => 'text'],
-    'textarea'       => ['vue' => 'Textarea',       'svelte' => 'Textarea',       'from' => 'textarea'],
+    'badge' => ['vue' => 'Badge',          'svelte' => 'Badge',          'from' => 'badge'],
+    'button' => ['vue' => 'Button',         'svelte' => 'Button',         'from' => 'button'],
+    'callout' => ['vue' => 'Alert',          'svelte' => 'Alert',          'from' => 'alert'],
+    'callout.heading' => ['vue' => 'AlertTitle',     'svelte' => 'AlertTitle',     'from' => 'alert'],
+    'callout.text' => ['vue' => 'AlertDescription', 'svelte' => 'AlertDescription', 'from' => 'alert'],
+    'checkbox' => ['vue' => 'Checkbox',       'svelte' => 'Checkbox',       'from' => 'checkbox'],
+    'dropdown' => ['vue' => 'DropdownMenu',   'svelte' => 'DropdownMenu',   'from' => 'dropdown-menu'],
+    'field' => ['vue' => 'Field',          'svelte' => 'Field',          'from' => 'field'],
+    'fieldset' => ['vue' => 'Fieldset',       'svelte' => 'Fieldset',       'from' => 'field'],
+    'heading' => ['vue' => 'Heading',        'svelte' => 'Heading',        'from' => 'heading'],
+    'icon' => ['vue' => null,             'svelte' => null,             'from' => null], // -> lucide
+    'input' => ['vue' => 'Input',          'svelte' => 'Input',          'from' => 'input'],
+    'label' => ['vue' => 'Label',          'svelte' => 'Label',          'from' => 'label'],
+    'legend' => ['vue' => 'Legend',         'svelte' => 'Legend',         'from' => 'field'],
+    'link' => ['vue' => 'Link',           'svelte' => 'Link',           'from' => '@inertiajs'],
+    'menu' => ['vue' => 'DropdownMenuContent', 'svelte' => 'DropdownMenuContent', 'from' => 'dropdown-menu'],
+    'menu.heading' => ['vue' => 'DropdownMenuLabel', 'svelte' => 'DropdownMenuLabel', 'from' => 'dropdown-menu'],
+    'menu.item' => ['vue' => 'DropdownMenuItem', 'svelte' => 'DropdownMenuItem', 'from' => 'dropdown-menu'],
+    'menu.separator' => ['vue' => 'DropdownMenuSeparator', 'svelte' => 'DropdownMenuSeparator', 'from' => 'dropdown-menu'],
+    'modal' => ['vue' => 'Dialog',         'svelte' => 'Dialog',         'from' => 'dialog'],
+    'modal.close' => ['vue' => 'DialogClose',    'svelte' => 'DialogClose',    'from' => 'dialog'],
+    'modal.trigger' => ['vue' => 'DialogTrigger',  'svelte' => 'DialogTrigger',  'from' => 'dialog'],
+    'radio' => ['vue' => 'RadioGroupItem', 'svelte' => 'RadioGroupItem', 'from' => 'radio-group'],
+    'radio.group' => ['vue' => 'RadioGroup',     'svelte' => 'RadioGroup',     'from' => 'radio-group'],
+    'select' => ['vue' => 'Select',         'svelte' => 'Select',         'from' => 'select'],
+    'select.option' => ['vue' => 'SelectItem',     'svelte' => 'SelectItem',     'from' => 'select'],
+    'separator' => ['vue' => 'Separator',      'svelte' => 'Separator',      'from' => 'separator'],
+    'spacer' => ['vue' => null,             'svelte' => null,             'from' => null], // -> <div class="flex-1" />
+    'subheading' => ['vue' => 'Subheading',     'svelte' => 'Subheading',     'from' => 'heading'],
+    'switch' => ['vue' => 'Switch',         'svelte' => 'Switch',         'from' => 'switch'],
+    'text' => ['vue' => 'Text',           'svelte' => 'Text',           'from' => 'text'],
+    'textarea' => ['vue' => 'Textarea',       'svelte' => 'Textarea',       'from' => 'textarea'],
 ];
 
 /** Core wire directives this porter knows how to translate. */
@@ -162,6 +161,7 @@ function translateBlade(string $blade, string $kit, array $fluxMap, callable $st
                     return '<'.$iconName.' class="size-4" />';
                 }
                 $unmappedTags[] = $tag;
+
                 return '<!-- TODO: unmapped flux:'.$tag.' -->';
             }
             $map = $fluxMap[$tag];
@@ -249,6 +249,7 @@ function translateBlade(string $blade, string $kit, array $fluxMap, callable $st
                     return $kit === 'vue' ? ' :key="'.$value.'" /* TODO: wire:key — use a real loop key */' : ' /* TODO: wire:key — use a real each-block key */';
                 default:
                     $unmappedWire[] = 'wire:'.$directive.$modifiers;
+
                     return ' /* TODO: unmapped wire:'.$directive.$modifiers.'="'.htmlspecialchars($value, ENT_QUOTES).'" */';
             }
         },
@@ -357,13 +358,13 @@ function scaffoldVue(array $screen, string $bladeBody, array $todos, array $comp
     $scriptImports[] = "import AppLayout from '@/layouts/AppLayout.vue';";
     $scriptImports[] = "import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';";
     if ($lucide) {
-        $scriptImports[] = "import { ".implode(', ', $lucide)." } from '{$lucidePkg}';";
+        $scriptImports[] = 'import { '.implode(', ', $lucide)." } from '{$lucidePkg}';";
     }
     foreach ($components as $module => $names) {
         if ($module === '@inertiajs') {
             continue;
         }
-        $scriptImports[] = "import { ".implode(', ', $names)." } from '@/components/ui/{$module}';";
+        $scriptImports[] = 'import { '.implode(', ', $names)." } from '@/components/ui/{$module}';";
     }
 
     $todoBlock = $todos
@@ -398,13 +399,13 @@ function scaffoldSvelte(array $screen, string $bladeBody, array $todos, array $c
     $scriptImports[] = "import AppLayout from '@/layouts/AppLayout.svelte';";
     $scriptImports[] = "import { Link, router, useForm } from '@inertiajs/svelte';";
     if ($lucide) {
-        $scriptImports[] = "import { ".implode(', ', $lucide)." } from '{$lucidePkg}';";
+        $scriptImports[] = 'import { '.implode(', ', $lucide)." } from '{$lucidePkg}';";
     }
     foreach ($components as $module => $names) {
         if ($module === '@inertiajs') {
             continue;
         }
-        $scriptImports[] = "import { ".implode(', ', $names)." } from '\$lib/components/ui/{$module}';";
+        $scriptImports[] = 'import { '.implode(', ', $names)." } from '\$lib/components/ui/{$module}';";
     }
 
     $todoBlock = $todos
@@ -463,7 +464,7 @@ function writeSharedBackend(string $root, array $screens): array
     @mkdir($controllersDir, 0777, true);
     @mkdir($routesDir, 0777, true);
 
-    $routeLines = ["<?php", "", "use Illuminate\\Support\\Facades\\Route;", ""];
+    $routeLines = ['<?php', '', 'use Illuminate\\Support\\Facades\\Route;', ''];
 
     // Group screens by controller-ish bucket from their path.
     $buckets = [];
@@ -502,16 +503,16 @@ function writeSharedBackend(string $root, array $screens): array
             $methods[$method] = $page;
         }
 
-        $body = ["<?php", "", "namespace App\\Http\\Controllers\\Port;", "", "use Inertia\\Inertia;", "", "class {$controller} extends \\App\\Http\\Controllers\\Controller", "{"];
+        $body = ['<?php', '', 'namespace App\\Http\\Controllers\\Port;', '', 'use Inertia\\Inertia;', '', "class {$controller} extends \\App\\Http\\Controllers\\Controller", '{'];
         foreach ($methods as $method => $page) {
             $body[] = "    public function {$method}()";
-            $body[] = "    {";
-            $body[] = "        // TODO: pass real props; Livewire component state must move here.";
+            $body[] = '    {';
+            $body[] = '        // TODO: pass real props; Livewire component state must move here.';
             $body[] = "        return Inertia::render('{$page}', []);";
-            $body[] = "    }";
-            $body[] = "";
+            $body[] = '    }';
+            $body[] = '';
         }
-        $body[] = "}";
+        $body[] = '}';
         file_put_contents("{$controllersDir}/{$controller}.php", implode("\n", $body)."\n");
         $written[] = "stubs/port/shared/app/Http/Controllers/Port/{$controller}.php";
 
@@ -519,7 +520,7 @@ function writeSharedBackend(string $root, array $screens): array
             $uri = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $page));
             $routeLines[] = "Route::inertia('/port/{$uri}', '{$page}')->name('port.{$bucket}.{$method}'); // or Route::get(..., [{$controller}::class, '{$method}'])";
         }
-        $routeLines[] = "";
+        $routeLines[] = '';
     }
 
     file_put_contents("{$routesDir}/port.php", implode("\n", $routeLines)."\n");

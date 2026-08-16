@@ -26,9 +26,9 @@ class UsersController
     {
         $validated = $request->validate([
             // ported from Livewire $this->validate()
-            
+
             'bulkRole' => ['required', 'exists:roles,name'],
-        
+
         ]);
 
         // TODO: port the component's save/action methods here.

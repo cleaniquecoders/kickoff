@@ -26,10 +26,10 @@ class RoleFormController
     {
         $validated = $request->validate([
             // ported from Livewire $this->validate()
-            
+
             'displayName' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
-        
+
         ]);
 
         // TODO: port the component's save/action methods here.

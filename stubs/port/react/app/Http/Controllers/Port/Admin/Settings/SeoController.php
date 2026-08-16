@@ -26,7 +26,7 @@ class SeoController
     {
         $validated = $request->validate([
             // ported from Livewire $this->validate()
-            
+
             'metaTitle' => ['nullable', 'string', 'max:255'],
             'metaDescription' => ['nullable', 'string', 'max:500'],
             'metaKeywords' => ['nullable', 'string', 'max:255'],
@@ -57,7 +57,7 @@ class SeoController
             'organizationName' => 'organization name',
             'organizationLogo' => 'organization logo URL',
             'organizationSameAs' => 'social profile URLs',
-        
+
         ]);
 
         // TODO: port the component's save/action methods here.

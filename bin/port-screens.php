@@ -10,7 +10,6 @@
  *
  * Standalone: no framework boot, no composer autoload.
  */
-
 $root = dirname(__DIR__);
 $manifestFile = $root.'/stubs/manifest/screens.json';
 $outDir = $root.'/stubs/port/react';
@@ -117,18 +116,21 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
         // --- Blade comments -> JSX comments
         if (preg_match('/^\{\{--(.*)--\}\}$/', $line, $m)) {
             $out[] = $ind().'{/*'.trim($m[1]).' */}';
+
             continue;
         }
 
         // --- HTML comments -> JSX comments (not TODOs)
         if (preg_match('/^<!--(.*)-->$/', $line, $m)) {
             $out[] = $ind().'{/*'.trim($m[1]).' */}';
+
             continue;
         }
 
         // --- @php blocks
         if (str_starts_with($line, '@php')) {
             $out[] = $ind().$reportTodo('blade', '@php block');
+
             continue;
         }
 
@@ -136,10 +138,12 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
         //     emit TODO except for the common "@if (x) ... @endif" one-liner guard.
         if (preg_match('/^@if\s*\((.+)\)$/', $line, $m)) {
             $out[] = $ind().$reportTodo('blade', '@if('.trim($m[1]).')');
+
             continue;
         }
         if (preg_match('/^@(elseif|else|endif|endunless|unless|endforelse|empty|endforeach|endcan|enderror|can|auth|guest|csrf|method|error|session|foreach|forelse)\b.*$/', $line, $m)) {
             $out[] = $ind().$reportTodo('blade', '@'.$m[1]);
+
             continue;
         }
 
@@ -183,6 +187,7 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
         // --- <x-*> custom blade components -> TODO
         if (preg_match('/^<x-([\w.-]+)/', $line, $m)) {
             $out[] = $ind().$reportTodo('blade', '<x-'.$m[1].'>');
+
             // keep translating inner lines naturally; closing tag skipped below
             continue;
         }
@@ -193,6 +198,7 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
         // --- @livewire / <livewire:..> embeds -> TODO
         if (preg_match('/^<livewire:([\w.-]+)/', $line, $m)) {
             $out[] = $ind().$reportTodo('blade', '<livewire:'.$m[1].'>');
+
             continue;
         }
 
@@ -207,6 +213,7 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
             $pendingTag = null;
         } elseif (preg_match('/^<flux:[\w.-]+/', $line) && ! preg_match('/\/?>\s*$/', $line)) {
             $pendingTag = $line;
+
             continue;
         }
 
@@ -264,8 +271,8 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
                     $method = $cm[1];
                     $arg = isset($cm[2]) ? trim($cm[2]) : null;
                     $call = $arg !== null && $arg !== ''
-                        ? "handle".ucfirst($method)."(".$arg.")"
-                        : "handle".ucfirst($method)."()";
+                        ? 'handle'.ucfirst($method).'('.$arg.')'
+                        : 'handle'.ucfirst($method).'()';
                     if ($confirm) {
                         return ' onClick={() => confirmAction(() => '.$call.', '.var_export(trim($confirm), true).')}';
                     }
@@ -534,6 +541,7 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
                     }
                     break;
             }
+
             continue;
         }
 
@@ -570,6 +578,7 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
                 $indent = max(0, $indent - 1);
                 $out[] = $ind().$c;
             }
+
             continue;
         }
 
@@ -578,6 +587,7 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
             $usesForm = true;
             $out[] = $ind().'<form onSubmit={handle'.ucfirst($m[2]).'}>';
             $indent++;
+
             continue;
         }
 
@@ -654,6 +664,7 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
             $html = preg_replace('/^class="/', 'className="', $html);
             $html = preg_replace('/\bfor="/', 'htmlFor="', $html);
             $out[] = $ind().$html;
+
             continue;
         }
 
@@ -663,12 +674,14 @@ $translateBlade = function (string $blade, array $screen, ?array $lw) use (&$rep
             $html = preg_replace('/^class="/', 'className="', $html);
             $html = str_replace(' class="', ' className="', $html);
             $out[] = $ind().$html;
+
             continue;
         }
 
         // --- @foreach/@forelse handled above; plain text lines
         if (! str_starts_with($line, '<') && ! str_starts_with($line, '@')) {
             $out[] = $ind().$interpolate($line);
+
             continue;
         }
 
@@ -714,18 +727,18 @@ $emitPage = function (array $screen, ?array $lw, string $jsx, array $used, array
     $imports = [];
     $inertiaImports = array_values(array_unique(array_merge(['Head'], $used['inertia'])));
     sort($inertiaImports);
-    $imports[] = "import { ".implode(', ', $inertiaImports)." } from '@inertiajs/react';";
+    $imports[] = 'import { '.implode(', ', $inertiaImports)." } from '@inertiajs/react';";
     if ($used['usesForm']) {
         $imports[] = "import { useForm } from '@inertiajs/react';";
     }
     $imports[] = "import AppLayout from '@/layouts/app-layout';";
     if ($used['ui']) {
         sort($used['ui']);
-        $imports[] = "import { ".implode(', ', $used['ui'])." } from '@/components/ui/*'; // split per shadcn convention";
+        $imports[] = 'import { '.implode(', ', $used['ui'])." } from '@/components/ui/*'; // split per shadcn convention";
     }
     if ($used['lucide']) {
         sort($used['lucide']);
-        $imports[] = "import { ".implode(', ', $used['lucide'])." } from 'lucide-react';";
+        $imports[] = 'import { '.implode(', ', $used['lucide'])." } from 'lucide-react';";
     }
     $imports[] = "import { useState } from 'react';";
 
@@ -740,7 +753,7 @@ $emitPage = function (array $screen, ?array $lw, string $jsx, array $used, array
     $stateHooks = [];
     foreach ($stateProps as $p) {
         $camel = lcfirst($p);
-        $stateHooks[] = '    const ['.$camel.', set'.ucfirst($camel)."] = useState<any>("
+        $stateHooks[] = '    const ['.$camel.', set'.ucfirst($camel).'] = useState<any>('
             .'props.'.$camel.');';
     }
 
@@ -762,7 +775,7 @@ TS;
     }
     // confirmAction helper if wire:confirm used anywhere
     if (str_contains($jsx, 'confirmAction(')) {
-        $handlers[] = <<<TS
+        $handlers[] = <<<'TS'
     function confirmAction(fn: () => void, message: string) {
         // TODO: replace with AlertDialog per shadcn conventions
         if (window.confirm(message)) fn();
@@ -798,7 +811,7 @@ TSX;
 
 $studly = fn (string $seg): string => str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $seg)));
 
-$controllerFor = function (string $fqcn, array $lw) use ($studly): array {
+$controllerFor = function (string $fqcn, array $lw): array {
     // App\Livewire\Security\Users\Index -> Security\UsersController, page path security/users/index
     $rel = substr($fqcn, strlen('App\\Livewire\\'));
     $parts = explode('\\', $rel);
@@ -1100,6 +1113,6 @@ fwrite(STDOUT, sprintf(
     $stats['controllers']
 ));
 fwrite(STDOUT, sprintf("TODO placeholders: %d\n", $stats['todos']));
-fwrite(STDOUT, "Unmapped flux tags: ".($unmappedFlux ? implode(', ', $unmappedFlux) : '(none)')."\n");
-fwrite(STDOUT, "Unmapped wire directives: ".($unmappedWire ? implode(', ', $unmappedWire) : '(none)')."\n");
-fwrite(STDOUT, "Unmapped blade constructs: ".($unmappedBlade ? implode(', ', $unmappedBlade) : '(none)')."\n");
+fwrite(STDOUT, 'Unmapped flux tags: '.($unmappedFlux ? implode(', ', $unmappedFlux) : '(none)')."\n");
+fwrite(STDOUT, 'Unmapped wire directives: '.($unmappedWire ? implode(', ', $unmappedWire) : '(none)')."\n");
+fwrite(STDOUT, 'Unmapped blade constructs: '.($unmappedBlade ? implode(', ', $unmappedBlade) : '(none)')."\n");

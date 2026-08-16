@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Port;
 
+use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
-class AdminController extends \App\Http\Controllers\Controller
+class AdminController extends Controller
 {
     public function index()
     {
@@ -65,5 +66,4 @@ class AdminController extends \App\Http\Controllers\Controller
         // TODO: pass real props; Livewire component state must move here.
         return Inertia::render('admin/settings/Show', []);
     }
-
 }

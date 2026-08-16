@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Port;
 
+use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
-class PagesController extends \App\Http\Controllers\Controller
+class PagesController extends Controller
 {
     public function changelog()
     {
@@ -23,5 +24,4 @@ class PagesController extends \App\Http\Controllers\Controller
         // TODO: pass real props; Livewire component state must move here.
         return Inertia::render('pages/Support', []);
     }
-
 }

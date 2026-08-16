@@ -26,7 +26,7 @@ class McpTokensController
     {
         $validated = $request->validate([
             // ported from Livewire $this->validate()
-            'tokenName' => ['required', 'string', 'max:255']
+            'tokenName' => ['required', 'string', 'max:255'],
         ]);
 
         // TODO: port the component's save/action methods here.

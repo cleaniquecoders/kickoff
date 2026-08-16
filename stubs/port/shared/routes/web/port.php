@@ -50,4 +50,3 @@ Route::inertia('/port/pages/-documentation', 'pages/Documentation')->name('port.
 Route::inertia('/port/pages/-support', 'pages/Support')->name('port.pages.support'); // or Route::get(..., [PagesController::class, 'support'])
 
 Route::inertia('/port/welcome', 'Welcome')->name('port.welcome.welcome'); // or Route::get(..., [WelcomeController::class, 'welcome'])
-

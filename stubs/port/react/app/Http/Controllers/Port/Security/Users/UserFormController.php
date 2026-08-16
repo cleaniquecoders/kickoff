@@ -26,7 +26,7 @@ class UserFormController
     {
         $validated = $request->validate([
             // ported from Livewire $this->validate()
-            
+
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required', 'string', 'email', 'max:255',
@@ -34,7 +34,7 @@ class UserFormController
             ],
             'roles' => ['array'],
             'roles.*' => [Rule::in($this->assignableRoles->pluck('name'))],
-        
+
         ]);
 
         // TODO: port the component's save/action methods here.

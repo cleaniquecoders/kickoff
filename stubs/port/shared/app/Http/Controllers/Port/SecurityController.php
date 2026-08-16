@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Port;
 
+use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
-class SecurityController extends \App\Http\Controllers\Controller
+class SecurityController extends Controller
 {
     public function auditTrailIndex()
     {
@@ -47,5 +48,4 @@ class SecurityController extends \App\Http\Controllers\Controller
         // TODO: pass real props; Livewire component state must move here.
         return Inertia::render('security/auditTrail/Show', []);
     }
-
 }
