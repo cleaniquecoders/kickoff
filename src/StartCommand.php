@@ -492,7 +492,11 @@ class StartCommand extends Command
             $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $envExampleFile);
             $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $envExampleFile);
 
-            copy($envExampleFile, $this->getProjectPath().'/.env');
+            // Rerun-safe: never clobber an existing .env — a previous run may have
+            // already provisioned a DB / fallen back to SQLite.
+            if (! file_exists($this->getProjectPath().'/.env')) {
+                copy($envExampleFile, $this->getProjectPath().'/.env');
+            }
         }, $output, $verbose);
     }
 
@@ -796,19 +800,45 @@ class StartCommand extends Command
     private function runTasks(OutputInterface $output, bool $verbose)
     {
         step('Building application', function () use ($verbose) {
-            runCommand('bin/install', $verbose);
-            runCommand('npm run build', $verbose);
+            // bin/install is a bash script; on Windows invoke it through Git Bash when available.
+            if (self::isWindows()) {
+                $gitBash = trim((string) shell_exec('where git 2>NUL'));
+                $gitBash = $gitBash ? dirname(dirname($gitBash)).'\bin\bash.exe' : '';
+                if ($gitBash !== '' && is_file($gitBash)) {
+                    runCommand('"'.$gitBash.'" -c "cd '.escapeshellarg(str_replace(DIRECTORY_SEPARATOR, '/', $this->getProjectPath())).' && bash bin/install"', $verbose);
+                } else {
+                    $output->writeln('<comment>⚠️  Git Bash not found — skipping bin/install. Run it manually (bash bin/install) to finish DB setup.</comment>');
+                }
+            } else {
+                runCommand('bin/install', $verbose);
+            }
+            runCommand('npm run build --prefix '.escapeshellarg($this->getProjectPath()), $verbose);
 
             // Force array-backed cache/session for bootstrap artisan calls so they don't
             // depend on Redis being up with the matching REDIS_PASSWORD. Spatie Laravel
             // Data's structure cache resolves CACHE_STORE → CACHE_DRIVER=redis from the
             // stub .env and would otherwise try to authenticate against local Redis.
             $this->withSafeBootstrapEnv(function () use ($verbose) {
-                runCommand('php artisan key:generate', $verbose);
-                runCommand('php artisan make:notifications-table', $verbose);
-                runCommand('php artisan operations:install', $verbose);
-                runCommand('php artisan mcp-kit:install --no-interaction', $verbose);
-                runCommand('php artisan reload:db', $verbose);
+                $artisanPath = escapeshellarg($this->getProjectPath().DIRECTORY_SEPARATOR.'artisan');
+                // Run artisan from the project dir so relative paths in .env
+                // (DB_DATABASE=database/database.sqlite) resolve correctly.
+                $cwd = escapeshellarg(str_replace(DIRECTORY_SEPARATOR, '/', $this->getProjectPath()));
+                $runInProject = fn (string $cmd) => runCommand(
+                    self::isWindows()
+                        ? 'pushd '.$cwd.' && php artisan '.$cmd.' & popd'
+                        : 'cd '.$cwd.' && php artisan '.$cmd,
+                    $verbose
+                );
+                runCommand('php '.$artisanPath.' key:generate --force', $verbose);
+                // Rerun-safe: skip when a notifications migration already exists.
+                $migrationsDir = $this->getProjectPath().'/database/migrations';
+                $hasNotifications = is_dir($migrationsDir) && glob($migrationsDir.'/*notifications*') !== [];
+                if (! $hasNotifications) {
+                    runCommand('php '.$artisanPath.' make:notifications-table', $verbose);
+                }
+                runCommand('php '.$artisanPath.' operations:install', $verbose);
+                runCommand('php '.$artisanPath.' mcp-kit:install --no-interaction', $verbose);
+                $runInProject('reload:db');
             });
         }, $output, $verbose);
     }
