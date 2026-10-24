@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    // Listeners are registered explicitly in App\Providers\EventServiceProvider::$listen.
+    // Discovery must be switched off HERE: the framework's own event provider scans
+    // app/Listeners regardless of shouldDiscoverEvents() on ours, so every listener
+    // would otherwise be registered twice (and every listener-sent email go out twice).
+    ->withEvents(discover: false)
     ->withMiddleware(function (Middleware $middleware) {
         // Trusted proxies come from config/trustedproxy.php (TRUSTED_PROXIES),
         // read per request by the framework's TrustProxies middleware. Do not call

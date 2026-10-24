@@ -1,9 +1,11 @@
-<x-layouts.auth>
+<x-layouts::auth :title="__('Register')">
     <div class="flex flex-col gap-6">
         <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
 
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
+
+        @include('partials.sso')
 
         <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
             @csrf
@@ -11,6 +13,7 @@
             <flux:input
                 name="name"
                 :label="__('Name')"
+                :value="old('name')"
                 type="text"
                 required
                 autofocus
@@ -22,6 +25,7 @@
             <flux:input
                 name="email"
                 :label="__('Email address')"
+                :value="old('email')"
                 type="email"
                 required
                 autocomplete="email"
@@ -36,6 +40,7 @@
                 required
                 autocomplete="new-password"
                 :placeholder="__('Password')"
+                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                 viewable
             />
 
@@ -47,6 +52,7 @@
                 required
                 autocomplete="new-password"
                 :placeholder="__('Confirm password')"
+                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                 viewable
             />
 
@@ -62,4 +68,4 @@
             <flux:link :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:link>
         </div>
     </div>
-</x-layouts.auth>
+</x-layouts::auth>

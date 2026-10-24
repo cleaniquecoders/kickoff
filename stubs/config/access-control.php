@@ -22,6 +22,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Role
+    |--------------------------------------------------------------------------
+    | Given to self-registered users (App\Listeners\AssignDefaultRole on
+    | Registered). Admin-created and SSO-created users are assigned the same
+    | role by their own paths — keep config-sso.registration.default_role equal.
+    */
+    'default_role' => 'user',
+
+    /*
+    |--------------------------------------------------------------------------
     | Permissions
     |--------------------------------------------------------------------------
     | Using grouped structure with action.target format and hyphens for multi-words.

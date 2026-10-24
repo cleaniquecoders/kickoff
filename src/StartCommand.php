@@ -127,7 +127,7 @@ class StartCommand extends Command
         $output->writeln('   • <comment>MINIO_ROOT_USER</comment> / <comment>MINIO_ROOT_PASSWORD</comment> — MinIO S3 credentials');
         $output->writeln('');
         $output->writeln('<info>2. Cache / session / queue drivers</info> — defaults assume Redis:');
-        $output->writeln('   • <comment>CACHE_DRIVER=redis</comment>   • <comment>SESSION_DRIVER=redis</comment>   • <comment>QUEUE_CONNECTION=sync</comment>');
+        $output->writeln('   • <comment>CACHE_STORE=redis</comment>   • <comment>SESSION_DRIVER=redis</comment>   • <comment>QUEUE_CONNECTION=sync</comment>');
         $output->writeln('   Switch any to <comment>file</comment> / <comment>database</comment> if you are not running Redis locally.');
         $output->writeln('');
         $output->writeln('<info>3. Mail</info> — defaults to Mailpit on <comment>localhost:1025</comment>. Update <comment>MAIL_*</comment> for SMTP/SES/etc.');

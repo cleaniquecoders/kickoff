@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Listeners\AssignDefaultRole;
 use App\Listeners\LogoutFromOtherDevices;
 use Illuminate\Auth\Events\Authenticated;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -15,7 +17,9 @@ class EventServiceProvider extends ServiceProvider
      *
      * Note: Email verification listener is automatically registered by Laravel's
      * base EventServiceProvider via configureEmailVerification(). Do not add it
-     * here to avoid duplicate emails.
+     * here to avoid duplicate emails. Event discovery is disabled in
+     * bootstrap/app.php (withEvents(discover: false)), so this map is the
+     * only place a listener is registered.
      *
      * @var array<class-string, array<int, class-string>>
      */
@@ -23,20 +27,15 @@ class EventServiceProvider extends ServiceProvider
         Authenticated::class => [
             LogoutFromOtherDevices::class,
         ],
+        Registered::class => [
+            AssignDefaultRole::class,
+        ],
     ];
 
     /**
      * Register any events for your application.
      */
     public function boot(): void {}
-
-    /**
-     * Determine if events and listeners should be automatically discovered.
-     */
-    public function shouldDiscoverEvents(): bool
-    {
-        return false;
-    }
 
     /**
      * Configure the proper event listeners for email verification.

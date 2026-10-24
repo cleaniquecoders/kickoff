@@ -78,7 +78,7 @@ DB_USERNAME=your_user
 DB_PASSWORD=secret
 
 # Cache & Session
-CACHE_DRIVER=redis
+CACHE_STORE=redis
 SESSION_DRIVER=redis
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379

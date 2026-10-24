@@ -247,7 +247,7 @@ already enforce `app/Contracts/` contains only interfaces and `app/Concerns/` co
 ```text
 app/
 ├── Actions/        # Single-purpose action classes (Builder/Menu already included)
-├── Concerns/       # Traits (InteractsWithLivewireForm, HasMedia, etc.)
+├── Concerns/       # Traits (EncryptsPii, RedactsPiiInAudit, InteractsWithExceptions, etc.)
 ├── Console/        # Artisan commands (24+ included: seeders, cache, code generation)
 ├── Contracts/      # Interfaces (HeadingMenuBuilder, AuthorizedMenuBuilder)
 ├── Enums/          # Status/type enums
@@ -665,7 +665,7 @@ Mail::send('emails.order', $data, function ($message) { ... });
     <flux:menu>
         <flux:menu.item icon="eye" href="{{ route('products.show', $product) }}">View</flux:menu.item>
         <flux:menu.item icon="pencil" href="{{ route('products.edit', $product) }}">Edit</flux:menu.item>
-        <flux:menu.item icon="trash-2" variant="danger" wire:click="delete({{ $product->id }})">Delete</flux:menu.item>
+        <flux:menu.item icon="trash-2" variant="danger" wire:click="delete('{{ $product->uuid }}')">Delete</flux:menu.item>
     </flux:menu>
 </flux:dropdown>
 ```
@@ -880,6 +880,19 @@ This project includes SOC 2-aligned security controls. See `docs/05-security/soc
 > whoever pre-registered the address keeps a way in. Keep that override when touching SSO, and
 > never trust an email match onto an unverified account anywhere else (invites, imports, APIs).
 
+> **Gotcha:** **CSP failures are silent and production-only.** `SecurityHeaders` turns CSP on in
+> production and composes the policy from `config('security.headers.csp_policy')` plus the
+> third-party origins Kickoff's own views load (Bunny fonts, jsDelivr for media-manager, GTM/GA
+> once an ID is set, the g8desk origin once its widget is on). A view that loads anything else
+> from another origin is blocked with nothing but a browser-console error — add the origin to
+> `SecurityHeaders::thirdPartySources()` gated on the same setting that renders it.
+> `ContentSecurityPolicyTest` fails on an unknown remote `src`/`href` in any view.
+
+> **Gotcha:** **Listeners are registered once, in `EventServiceProvider::$listen`.** Event
+> discovery is off in `bootstrap/app.php` (`withEvents(discover: false)`); overriding
+> `shouldDiscoverEvents()` on the app provider does **not** stop the framework's own provider from
+> scanning `app/Listeners`, which registered every listener twice. Keep the `withEvents` line.
+
 > **Gotcha:** **Docker services bind to `127.0.0.1`.** The dev credentials are defaults
 > (`root`, `minioadmin`, `masterKey`, Redis without a password); published on `0.0.0.0` they
 > are reachable by anyone on the same Wi-Fi. Keep the `127.0.0.1:` prefix on every port.
@@ -925,15 +938,21 @@ php artisan operations:status            # Show ran/pending operations
 > **Gotcha:** CSRF middleware was renamed from `VerifyCsrfToken` to `PreventRequestForgery` in
 > Laravel 13. If you customize CSRF behavior, use the new class name.
 
-> **Gotcha:** Cache serialization defaults to `serializable_classes: false` in Laravel 13.
-> If you need to cache PHP objects (not just strings/arrays), explicitly set
-> `'serializable_classes' => true` in `config/cache.php`.
+> **Gotcha:** Cache serialization defaults to `serializable_classes: false` in Laravel 13 —
+> **keep it off and cache arrays, not objects.** A cached object outlives the deploy that
+> wrote it: after a release renames or reshapes the class it unserializes as
+> `__PHP_Incomplete_Class` (or silently stale), and the bug only appears in production, only
+> until the TTL expires. Cache `$model->only([...])` / `toArray()` and rebuild on read; store an
+> enum by its `->value` and read it back with `tryFrom()` so an unknown value is `null`, not a crash.
 
 ### Livewire 4
 
-> **Gotcha:** Livewire 4 does not support the `rules()` method for dynamic validation.
-> Calling `$this->validate()` without rules throws `MissingRulesException`.
-> Always pass rules inline: `$this->validate($rules)`.
+> **Gotcha:** Pick **one** source of validation rules per component. Livewire 4 reads a
+> `rules()` method or `#[Validate]` attributes when `$this->validate()` is called with no
+> arguments, and throws `MissingRulesException` when neither exists. Passing an array —
+> `$this->validate($rules)` — validates **only** that array: every `#[Validate]` attribute on
+> the component is skipped, so a field you thought was validated is not. Kickoff components pass
+> rules inline; don't add `#[Validate]` to one of them.
 
 > **Gotcha:** `<script>` tags inside Livewire components don't re-execute on `wire:navigate`.
 > For Alpine.js components, use inline `x-data="{...}"` objects instead of `Alpine.data()`

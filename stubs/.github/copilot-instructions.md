@@ -1162,7 +1162,7 @@ DB_CONNECTION=mysql
 DB_DATABASE=your_database_name
 
 # Cache & Session
-CACHE_DRIVER=redis
+CACHE_STORE=redis
 SESSION_DRIVER=redis
 
 # Media

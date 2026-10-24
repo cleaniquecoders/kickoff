@@ -8,6 +8,7 @@ use App\Mail\DefaultMail;
 use App\Settings\GeneralSettings;
 use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -104,6 +105,11 @@ class Show extends Component
                 $settings->save();
             }
 
+            // Settings are overlaid onto config() once, at boot — and a queue worker boots
+            // once. Without a restart, queued mail keeps the old SMTP settings (and every
+            // queued job the old site name / timezone) until the next deploy.
+            Artisan::call('queue:restart');
+
             $this->dispatch('toast',
                 type: 'success',
                 message: ucfirst($this->section).' settings saved successfully!',
@@ -159,6 +165,10 @@ class Show extends Component
             'mail.from.address' => $email['from_address'],
             'mail.from.name' => $email['from_name'] ?? config('app.name'),
         ]);
+
+        // The mailer may already be resolved with the boot-time config; drop it so the
+        // test send really uses the values above.
+        Mail::purge();
 
         $appName = config('app.name');
 

@@ -8,6 +8,12 @@ use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
 
+/**
+ * Additive by design: safe to re-run on a live app (e.g. from a deploy operation after adding a
+ * permission to config). It creates missing roles/permissions and grants missing role_scope
+ * permissions, but never overwrites what an admin changed in the UI — no description/enabled
+ * reset, no syncPermissions() stripping grants an admin added.
+ */
 class AccessControlSeeder extends Seeder
 {
     /**
@@ -26,11 +32,10 @@ class AccessControlSeeder extends Seeder
     private function seedRoles(): void
     {
         foreach (config('access-control.roles') as $role => $description) {
-            Role::updateOrCreate(
-                ['name' => $role],
+            Role::firstOrCreate(
+                ['name' => $role, 'guard_name' => 'web'],
                 [
                     'display_name' => str($role)->headline()->toString(),
-                    'guard_name' => 'web',
                     'description' => $description,
                     'is_enabled' => true,
                 ]
@@ -48,7 +53,7 @@ class AccessControlSeeder extends Seeder
 
         foreach ($permissions as $module => $modulePermissions) {
             foreach ($modulePermissions as $permissionKey => $description) {
-                Permission::updateOrCreate(
+                Permission::firstOrCreate(
                     [
                         'name' => "{$module}.{$permissionKey}",
                         'guard_name' => 'web',
@@ -64,7 +69,8 @@ class AccessControlSeeder extends Seeder
     }
 
     /**
-     * Map permissions to roles based on role_scope.
+     * Grant role_scope permissions to roles. Additive: grants an admin added are kept, and a
+     * permission removed from role_scope is not revoked from live roles — revoke it explicitly.
      */
     private function mapPermissionsToRoles(): void
     {
@@ -79,7 +85,7 @@ class AccessControlSeeder extends Seeder
 
             // Superadmin (wildcard *)
             if ($scopes === '*') {
-                $role->syncPermissions(Permission::all());
+                $role->givePermissionTo(Permission::all());
 
                 continue;
             }
@@ -100,7 +106,7 @@ class AccessControlSeeder extends Seeder
                 }
             }
 
-            $role->syncPermissions($permissions);
+            $role->givePermissionTo($permissions);
         }
     }
 }
