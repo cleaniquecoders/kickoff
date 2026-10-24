@@ -382,6 +382,15 @@ class StartCommand extends Command
             $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $envExampleFile);
 
             copy($envExampleFile, $this->getProjectPath().'/.env');
+
+            // Pin the passkey user-handle secret now: left blank it derives from APP_KEY, and
+            // the first key rotation silently orphans every registered passkey.
+            $envFile = $this->getProjectPath().'/.env';
+            putFile($envFile, preg_replace(
+                '/^PASSKEYS_USER_HANDLE_SECRET=$/m',
+                'PASSKEYS_USER_HANDLE_SECRET='.bin2hex(random_bytes(32)),
+                file_get_contents($envFile)
+            ));
         }, $output, $verbose);
     }
 

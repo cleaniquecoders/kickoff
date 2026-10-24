@@ -23,6 +23,6 @@ class PrepareSeeder extends Seeder
         $user = User::create(config('seeder.users.superadmin'));
         $user->assignRole('superadmin');
         $user->assignRole('user');
-        $user->update(['email_verified_at' => now()]);
+        $user->markEmailAsVerified();
     }
 }

@@ -85,7 +85,7 @@ The Base model provides:
 
 ### Database Conventions
 
-- **Primary keys**: Auto-increment `id` for internal DB relations + `uuid` column for public-facing identifiers (`$table->id()` + `$table->uuid('uuid')->index()`)
+- **Primary keys**: Auto-increment `id` for internal DB relations + `uuid` column for public-facing identifiers (`$table->id()` + `$table->uuid('uuid')->unique()` — unique, not just indexed: it is a lookup key)
 - **Soft deletes**: Use for all user-facing models
 - **Column naming**: snake_case
 - **Credentials columns**: Always cast with `encrypted:array` (not manual `encrypt()`)
@@ -767,6 +767,11 @@ When asked to commit, push, tag, and release:
 4. **Push the tag** with `git push origin <tag>`
 5. **Create a GitHub release** using `gh release create <tag> --title "<tag>" --notes "<release notes>"` with a concise summary of changes. Always include a **Full Changelog** compare link at the bottom of the release notes: `**Full Changelog**: https://github.com/<owner>/<repo>/compare/<previous-tag>...<new-tag>`
 
+> **Gotcha:** **Pull, then prove the change is in the tree, then tag.** A tag is cut from
+> whatever `HEAD` is, not from what you meant to release — `git pull` first and `git log`/`grep`
+> for the change. A published tag (Packagist, a deploy pinned to it) is never moved or re-pushed:
+> ship a new patch version instead.
+
 ## Code Quality Checklist
 
 Before committing:
@@ -966,6 +971,11 @@ php artisan operations:status            # Show ran/pending operations
 
 ### Livewire 4
 
+> **Gotcha:** **`#[Url]` properties are user input.** Anyone can put `?perPage=1000000` or
+> `?sort=password` in the address bar, and Livewire hydrates it before your code runs. Clamp or
+> allow-list every `#[Url]` value where it is used (see `Admin\MailHistory\Index::PER_PAGE_OPTIONS`),
+> exactly as you would a request parameter.
+
 > **Gotcha:** Pick **one** source of validation rules per component. Livewire 4 reads a
 > `rules()` method or `#[Validate]` attributes when `$this->validate()` is called with no
 > arguments, and throws `MissingRulesException` when neither exists. Passing an array —
@@ -1072,6 +1082,26 @@ php artisan operations:status            # Show ran/pending operations
 > guard when touching middleware config.
 
 ### Horizon & Queues
+
+> **Gotcha:** **Long work leaves the request.** Anything slower than a few hundred ms (exports,
+> builds, third-party calls, bulk mail) runs in a job dispatched from the Livewire action — never
+> inline, or three impatient clicks are three concurrent runs. Set the queue in the job's
+> constructor (`$this->onQueue('reports')`), not at each dispatch site, and test with
+> `Queue::assertPushedOn('reports', …)` — `assertPushed` passes for a job on a queue Horizon never
+> works. Locally `QUEUE_CONNECTION=sync` runs jobs inline; production must use `redis`.
+
+> **Gotcha:** **A status only a job can advance needs a scheduled reconciler.** A dispatched job
+> can vanish without a trace (worker killed, `horizon:clear-all-queues`, Redis flushed), leaving a
+> row in `pending` forever. Pair every such state with a scheduled command in
+> `routes/console.php` that re-dispatches rows stuck past a threshold — and make the job
+> idempotent so a re-dispatch is safe.
+
+> **Gotcha:** **`config()` set at runtime does not reach what is already resolved.** Settings are
+> overlaid onto `config()` at boot; a queue worker boots once, and a resolved singleton (mailer,
+> encrypter, a client built in a service provider) keeps the values it was built with. That is
+> why saving settings runs `queue:restart` and the test mail calls `Mail::purge()`. Anything
+> registered with `singleton()` lives for the whole worker — never store per-request or per-user
+> state in one (use `scoped()`), especially under Octane.
 
 > **Gotcha:** When adding new queue names (e.g., `backups`, `webhooks`), they must be
 > registered in `config/horizon.php` supervisor queue list — otherwise Horizon won't pick
@@ -1185,6 +1215,12 @@ php artisan operations:status            # Show ran/pending operations
 
 ### Authorization & Tenancy
 
+> **Gotcha:** **An MCP tool is another UI, with no browser in front of it.** Every tool checks an
+> ability (pinned to the `web` guard — see below) before it does anything, resolves records by
+> `uuid` through a scoped finder, writes only through the same Action the UI uses, returns a
+> narrowed projection (never `toArray()` of a model), and refuses with no data at all. Write the
+> **deny-path test first**: a token whose user lacks the ability gets nothing.
+
 > **Gotcha:** **A capability permission is not a tenancy scope, and `App\Policies\*` does not
 > supply one either.** There are **no global scopes** in the baseline — `create()` on a policy is
 > a bare `$user->can('resource.create.item')` with no organisation check — so every list and
@@ -1211,6 +1247,28 @@ php artisan operations:status            # Show ran/pending operations
 > losing the evidence exactly when it matters.
 
 ### Database Portability
+
+> **Gotcha:** **Change schema expand → migrate → contract.** `bin/deploy`'s rollback restores
+> the previous *code*, never the schema. So a release adds (new column/table, nullable), a deploy
+> operation backfills, and only a **later** release drops or renames what the old code still
+> reads. A migration that drops a column in the same release as the code that stops using it
+> makes every rollback a second outage.
+
+> **Gotcha:** **Foreign keys hold the integer `id`; the `uuid` stops at the edge.** Forms and
+> URLs carry the uuid; resolve it to the model once, in the action that writes
+> (`Model::where('uuid', $uuid)->firstOrFail()` through a scoped finder), and store `$model->id`.
+> An unknown uuid is a validation error — never write `null` or create a row for it.
+
+> **Gotcha:** **Soft deletes and a unique index do not compose.** A soft-deleted user still owns
+> its `email` in the unique index, so re-creating the account fails with "already taken" and no
+> hint that a restorable account exists. Check `withTrashed()` before creating and offer a
+> restore. Do **not** "fix" it with a unique index on `(email, deleted_at)`: MySQL treats NULLs as
+> distinct, so that index stops enforcing uniqueness between live rows entirely.
+
+> **Gotcha:** **Raw SQL inside a package or helper must speak the connection's dialect.** Tests
+> run on SQLite, production on MySQL or PostgreSQL. Quote identifiers with
+> `DB::connection()->getQueryGrammar()->wrap('col')`, and give every driver its own arm in a
+> `match (DB::getDriverName())` — a `default` arm is not "MySQL", it is "untested".
 
 > **Gotcha:** **MySQL needs an index whose *leading* column backs each foreign key.** Dropping a
 > unique before creating its replacement fails with errno 1553 — while PostgreSQL and SQLite

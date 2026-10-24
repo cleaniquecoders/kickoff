@@ -65,6 +65,15 @@ only run through it:
 * * * * * cd /var/www/${PROJECT_NAME} && php artisan schedule:run >> /dev/null 2>&1
 ```
 
+## nginx and Security Headers
+
+The app already sends `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`,
+`Permissions-Policy`, HSTS (production) and the CSP (`App\Http\Middleware\SecurityHeaders`).
+Do not repeat them with `add_header` in the nginx site: `add_header` **appends**, so the browser
+receives two `X-Frame-Options` values — and a duplicated header is treated as invalid, which
+removes the protection instead of doubling it. (Also: an `add_header` inside a `location` block
+silently drops every `add_header` inherited from the `server` block.)
+
 ## Restoring a Backup
 
 `bin/backup-db` proves the archive is readable and non-empty, not that it restores. Rehearse a
