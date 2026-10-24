@@ -127,7 +127,7 @@ class StartCommand extends Command
         $output->writeln('   • <comment>MINIO_ROOT_USER</comment> / <comment>MINIO_ROOT_PASSWORD</comment> — MinIO S3 credentials');
         $output->writeln('');
         $output->writeln('<info>2. Cache / session / queue drivers</info> — defaults assume Redis:');
-        $output->writeln('   • <comment>CACHE_DRIVER=redis</comment>   • <comment>SESSION_DRIVER=redis</comment>   • <comment>QUEUE_CONNECTION=sync</comment>');
+        $output->writeln('   • <comment>CACHE_STORE=redis</comment>   • <comment>SESSION_DRIVER=redis</comment>   • <comment>QUEUE_CONNECTION=sync</comment>');
         $output->writeln('   Switch any to <comment>file</comment> / <comment>database</comment> if you are not running Redis locally.');
         $output->writeln('');
         $output->writeln('<info>3. Mail</info> — defaults to Mailpit on <comment>localhost:1025</comment>. Update <comment>MAIL_*</comment> for SMTP/SES/etc.');
@@ -267,6 +267,7 @@ class StartCommand extends Command
             $composerFile = $this->getProjectPath().'/composer.json';
             $composer = json_decode(file_get_contents($composerFile), true);
 
+            $composer['require']['php'] = '^8.5';
             $composer['autoload']['files'] = ['support/helpers.php'];
             $composer['config']['allow-plugins']['pestphp/pest-plugin'] = true;
 
@@ -277,6 +278,9 @@ class StartCommand extends Command
                 ],
                 'post-update-cmd' => [
                     '@php artisan vendor:publish --tag=laravel-assets --ansi --force',
+                    // Published Livewire JS must match the updated server package, or the
+                    // browser runs an old client against a new server and breaks quietly.
+                    '@php artisan vendor:publish --tag=livewire:assets --ansi --force',
                 ],
                 'post-root-package-install' => [
                     "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
@@ -352,18 +356,12 @@ class StartCommand extends Command
 
     private function setupProjectName(OutputInterface $output, bool $verbose)
     {
-        step('Update project name in bin/ directory', function () {
-            $binDir = $this->getProjectPath().'/bin';
-
-            foreach (glob($binDir.'/*') as $file) {
+        step('Replace project name and owner placeholders', function () {
+            foreach ($this->placeholderFiles() as $relative) {
+                $file = $this->getProjectPath().'/'.$relative;
                 $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
+                $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $file);
             }
-        }, $output, $verbose);
-
-        step('Update README', function () {
-            $file = $this->getProjectPath().'/README.md';
-            $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
-            $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $file);
         }, $output, $verbose);
 
         // .env.example placeholder substitution is handled in setupEnvironmentFile() so
@@ -384,6 +382,15 @@ class StartCommand extends Command
             $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $envExampleFile);
 
             copy($envExampleFile, $this->getProjectPath().'/.env');
+
+            // Pin the passkey user-handle secret now: left blank it derives from APP_KEY, and
+            // the first key rotation silently orphans every registered passkey.
+            $envFile = $this->getProjectPath().'/.env';
+            putFile($envFile, preg_replace(
+                '/^PASSKEYS_USER_HANDLE_SECRET=$/m',
+                'PASSKEYS_USER_HANDLE_SECRET='.bin2hex(random_bytes(32)),
+                file_get_contents($envFile)
+            ));
         }, $output, $verbose);
     }
 
@@ -409,6 +416,42 @@ class StartCommand extends Command
         $snake = preg_replace('/_+/', '_', $snake);
 
         return trim($snake, '_');
+    }
+
+    /**
+     * Stub files (relative paths) that carry a placeholder. Scanning the stubs rather than
+     * listing paths means a new file with ${PROJECT_NAME} cannot ship unreplaced — a hand
+     * list once missed .config/supervisord.ini. .claude/ is skipped (its skills document the
+     * placeholders); .env.example is handled by setupEnvironmentFile (snake-casing first).
+     *
+     * @return list<string>
+     */
+    public function placeholderFiles(): array
+    {
+        $stubs = realpath(__DIR__.'/../stubs');
+        $files = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($stubs, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $item) {
+            $relative = substr($item->getPathname(), strlen($stubs) + 1);
+
+            if (str_starts_with($relative, '.claude/') || $relative === '.env.example') {
+                continue;
+            }
+
+            $content = file_get_contents($item->getPathname());
+
+            if (str_contains($content, self::PLACEHOLDER_PROJECT_NAME) || str_contains($content, self::PLACEHOLDER_OWNER)) {
+                $files[] = $relative;
+            }
+        }
+
+        sort($files);
+
+        return $files;
     }
 
     private function updatePlaceholder($placeholder, $file)
@@ -514,6 +557,11 @@ class StartCommand extends Command
 
         if (! $skipNpm) {
             step('Install npm packages', function () use ($verbose) {
+                $packageFile = $this->getProjectPath().'/package.json';
+                $package = json_decode(file_get_contents($packageFile), true);
+                $package['engines']['node'] = '>=26';
+                putFile($packageFile, json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+
                 runCommand('npm install lodash axios tippy.js', $verbose);
             }, $output, $verbose);
         } else {

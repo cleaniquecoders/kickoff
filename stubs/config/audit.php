@@ -86,11 +86,21 @@ return [
     |--------------------------------------------------------------------------
     |
     | Have something you always want to exclude by default? - add it here.
-    | Note that this is overwritten (not merged) with local exclude
+    | Note that this is overwritten (not merged) with local exclude — a model
+    | that sets its own $auditExclude must repeat these.
+    |
+    | Credentials never belong in the audit trail: the audit-trail screen shows
+    | old/new values to admins, so an unexcluded password hash or 2FA secret is
+    | readable by anyone with audit access.
     |
     */
 
-    'exclude' => [],
+    'exclude' => [
+        'password',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+    ],
 
     /*
     |--------------------------------------------------------------------------

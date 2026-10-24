@@ -46,6 +46,12 @@ return [
     | expressions at runtime; it still locks down object-src, base-uri,
     | frame-ancestors and form-action.
     |
+    | SecurityHeaders appends the origins Kickoff's own views load (Bunny
+    | fonts always; Google Tag Manager/Analytics when an ID is set in SEO
+    | settings; the g8desk origin when its widget is enabled). Add any other
+    | third-party origin your views load to this policy — CSP failures only
+    | show in the browser console, and only in production.
+    |
     */
 
     'headers' => [

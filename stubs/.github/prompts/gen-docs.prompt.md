@@ -355,7 +355,7 @@ The {Feature Name} feature allows users to {description of what the feature does
 
 ## Prerequisites
 
-- **PHP**: 8.4 or higher
+- **PHP**: 8.5 or higher
 - **Node.js**: 18 or higher
 - **Composer**: Latest version
 - **Database**: MySQL 8.0 or PostgreSQL 13+

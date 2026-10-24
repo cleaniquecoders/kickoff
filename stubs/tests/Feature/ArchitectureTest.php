@@ -1,8 +1,8 @@
 <?php
 
-it('runs on PHP 8.4 or above')
+it('runs on PHP 8.5 or above')
     ->expect(phpversion())
-    ->toBeGreaterThanOrEqual('8.4.0');
+    ->toBeGreaterThanOrEqual('8.5.0');
 
 arch()
     ->expect(['dd', 'dump', 'ray'])
@@ -46,17 +46,15 @@ arch()
         'config',
     ]);
 
-arch()
+// toUse() matches class/function names, never strings like 'DB::table' — the old list of
+// 'DB::*' strings could not fail. Forbid the facade itself and allowlist deliberate users.
+arch('no raw database access outside the allowlist')
     ->expect('App')
     ->not
-    ->toUse([
-        'DB::raw',
-        'DB::select',
-        'DB::statement',
-        'DB::table',
-        'DB::insert',
-        'DB::update',
-        'DB::delete',
+    ->toUse('Illuminate\Support\Facades\DB')
+    ->ignoring([
+        // Bulk retention deletes across tables that have no Eloquent model (audits, telescope).
+        'App\Console\Commands\PurgeExpiredDataCommand',
     ]);
 
 arch()

@@ -215,11 +215,22 @@ class Index extends Component
     public function bulkDelete(): void
     {
         $deleted = 0;
-        $skipped = 0;
+        $users = User::whereIn('uuid', $this->selected)->get();
+        $skips = [
+            __('yourself') => 0,
+            __('not permitted') => 0,
+            __('no longer exist') => count($this->selected) - $users->count(),
+        ];
 
-        foreach (User::whereIn('uuid', $this->selected)->get() as $user) {
+        foreach ($users as $user) {
+            if ($user->is(auth()->user())) {
+                $skips[__('yourself')]++;
+
+                continue;
+            }
+
             if (auth()->user()->cannot('delete', $user)) {
-                $skipped++;
+                $skips[__('not permitted')]++;
 
                 continue;
             }
@@ -230,11 +241,7 @@ class Index extends Component
 
         $this->clearSelection();
 
-        $message = trans_choice(':count user deleted.|:count users deleted.', $deleted, ['count' => $deleted]);
-
-        if ($skipped > 0) {
-            $message .= ' '.__(':count skipped.', ['count' => $skipped]);
-        }
+        $message = trans_choice(':count user deleted.|:count users deleted.', $deleted, ['count' => $deleted]).$this->skipSummary($skips);
 
         $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'warning', message: $message);
     }
@@ -254,11 +261,23 @@ class Index extends Component
         }
 
         $assigned = 0;
-        $skipped = 0;
+        $users = User::with('roles')->whereIn('uuid', $this->selected)->get();
+        $skips = [
+            __('not permitted') => 0,
+            __('already had it') => 0,
+            __('no longer exist') => count($this->selected) - $users->count(),
+        ];
 
-        foreach (User::whereIn('uuid', $this->selected)->get() as $user) {
+        foreach ($users as $user) {
             if (auth()->user()->cannot('assignRoles', $user)) {
-                $skipped++;
+                $skips[__('not permitted')]++;
+
+                continue;
+            }
+
+            // Already holding the role is not an assignment — don't count it as one.
+            if ($user->hasRole($role)) {
+                $skips[__('already had it')]++;
 
                 continue;
             }
@@ -269,13 +288,24 @@ class Index extends Component
 
         $this->clearSelection();
 
-        $message = __('Role :role assigned to :count user(s).', ['role' => $role->display_name, 'count' => $assigned]);
-
-        if ($skipped > 0) {
-            $message .= ' '.__(':count skipped.', ['count' => $skipped]);
-        }
+        $message = __('Role :role assigned to :count user(s).', ['role' => $role->display_name, 'count' => $assigned]).$this->skipSummary($skips);
 
         $this->dispatch('toast', type: $assigned > 0 ? 'success' : 'warning', message: $message);
+    }
+
+    /**
+     * "3 skipped" tells the operator nothing; say why each one was skipped.
+     *
+     * @param  array<string, int>  $skips  reason => count
+     */
+    private function skipSummary(array $skips): string
+    {
+        $reasons = collect($skips)
+            ->filter()
+            ->map(fn (int $count, string $reason) => "{$count} {$reason}")
+            ->implode(', ');
+
+        return $reasons === '' ? '' : ' '.__('Skipped: :reasons.', ['reasons' => $reasons]);
     }
 
     #[On('user-saved')]

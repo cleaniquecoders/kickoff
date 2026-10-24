@@ -104,3 +104,11 @@ test('is windows matches php os family', function () {
 
     expect($method->invoke(null))->toBe(PHP_OS_FAMILY === 'Windows');
 });
+
+test('placeholder replacement covers every stub file that carries one', function () {
+    $files = (new StartCommand)->placeholderFiles();
+
+    expect($files)->toContain('.config/supervisord.ini', 'README.md', 'bin/deploy')
+        ->not->toContain('.env.example')
+        ->and(array_filter($files, fn ($f) => str_starts_with($f, '.claude/')))->toBeEmpty();
+});

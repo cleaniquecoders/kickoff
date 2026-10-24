@@ -12,6 +12,12 @@ use Spatie\Sitemap\Tags\Url;
  * static public/robots.txt during setup so this route is reachable.
  */
 Route::get('robots.txt', function () {
+    // Staging/UAT copies are public and get indexed, then outrank production with stale
+    // content. Anything that is not production (or a developer's machine) refuses all crawlers.
+    if (! app()->environment(['production', 'local', 'testing'])) {
+        return response("User-agent: *\nDisallow: /\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+    }
+
     $content = rtrim((string) config('seo.robots_txt'))
         ."\n\nSitemap: ".route('seo.sitemap')."\n";
 

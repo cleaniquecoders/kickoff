@@ -8,7 +8,7 @@ This document defines backend development standards, patterns, and best practice
 
 ## Core Principles
 
-1. **Type Safety First**: Use PHP 8.4+ features including typed properties, enums, and match expressions
+1. **Type Safety First**: Use PHP 8.5+ features including typed properties, enums, and match expressions
 2. **Convention Over Configuration**: Follow Laravel conventions and PSR-12 standards
 3. **Security by Default**: Always validate input, use policies, and audit sensitive operations
 4. **Consistency**: Use established patterns (Base model, Traitify contracts, enum structure)

@@ -116,3 +116,10 @@ test('schema helpers emit valid json-ld', function () {
     expect($decoded['itemListElement'])->toHaveCount(2);
     expect($decoded['itemListElement'][1])->not->toHaveKey('item');
 });
+
+test('robots.txt refuses all crawlers outside production', function () {
+    config(['seo.robots_txt' => "User-agent: *\nAllow: /"]);
+    app()->detectEnvironment(fn () => 'staging');
+
+    $this->get('/robots.txt')->assertOk()->assertSee('Disallow: /')->assertDontSee('Allow: /');
+});

@@ -8,7 +8,7 @@ This is a **Laravel application** bootstrapped with
 [CleaniqueCoders Kickoff](https://github.com/cleaniquecoders/kickoff), providing a standardized
 structure with pre-configured packages and conventions.
 
-- **Framework**: Laravel 13+ with PHP 8.4+
+- **Framework**: Laravel 13+ with PHP 8.5+ (Node.js 26+ for assets, pinned in `.nvmrc`)
 - **Frontend**: Livewire 4 + TailwindCSS v4 + Alpine.js
 - **Testing**: Pest PHP (not PHPUnit syntax)
 - **Database**: MySQL with dual-key pattern (auto-increment `id` for internal relations + `uuid` column for public-facing identifiers)
@@ -85,7 +85,7 @@ The Base model provides:
 
 ### Database Conventions
 
-- **Primary keys**: Auto-increment `id` for internal DB relations + `uuid` column for public-facing identifiers (`$table->id()` + `$table->uuid('uuid')->index()`)
+- **Primary keys**: Auto-increment `id` for internal DB relations + `uuid` column for public-facing identifiers (`$table->id()` + `$table->uuid('uuid')->unique()` — unique, not just indexed: it is a lookup key)
 - **Soft deletes**: Use for all user-facing models
 - **Column naming**: snake_case
 - **Credentials columns**: Always cast with `encrypted:array` (not manual `encrypt()`)
@@ -197,13 +197,17 @@ Operations live in `operations/`, run once per environment, and are tracked in t
 ```bash
 php artisan make:operation backfill_user_uuids   # scaffold
 php artisan operations                            # run pending
-php artisan operations --force                    # run in production (no prompt)
+php artisan operations --isolated --no-interaction  # production (there is NO --force option)
 php artisan operations:status                     # show ran/pending
 php artisan operations:rollback                   # rollback last batch
 php artisan operations:fresh                      # re-run all from scratch
 ```
 
-`bin/deploy` runs `php artisan operations --force` automatically after `migrate --force`.
+`bin/deploy` runs `php artisan operations --isolated --no-interaction` automatically after `migrate --force`.
+
+> **Gotcha:** **`operations` has no `--force` option.** `php artisan operations --force` fails
+> with *"The --force option does not exist"* — and an earlier `bin/deploy` without `set -e`
+> carried on past it, so deploy operations silently never ran. Use `--isolated --no-interaction`.
 
 | Use Case | Tool |
 |---|---|
@@ -243,7 +247,7 @@ already enforce `app/Contracts/` contains only interfaces and `app/Concerns/` co
 ```text
 app/
 ├── Actions/        # Single-purpose action classes (Builder/Menu already included)
-├── Concerns/       # Traits (InteractsWithLivewireForm, HasMedia, etc.)
+├── Concerns/       # Traits (EncryptsPii, RedactsPiiInAudit, InteractsWithExceptions, etc.)
 ├── Console/        # Artisan commands (24+ included: seeders, cache, code generation)
 ├── Contracts/      # Interfaces (HeadingMenuBuilder, AuthorizedMenuBuilder)
 ├── Enums/          # Status/type enums
@@ -294,6 +298,25 @@ tests in Pest syntax either way. CI always runs the full suite.
 > there is. A green suite is not evidence a migration is portable, and it is not evidence that
 > anything in Alpine or a Flux custom element works. See the Database Portability and Alpine.js
 > gotchas.
+
+### Guardrail tests (keep them green, extend their allowlists only with a reason)
+
+| Test | Fails when |
+|---|---|
+| `RouteSmokeTest` | any parameterless GET page returns 5xx for a superadmin over seeded rows |
+| `DeployParityTest` | `view:cache` / `route:cache` fail — i.e. `bin/deploy`'s `optimize` would fail on the server |
+| `FluxIconsExistTest` | a view, config or menu uses an icon that was never imported (`php artisan flux:icon …`) |
+| `ContentSecurityPolicyTest` | a view loads a remote asset the production CSP does not allow |
+| `ArchitectureTest` | the `DB` facade is used outside its allowlist, `env()` outside `config/`, etc. |
+
+> **Gotcha:** **A view no test renders can still be uncompilable.** Feature tests compile only
+> the views they open; a two-factor modal step once used an `<x-input-otp>` component that never
+> existed, and every suite stayed green while `php artisan optimize` — and therefore every deploy
+> — would have failed. `DeployParityTest` compiles all of them.
+
+> **Gotcha:** **Strict Eloquent is on outside production** (`AppServiceProvider`): lazy loading
+> and silently-discarded mass assignment throw. Eager-load (`with()`) what a loop touches, and
+> write non-fillable columns with `forceFill()` — never relax the check to make a test pass.
 
 Use Pest syntax (not PHPUnit):
 
@@ -661,7 +684,7 @@ Mail::send('emails.order', $data, function ($message) { ... });
     <flux:menu>
         <flux:menu.item icon="eye" href="{{ route('products.show', $product) }}">View</flux:menu.item>
         <flux:menu.item icon="pencil" href="{{ route('products.edit', $product) }}">Edit</flux:menu.item>
-        <flux:menu.item icon="trash-2" variant="danger" wire:click="delete({{ $product->id }})">Delete</flux:menu.item>
+        <flux:menu.item icon="trash-2" variant="danger" wire:click="delete('{{ $product->uuid }}')">Delete</flux:menu.item>
     </flux:menu>
 </flux:dropdown>
 ```
@@ -743,6 +766,11 @@ When asked to commit, push, tag, and release:
 3. **Tag** with the next version. Determine next version by checking the latest tag with `git tag --sort=-v:refname | head -1`
 4. **Push the tag** with `git push origin <tag>`
 5. **Create a GitHub release** using `gh release create <tag> --title "<tag>" --notes "<release notes>"` with a concise summary of changes. Always include a **Full Changelog** compare link at the bottom of the release notes: `**Full Changelog**: https://github.com/<owner>/<repo>/compare/<previous-tag>...<new-tag>`
+
+> **Gotcha:** **Pull, then prove the change is in the tree, then tag.** A tag is cut from
+> whatever `HEAD` is, not from what you meant to release — `git pull` first and `git log`/`grep`
+> for the change. A published tag (Packagist, a deploy pinned to it) is never moved or re-pushed:
+> ship a new patch version instead.
 
 ## Code Quality Checklist
 
@@ -857,6 +885,42 @@ This project includes SOC 2-aligned security controls. See `docs/05-security/soc
 - Schedule `data:purge` for retention compliance
 - Run `composer audit` regularly for dependency vulnerabilities
 
+> **Gotcha:** **Credentials never go in the audit trail.** The audit-trail screen shows every
+> old/new value to admins, so `config/audit.php` `exclude` lists `password`, `remember_token`
+> and the 2FA columns. That list is **replaced, not merged**, by a model's own
+> `$auditExclude` — a model that sets one must repeat them. Any new secret column (API keys,
+> webhook secrets) goes in `#[Hidden]` *and* the audit exclude list.
+
+> **Gotcha:** **Trusted proxies live in `config/trustedproxy.php`, never
+> `trustProxies(at: '*')`.** A wildcard in `bootstrap/app.php` applies in production too, so any
+> client can send `X-Forwarded-For` and walk past IP-keyed rate limits and poison audit /
+> auth-log IPs. Local/testing trust `*` (for `bin/share` tunnels); elsewhere the default is
+> loopback + private ranges. Behind Cloudflare or another public CDN, set `TRUSTED_PROXIES`.
+
+> **Gotcha:** **An unverified account is a claim, not an identity.** The SSO package links an
+> identity to any local account with the same email. `App\Http\Controllers\Auth\SsoController`
+> (wired via `config-sso.routes.controller`) revokes the password, remember token, 2FA, API
+> tokens and passkeys of an *unverified* match before signing the SSO owner in — otherwise
+> whoever pre-registered the address keeps a way in. Keep that override when touching SSO, and
+> never trust an email match onto an unverified account anywhere else (invites, imports, APIs).
+
+> **Gotcha:** **CSP failures are silent and production-only.** `SecurityHeaders` turns CSP on in
+> production and composes the policy from `config('security.headers.csp_policy')` plus the
+> third-party origins Kickoff's own views load (Bunny fonts, jsDelivr for media-manager, GTM/GA
+> once an ID is set, the g8desk origin once its widget is on). A view that loads anything else
+> from another origin is blocked with nothing but a browser-console error — add the origin to
+> `SecurityHeaders::thirdPartySources()` gated on the same setting that renders it.
+> `ContentSecurityPolicyTest` fails on an unknown remote `src`/`href` in any view.
+
+> **Gotcha:** **Listeners are registered once, in `EventServiceProvider::$listen`.** Event
+> discovery is off in `bootstrap/app.php` (`withEvents(discover: false)`); overriding
+> `shouldDiscoverEvents()` on the app provider does **not** stop the framework's own provider from
+> scanning `app/Listeners`, which registered every listener twice. Keep the `withEvents` line.
+
+> **Gotcha:** **Docker services bind to `127.0.0.1`.** The dev credentials are defaults
+> (`root`, `minioadmin`, `masterKey`, Redis without a password); published on `0.0.0.0` they
+> are reachable by anyone on the same Wi-Fi. Keep the `127.0.0.1:` prefix on every port.
+
 ## Quick Reference
 
 ```bash
@@ -898,15 +962,26 @@ php artisan operations:status            # Show ran/pending operations
 > **Gotcha:** CSRF middleware was renamed from `VerifyCsrfToken` to `PreventRequestForgery` in
 > Laravel 13. If you customize CSRF behavior, use the new class name.
 
-> **Gotcha:** Cache serialization defaults to `serializable_classes: false` in Laravel 13.
-> If you need to cache PHP objects (not just strings/arrays), explicitly set
-> `'serializable_classes' => true` in `config/cache.php`.
+> **Gotcha:** Cache serialization defaults to `serializable_classes: false` in Laravel 13 —
+> **keep it off and cache arrays, not objects.** A cached object outlives the deploy that
+> wrote it: after a release renames or reshapes the class it unserializes as
+> `__PHP_Incomplete_Class` (or silently stale), and the bug only appears in production, only
+> until the TTL expires. Cache `$model->only([...])` / `toArray()` and rebuild on read; store an
+> enum by its `->value` and read it back with `tryFrom()` so an unknown value is `null`, not a crash.
 
 ### Livewire 4
 
-> **Gotcha:** Livewire 4 does not support the `rules()` method for dynamic validation.
-> Calling `$this->validate()` without rules throws `MissingRulesException`.
-> Always pass rules inline: `$this->validate($rules)`.
+> **Gotcha:** **`#[Url]` properties are user input.** Anyone can put `?perPage=1000000` or
+> `?sort=password` in the address bar, and Livewire hydrates it before your code runs. Clamp or
+> allow-list every `#[Url]` value where it is used (see `Admin\MailHistory\Index::PER_PAGE_OPTIONS`),
+> exactly as you would a request parameter.
+
+> **Gotcha:** Pick **one** source of validation rules per component. Livewire 4 reads a
+> `rules()` method or `#[Validate]` attributes when `$this->validate()` is called with no
+> arguments, and throws `MissingRulesException` when neither exists. Passing an array —
+> `$this->validate($rules)` — validates **only** that array: every `#[Validate]` attribute on
+> the component is skipped, so a field you thought was validated is not. Kickoff components pass
+> rules inline; don't add `#[Validate]` to one of them.
 
 > **Gotcha:** `<script>` tags inside Livewire components don't re-execute on `wire:navigate`.
 > For Alpine.js components, use inline `x-data="{...}"` objects instead of `Alpine.data()`
@@ -1007,6 +1082,26 @@ php artisan operations:status            # Show ran/pending operations
 > guard when touching middleware config.
 
 ### Horizon & Queues
+
+> **Gotcha:** **Long work leaves the request.** Anything slower than a few hundred ms (exports,
+> builds, third-party calls, bulk mail) runs in a job dispatched from the Livewire action — never
+> inline, or three impatient clicks are three concurrent runs. Set the queue in the job's
+> constructor (`$this->onQueue('reports')`), not at each dispatch site, and test with
+> `Queue::assertPushedOn('reports', …)` — `assertPushed` passes for a job on a queue Horizon never
+> works. Locally `QUEUE_CONNECTION=sync` runs jobs inline; production must use `redis`.
+
+> **Gotcha:** **A status only a job can advance needs a scheduled reconciler.** A dispatched job
+> can vanish without a trace (worker killed, `horizon:clear-all-queues`, Redis flushed), leaving a
+> row in `pending` forever. Pair every such state with a scheduled command in
+> `routes/console.php` that re-dispatches rows stuck past a threshold — and make the job
+> idempotent so a re-dispatch is safe.
+
+> **Gotcha:** **`config()` set at runtime does not reach what is already resolved.** Settings are
+> overlaid onto `config()` at boot; a queue worker boots once, and a resolved singleton (mailer,
+> encrypter, a client built in a service provider) keeps the values it was built with. That is
+> why saving settings runs `queue:restart` and the test mail calls `Mail::purge()`. Anything
+> registered with `singleton()` lives for the whole worker — never store per-request or per-user
+> state in one (use `scoped()`), especially under Octane.
 
 > **Gotcha:** When adding new queue names (e.g., `backups`, `webhooks`), they must be
 > registered in `config/horizon.php` supervisor queue list — otherwise Horizon won't pick
@@ -1120,6 +1215,12 @@ php artisan operations:status            # Show ran/pending operations
 
 ### Authorization & Tenancy
 
+> **Gotcha:** **An MCP tool is another UI, with no browser in front of it.** Every tool checks an
+> ability (pinned to the `web` guard — see below) before it does anything, resolves records by
+> `uuid` through a scoped finder, writes only through the same Action the UI uses, returns a
+> narrowed projection (never `toArray()` of a model), and refuses with no data at all. Write the
+> **deny-path test first**: a token whose user lacks the ability gets nothing.
+
 > **Gotcha:** **A capability permission is not a tenancy scope, and `App\Policies\*` does not
 > supply one either.** There are **no global scopes** in the baseline — `create()` on a policy is
 > a bare `$user->can('resource.create.item')` with no organisation check — so every list and
@@ -1146,6 +1247,28 @@ php artisan operations:status            # Show ran/pending operations
 > losing the evidence exactly when it matters.
 
 ### Database Portability
+
+> **Gotcha:** **Change schema expand → migrate → contract.** `bin/deploy`'s rollback restores
+> the previous *code*, never the schema. So a release adds (new column/table, nullable), a deploy
+> operation backfills, and only a **later** release drops or renames what the old code still
+> reads. A migration that drops a column in the same release as the code that stops using it
+> makes every rollback a second outage.
+
+> **Gotcha:** **Foreign keys hold the integer `id`; the `uuid` stops at the edge.** Forms and
+> URLs carry the uuid; resolve it to the model once, in the action that writes
+> (`Model::where('uuid', $uuid)->firstOrFail()` through a scoped finder), and store `$model->id`.
+> An unknown uuid is a validation error — never write `null` or create a row for it.
+
+> **Gotcha:** **Soft deletes and a unique index do not compose.** A soft-deleted user still owns
+> its `email` in the unique index, so re-creating the account fails with "already taken" and no
+> hint that a restorable account exists. Check `withTrashed()` before creating and offer a
+> restore. Do **not** "fix" it with a unique index on `(email, deleted_at)`: MySQL treats NULLs as
+> distinct, so that index stops enforcing uniqueness between live rows entirely.
+
+> **Gotcha:** **Raw SQL inside a package or helper must speak the connection's dialect.** Tests
+> run on SQLite, production on MySQL or PostgreSQL. Quote identifiers with
+> `DB::connection()->getQueryGrammar()->wrap('col')`, and give every driver its own arm in a
+> `match (DB::getDriverName())` — a `default` arm is not "MySQL", it is "untested".
 
 > **Gotcha:** **MySQL needs an index whose *leading* column backs each foreign key.** Dropping a
 > unique before creating its replacement fails with errno 1553 — while PostgreSQL and SQLite

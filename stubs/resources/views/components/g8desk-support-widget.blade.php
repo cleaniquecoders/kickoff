@@ -21,7 +21,9 @@
     @php
         $u = auth()->user();
         $ref = (string) ($u->uuid ?? $u->getKey());
-        $name = (string) $u->name;
+        // '|' is the signing delimiter and g8desk rejects payloads containing it: a user named
+        // "Ali | Ops" would silently get no widget. The name is display-only, so neutralise it.
+        $name = str_replace('|', '/', (string) $u->name);
         $email = (string) $u->email;
         $exp = time() + 300;
         $sig = hash_hmac('sha256', $ref.'|'.$email.'|'.$name.'|'.$exp, $s->widget_secret);

@@ -22,9 +22,18 @@ mysqldump -h "${DB_HOST:-127.0.0.1}" -P "${DB_PORT:-3306}" \
   -u "${DB_USERNAME:-root}" -p"${DB_PASSWORD}" \
   --single-transaction --quick --lock-tables=false \
   "${DB_DATABASE:-${PROJECT_NAME}}" | gzip > "$backup_file"
+pipe_status=("${PIPESTATUS[@]}")
 
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
-  echo "ERROR: Database backup failed"
+# Exit codes alone are not proof: also require a readable, non-empty archive.
+# (A dump that succeeds against the wrong/empty database still reports 0.)
+if [ "${pipe_status[0]}" -ne 0 ] || [ "${pipe_status[1]}" -ne 0 ]; then
+  echo "ERROR: Database backup failed (mysqldump=${pipe_status[0]}, gzip=${pipe_status[1]})"
+  rm -f "$backup_file"
+  exit 1
+fi
+
+if ! gzip -t "$backup_file" || [ "$(gzip -dc "$backup_file" | head -c 1 | wc -c)" -eq 0 ]; then
+  echo "ERROR: Backup archive is corrupt or empty: $backup_file"
   rm -f "$backup_file"
   exit 1
 fi
@@ -40,7 +49,9 @@ if [ -n "$BACKUP_GPG_RECIPIENT" ]; then
     backup_file="${backup_file}.gpg"
     echo "Backup encrypted: $backup_file"
   else
-    echo "WARNING: GPG encryption failed, keeping unencrypted backup"
+    # Keep the plaintext (a backup beats none) but do not report success.
+    echo "ERROR: GPG encryption failed — unencrypted backup kept at $backup_file"
+    exit 1
   fi
 fi
 
@@ -51,4 +62,5 @@ find "$backup_dir" -maxdepth 1 -name "*.sql.gz*" -mtime +"$retention_days" -dele
 
 chown -R ${PROJECT_NAME}:${PROJECT_NAME} "$backup_dir"
 
-echo "Database backup completed successfully"
+echo "Database backup completed and verified: $backup_file"
+echo "A backup is only proven by a restore — rehearse one regularly (docs/04-deployment)."

@@ -1,32 +1,54 @@
 #!/usr/bin/env bash
+#
+# Git-based deploy. Every step is checked (set -e): a failing step stops the
+# deploy instead of the script reporting success over it.
+#
+# Once maintenance mode is on, a failure leaves it ON deliberately — a
+# half-applied release must not go live. Fix the cause, then `php artisan up`
+# (or re-run the deploy). A failed health check rolls the CODE back to the
+# previous commit; migrations are never reversed, so ship schema changes
+# expand → migrate → contract (see CLAUDE.md, Database Portability).
+#
+# Env overrides: APP_URL, WEB_USER (default nginx), PHP_FPM_SERVICE (reloaded
+# when set, e.g. php8.5-fpm), SKIP_BACKUP=1 (deploy without a pre-deploy dump).
+
+set -Eeuo pipefail
 
 BRANCH=""
 REMOTE="origin"
 PROJECT_PATH="/var/www/${PROJECT_NAME}"
-COMPOSER_ALLOW_SUPERUSER=1
 APP_URL="${APP_URL:-http://localhost}"
+WEB_USER="${WEB_USER:-nginx}"
+export COMPOSER_ALLOW_SUPERUSER=1
 
-# Function to display usage
 usage() {
     echo "Usage: $0 [-b branch] [-r remote] [-p project_path]"
     exit 1
 }
 
-# Function to get the latest tag
 get_latest_tag() {
-    git fetch --tags
-    LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-    echo $LATEST_TAG
+    git fetch --tags --quiet
+    git describe --tags "$(git rev-list --tags --max-count=1)"
 }
 
-# Parse command line arguments for branch, remote, and project path
-while getopts "b:r:p:" flag
-do
+build_assets() {
+    if [ ! -f package.json ]; then
+        return
+    fi
+    if ! command -v npm >/dev/null; then
+        echo "WARNING: npm not found — front-end assets were NOT rebuilt"
+        return
+    fi
+    npm ci --no-audit --no-fund
+    npm run build
+}
+
+while getopts "b:r:p:" flag; do
     case "${flag}" in
         b) BRANCH=${OPTARG};;
         r) REMOTE=${OPTARG};;
         p) PROJECT_PATH=${OPTARG};;
-        *) usage;;  # Handle invalid flag
+        *) usage;;
     esac
 done
 
@@ -35,85 +57,126 @@ if [ ! -d "$PROJECT_PATH" ]; then
     exit 1
 fi
 
-clear
+cd "$PROJECT_PATH"
+
+# Deploys usually run as root over a checkout owned by the web user, which git
+# refuses ("dubious ownership") — and an unchecked refusal deploys nothing.
+git config --global --get-all safe.directory | grep -qxF "$PROJECT_PATH" \
+    || git config --global --add safe.directory "$PROJECT_PATH"
 
 if [ -z "$BRANCH" ]; then
     echo "No branch provided, using the latest tag."
     BRANCH=$(get_latest_tag)
 fi
 
-echo "🚀 Deploying codes for branch/tag $BRANCH from remote $REMOTE at path $PROJECT_PATH"
+echo "🚀 Deploying $BRANCH from $REMOTE at $PROJECT_PATH"
 
-echo "Navigate to $PROJECT_PATH"
-cd "$PROJECT_PATH" || exit
-
-# Store current commit for rollback
 PREVIOUS_COMMIT=$(git rev-parse HEAD)
 echo "Current commit: $PREVIOUS_COMMIT (rollback target)"
 
-# Pre-deploy backup
-echo "Creating pre-deploy backup..."
-if [ -x "$PROJECT_PATH/bin/backup-db" ]; then
-    "$PROJECT_PATH/bin/backup-db" || echo "WARNING: Pre-deploy database backup failed"
+if [ "${SKIP_BACKUP:-0}" != "1" ] && [ -x bin/backup-db ]; then
+    echo "Creating pre-deploy backup..."
+    if ! bin/backup-db; then
+        echo "ERROR: pre-deploy database backup failed — nothing has been changed."
+        echo "Fix the backup, or re-run with SKIP_BACKUP=1 to deploy without one."
+        exit 1
+    fi
 fi
 
-# Enable maintenance mode
+IN_MAINTENANCE=false
+on_error() {
+    echo ""
+    echo "❌ Deploy failed at line $1: $2"
+    if $IN_MAINTENANCE; then
+        echo "The application is left in maintenance mode on purpose. Fix the cause, then:"
+        echo "  php artisan up                              # the release is fine"
+        echo "  git checkout $PREVIOUS_COMMIT && composer install --no-dev && php artisan up   # go back"
+    fi
+}
+trap 'on_error $LINENO "$BASH_COMMAND"' ERR
+
 echo "Enabling maintenance mode..."
 php artisan down --retry=60
+IN_MAINTENANCE=true
 
-echo "Pulling codes"
+echo "Pulling code"
+git fetch "$REMOTE" --tags --quiet
 git checkout "$BRANCH"
-git pull "$REMOTE" "$BRANCH"
+# A tag checks out detached; only a branch has anything to pull.
+if git symbolic-ref -q HEAD >/dev/null; then
+    git pull --ff-only "$REMOTE" "$BRANCH"
+fi
+echo "Now at: $(git log --oneline -1 HEAD)"
 
-echo "Install dependencies"
-y | composer install --no-dev --optimize-autoloader
+echo "Installing dependencies"
+composer install --no-dev --optimize-autoloader --no-interaction
+build_assets
 
-echo "Clear config caches"
+echo "Clearing compiled caches"
 php artisan config:clear
-
-echo "Clear view caches"
+php artisan route:clear
 php artisan view:clear
+php artisan event:clear
 
-echo "Running migration"
-php artisan migrate --force
+echo "Running migrations"
+MIGRATE_OUTPUT=$(php artisan migrate --force)
+echo "$MIGRATE_OUTPUT"
+MIGRATED=$(echo "$MIGRATE_OUTPUT" | grep 'DONE' | awk '{print $1}' || true)
 
 echo "Running deploy operations"
-php artisan operations --force
+php artisan operations --isolated --no-interaction
 
-echo "Restart Horizon"
+echo "Caching config, routes, views and events"
+php artisan optimize
+
+# A browser running an old Livewire client against a new server breaks quietly.
+php artisan vendor:publish --tag=livewire:assets --force
+
+echo "Restarting queue workers"
 php artisan horizon:terminate
 
-echo "Change project ownership to web server"
-chown nginx:nginx "$PROJECT_PATH" -R
+chown -R "$WEB_USER:$WEB_USER" "$PROJECT_PATH"
 
-# Disable maintenance mode
+if [ -n "${PHP_FPM_SERVICE:-}" ]; then
+    systemctl reload "$PHP_FPM_SERVICE"
+fi
+
 echo "Disabling maintenance mode..."
 php artisan up
+IN_MAINTENANCE=false
+trap - ERR
 
-# Health check
 echo "Running health check..."
 sleep 2
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${APP_URL}/up" 2>/dev/null)
+HEALTH_FAILED=""
+for path in /up /; do
+    # /up only proves the framework boots; / proves the app renders a page.
+    status=$(curl -sL -o /dev/null -w "%{http_code}" "${APP_URL%/}${path}" || true)
+    echo "  ${path} → HTTP ${status}"
+    if [ "$status" != "200" ]; then
+        HEALTH_FAILED="$path"
+    fi
+done
 
-if [ "$HTTP_STATUS" = "200" ]; then
-    echo "Health check passed (HTTP $HTTP_STATUS)"
-else
-    echo "WARNING: Health check returned HTTP $HTTP_STATUS"
-    echo "Rolling back to previous commit: $PREVIOUS_COMMIT"
+if [ -n "$HEALTH_FAILED" ]; then
+    echo "WARNING: health check failed on $HEALTH_FAILED"
+    echo "Rolling back code to previous commit: $PREVIOUS_COMMIT"
+    if [ -n "$MIGRATED" ]; then
+        echo "NOTE: these migrations ran and are NOT reversed:"
+        echo "$MIGRATED" | sed 's/^/  /'
+    fi
 
     php artisan down --retry=60
-
     git checkout "$PREVIOUS_COMMIT"
-    y | composer install --no-dev --optimize-autoloader
-    php artisan migrate --force
-    chown nginx:nginx "$PROJECT_PATH" -R
-
+    composer install --no-dev --optimize-autoloader --no-interaction
+    build_assets
+    php artisan optimize
+    chown -R "$WEB_USER:$WEB_USER" "$PROJECT_PATH"
     php artisan up
 
     echo "Rollback completed to $PREVIOUS_COMMIT"
     exit 1
 fi
 
-clear
 echo ""
-echo "🚀 Deployed codes for $BRANCH from remote $REMOTE at path $PROJECT_PATH"
+echo "🚀 Deployed $(git log --oneline -1 HEAD) from $REMOTE at $PROJECT_PATH"

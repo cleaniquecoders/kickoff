@@ -23,6 +23,9 @@ class Index extends Component
     #[Url]
     public string $status = '';
 
+    /** #[Url] props are user input: anything outside this list falls back to the first. */
+    public const PER_PAGE_OPTIONS = [10, 25, 50, 100];
+
     #[Url]
     public int $perPage = 10;
 
@@ -133,6 +136,10 @@ class Index extends Component
             })
             ->when($this->status, fn ($query) => $query->where('status', $this->status))
             ->latest();
+
+        if (! in_array($this->perPage, self::PER_PAGE_OPTIONS, true)) {
+            $this->perPage = self::PER_PAGE_OPTIONS[0];
+        }
 
         $mails = $query->paginate($this->perPage);
 

@@ -63,7 +63,7 @@
                 @endcan
                 @can('users.delete.account')
                     <flux:button size="sm" variant="danger" icon="trash-2" wire:click="bulkDelete"
-                        wire:confirm="{{ __('Delete :count selected user(s)? Protected accounts will be skipped. Deleted accounts can be restored later.', ['count' => count($selected)]) }}"
+                        wire:confirm="{{ __('Delete :count selected user(s)? Protected accounts will be skipped. Deleted accounts can be restored for :days days, then they are permanently removed.', ['count' => count($selected), 'days' => config('audit.retention.soft_deleted_users_days', 90)]) }}"
                         class="cursor-pointer">
                         {{ __('Delete') }}
                     </flux:button>
@@ -197,7 +197,7 @@
                                         @can('delete', $user)
                                             <flux:menu.item icon="trash-2" variant="danger"
                                                 wire:click="delete('{{ $user->uuid }}')"
-                                                wire:confirm="{{ __('Are you sure you want to delete :name? The account can be restored later.', ['name' => $user->name]) }}">
+                                                wire:confirm="{{ __('Delete :name? The account can be restored for :days days, then it is permanently removed.', ['name' => $user->name, 'days' => config('audit.retention.soft_deleted_users_days', 90)]) }}">
                                                 {{ __('Delete') }}
                                             </flux:menu.item>
                                         @endcan
@@ -297,7 +297,7 @@
                         @endcan
                         @can('delete', $u)
                             <flux:button size="sm" variant="danger" icon="trash-2" wire:click="delete('{{ $u->uuid }}')"
-                                wire:confirm="{{ __('Are you sure you want to delete :name? The account can be restored later.', ['name' => $u->name]) }}"
+                                wire:confirm="{{ __('Delete :name? The account can be restored for :days days, then it is permanently removed.', ['name' => $u->name, 'days' => config('audit.retention.soft_deleted_users_days', 90)]) }}"
                                 class="cursor-pointer">{{ __('Delete') }}</flux:button>
                         @endcan
                     @endif
