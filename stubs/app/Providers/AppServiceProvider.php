@@ -130,6 +130,8 @@ class AppServiceProvider extends ServiceProvider
                 'mail.mailers.smtp.encryption' => $mail->encryption !== '' ? $mail->encryption : null,
                 'mail.from.address' => $mail->from_address,
                 'mail.from.name' => $mail->from_name,
+                'mailhistory.tracking.open.enabled' => $mail->track_opens,
+                'mailhistory.tracking.click.enabled' => $mail->track_clicks,
             ]);
 
             $notification = app(NotificationSettings::class);

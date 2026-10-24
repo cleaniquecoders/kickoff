@@ -72,6 +72,24 @@
 
                     <flux:separator variant="subtle" />
 
+                    {{-- Tracking (cleaniquecoders/mailhistory). HTML mail only; results show in Mail > History. --}}
+                    <div class="space-y-3">
+                        <flux:field variant="inline">
+                            <flux:switch wire:model="settings.email.track_opens" />
+                            <flux:label>Track opens</flux:label>
+                        </flux:field>
+                        <flux:field variant="inline">
+                            <flux:switch wire:model="settings.email.track_clicks" />
+                            <flux:label>Track link clicks</flux:label>
+                        </flux:field>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                            Opens are an estimate: many clients block or pre-fetch images. Unsubscribe links are never rewritten.
+                            Takes effect for queued mail once workers restart (done automatically on save).
+                        </p>
+                    </div>
+
+                    <flux:separator variant="subtle" />
+
                     {{-- Send a test email using the values above (saved or not) to verify delivery. --}}
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
                         <div class="flex-1">
