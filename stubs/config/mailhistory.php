@@ -93,6 +93,10 @@ return [
     | load the pixel. NOTE: only HTML mail is tracked — send via a Mailable
     | (e.g. DefaultMail), not Mail::raw, or no pixel is injected.
     |
+    | These env values only seed MailSettings (track_opens / track_clicks);
+    | after that, Admin > Settings > Mail is the source of truth — it is
+    | overlaid onto this config at boot.
+    |
     */
 
     'tracking' => [

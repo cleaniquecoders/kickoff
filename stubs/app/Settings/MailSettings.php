@@ -25,6 +25,12 @@ class MailSettings extends Settings
 
     public string $from_name;
 
+    /** Inject the open-tracking pixel into outgoing HTML mail (mailhistory). */
+    public bool $track_opens;
+
+    /** Rewrite links in outgoing HTML mail through the click tracker (mailhistory). */
+    public bool $track_clicks;
+
     public static function group(): string
     {
         return 'mail';

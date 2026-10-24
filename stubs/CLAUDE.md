@@ -153,7 +153,7 @@ Application-level settings are stored in the **database** via `spatie/laravel-se
 
 **Settings classes** in `app/Settings/`:
 - `GeneralSettings` — `site_name`
-- `MailSettings` — `from_address`, `from_name`
+- `MailSettings` — mailer/SMTP, `from_address`, `from_name`, `track_opens`, `track_clicks` (overlaid onto `mailhistory.tracking.*`)
 - `NotificationSettings` — `enabled`, `channels`
 - `SeoSettings` — meta defaults, Open Graph, canonical toggle, robots.txt, GA4/GTM IDs, organization schema
 

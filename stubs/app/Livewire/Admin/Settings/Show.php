@@ -51,6 +51,8 @@ class Show extends Component
                 'encryption' => $mailSettings->encryption,
                 'from_address' => $mailSettings->from_address,
                 'from_name' => $mailSettings->from_name,
+                'track_opens' => $mailSettings->track_opens,
+                'track_clicks' => $mailSettings->track_clicks,
             ],
             'notifications' => [
                 'enabled' => $notificationSettings->enabled,
@@ -85,6 +87,8 @@ class Show extends Component
                     'settings.email.encryption' => 'nullable|in:tls,ssl',
                     'settings.email.from_address' => 'required|email',
                     'settings.email.from_name' => 'required|string|max:255',
+                    'settings.email.track_opens' => 'boolean',
+                    'settings.email.track_clicks' => 'boolean',
                 ]);
 
                 $settings = app(MailSettings::class);
@@ -96,6 +100,8 @@ class Show extends Component
                 $settings->encryption = (string) ($this->settings['email']['encryption'] ?? '');
                 $settings->from_address = $this->settings['email']['from_address'];
                 $settings->from_name = $this->settings['email']['from_name'];
+                $settings->track_opens = (bool) ($this->settings['email']['track_opens'] ?? false);
+                $settings->track_clicks = (bool) ($this->settings['email']['track_clicks'] ?? false);
                 $settings->save();
 
             } elseif ($this->section === 'notifications') {
