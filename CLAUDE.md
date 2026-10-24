@@ -139,7 +139,7 @@ add new tests as PHPUnit classes either way. CI always runs the full suite.
 
 ### Code Style
 
-- **PHP Version**: 8.4+
+- **PHP Version**: 8.5+
 - **Formatting**: Laravel Pint (`composer lint`)
 - **Static Analysis**: PHPStan (`composer analyse`)
 - **Testing**: Pest 5 (Pest syntax; TIA mode requires it)
@@ -352,7 +352,7 @@ Projects created with `kickoff start` receive:
 
 **Backend**:
 
-- Laravel 13+, PHP 8.4+
+- Laravel 13+, PHP 8.5+ (generated `composer.json` requires `php ^8.5`; `package.json` `engines.node >=26`, `.nvmrc` 26)
 - 15+ packages: Spatie (permission, media, settings, activity log), Laravel (Sanctum, Horizon, Telescope), Livewire Flux
 - Custom Base model with dual-key pattern (id + uuid), auditing, media support, PHP attribute syntax
 - Helper functions organized by domain

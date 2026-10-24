@@ -6,10 +6,10 @@ Welcome! This section helps you install, configure, and run the project for the 
 
 Before you begin, ensure you have:
 
-- PHP 8.4+ (compatible with Laravel 13)
+- PHP 8.5+ (compatible with Laravel 13)
 - Composer for PHP dependencies
 - MySQL/MariaDB for database
-- Node.js and npm for frontend assets
+- Node.js 26+ and npm for frontend assets (`.nvmrc` pins 26 — run `nvm use`)
 - Git for version control
 - Docker (optional, for containerized setup)
 

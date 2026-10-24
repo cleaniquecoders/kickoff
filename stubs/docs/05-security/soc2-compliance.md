@@ -67,7 +67,7 @@ This document describes the security controls implemented in this project to sup
 
 ### Static Analysis
 - PHPStan at level 5 with Larastan
-- Rector for automated PHP 8.4+ refactoring
+- Rector for automated PHP 8.5+ refactoring
 - Laravel Pint for code style enforcement
 - Security CI workflow runs `composer audit` on every push
 

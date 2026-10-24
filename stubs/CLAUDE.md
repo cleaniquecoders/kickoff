@@ -8,7 +8,7 @@ This is a **Laravel application** bootstrapped with
 [CleaniqueCoders Kickoff](https://github.com/cleaniquecoders/kickoff), providing a standardized
 structure with pre-configured packages and conventions.
 
-- **Framework**: Laravel 13+ with PHP 8.4+
+- **Framework**: Laravel 13+ with PHP 8.5+ (Node.js 26+ for assets, pinned in `.nvmrc`)
 - **Frontend**: Livewire 4 + TailwindCSS v4 + Alpine.js
 - **Testing**: Pest PHP (not PHPUnit syntax)
 - **Database**: MySQL with dual-key pattern (auto-increment `id` for internal relations + `uuid` column for public-facing identifiers)

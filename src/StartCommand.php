@@ -267,6 +267,7 @@ class StartCommand extends Command
             $composerFile = $this->getProjectPath().'/composer.json';
             $composer = json_decode(file_get_contents($composerFile), true);
 
+            $composer['require']['php'] = '^8.5';
             $composer['autoload']['files'] = ['support/helpers.php'];
             $composer['config']['allow-plugins']['pestphp/pest-plugin'] = true;
 
@@ -514,6 +515,11 @@ class StartCommand extends Command
 
         if (! $skipNpm) {
             step('Install npm packages', function () use ($verbose) {
+                $packageFile = $this->getProjectPath().'/package.json';
+                $package = json_decode(file_get_contents($packageFile), true);
+                $package['engines']['node'] = '>=26';
+                putFile($packageFile, json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+
                 runCommand('npm install lodash axios tippy.js', $verbose);
             }, $output, $verbose);
         } else {

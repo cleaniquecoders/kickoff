@@ -240,7 +240,7 @@ The command modifies target project's `composer.json` to add:
 - **lint.yml**: Runs Laravel Pint on every push
 - **phpstan.yml**: Static analysis
 - **rector.yml**: Checks for refactoring opportunities
-- **run-tests.yml**: PHPUnit on PHP 8.4, Ubuntu
+- **run-tests.yml**: Pest on PHP 8.5, Ubuntu
 - **update-changelog.yml**: Auto-updates CHANGELOG.md
 
 ## Common Development Tasks

@@ -1,8 +1,8 @@
 <?php
 
-it('runs on PHP 8.4 or above')
+it('runs on PHP 8.5 or above')
     ->expect(phpversion())
-    ->toBeGreaterThanOrEqual('8.4.0');
+    ->toBeGreaterThanOrEqual('8.5.0');
 
 arch()
     ->expect(['dd', 'dump', 'ray'])
