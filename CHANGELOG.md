@@ -2,6 +2,49 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.39.0 - 2026-10-24
+
+Baseline hardening from a review of 113 dev.to drafts + 81 devlogs against the stubs (#59, #60, #61).
+
+### Requirements
+
+- **PHP 8.5+** for Kickoff and generated apps; generated apps pin **Node 26** (`.nvmrc`, `engines.node`). PHP 8.4 users stay on 1.38.
+
+### Security
+
+- Passwords, remember tokens and 2FA secrets excluded from the audit trail; 2FA columns hidden from serialization
+- SSO: an unverified email match is claimed (credentials revoked), not handed over — requires `laravel-config-sso` ^1.1
+- Webhooks refuse private/metadata hosts and send exactly the signed bytes — `laravel-config-webhook` ^1.1
+- Docker services bound to `127.0.0.1`; trusted proxies via `config/trustedproxy.php` (no production wildcard)
+- CSP composed from the origins Kickoff views load (fonts, GTM/GA, g8desk); `#[Url] perPage` clamped
+
+### Deploy & ops
+
+- `bin/deploy` fails fast (`set -Eeuo pipefail`), uses `operations --isolated` (`--force` never existed — operations did not run), checked git, npm build, `optimize`, health check on `/up` and `/`, honest rollback
+- `bin/backup-db` verifies the archive; GPG failure exits non-zero
+- Scheduler ships in `routes/console.php` (`data:purge`, package pruning, Horizon snapshot)
+- Every `${PROJECT_NAME}` placeholder replaced (fixes `supervisord.ini`)
+
+### Fixes
+
+- Listeners registered once (`withEvents(discover: false)`); `CACHE_STORE` (was ignored `CACHE_DRIVER`)
+- Self-registered users get the default role; `migrate:fresh --seed` yields a login
+- Real auth views get SSO buttons; login no longer crashes with registration disabled; dead `auth/*` views removed
+- Two-factor settings used a non-existent `<x-input-otp>` (`optimize` failed)
+- `AccessControlSeeder` additive; settings save restarts workers; bulk actions say why users were skipped
+- Mail open/click tracking editable in Admin > Settings > Mail (#60)
+
+### Guardrails
+
+- New tests: `RouteSmokeTest`, `DeployParityTest`, `FluxIconsExistTest`, `ContentSecurityPolicyTest`; architecture DB rule now enforceable
+- Strict Eloquent (lazy loading, discarded attributes) outside production; CI `composer install` + `optimize`
+
+### Upgrading an existing app
+
+Use the `kickoff-patch` skill. Re-publish `media-manager-views`, set `QUEUE_CONNECTION=redis` + the scheduler cron in production, and rename `CACHE_DRIVER` → `CACHE_STORE` in `.env`.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.38.0...1.39.0
+
 ## 1.38.0 - 2026-08-13
 
 Hard-won lessons from a production Kickoff app, folded back into the baseline. Three of these are defects that ship green — a passing test suite proved nothing about any of them.
@@ -1323,6 +1366,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1342,6 +1386,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1418,6 +1463,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1616,6 +1662,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1625,6 +1672,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1733,11 +1781,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1842,11 +1892,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -2116,11 +2168,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -2231,11 +2285,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
