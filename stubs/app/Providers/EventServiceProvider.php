@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Listeners\AssignDefaultRole;
 use App\Listeners\LogoutFromOtherDevices;
+use App\Listeners\RevokeClaimedAccountCredentials;
+use CleaniqueCoders\ConfigSso\Events\UnverifiedAccountClaimed;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -29,6 +31,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         Registered::class => [
             AssignDefaultRole::class,
+        ],
+        UnverifiedAccountClaimed::class => [
+            RevokeClaimedAccountCredentials::class,
         ],
     ];
 

@@ -27,7 +27,7 @@ it('allows Google Tag Manager only once an ID is configured', function () {
 
 it('loads no third-party asset the policy does not know about', function () {
     // Every remote <script>/<link>/<img> a view emits must be allowed in SecurityHeaders.
-    $known = ['fonts.bunny.net', 'www.googletagmanager.com', 'cdn.jsdelivr.net'];
+    $known = ['fonts.bunny.net', 'www.googletagmanager.com'];
 
     $offenders = collect(File::allFiles(resource_path('views')))
         ->flatMap(function ($file) use ($known) {
