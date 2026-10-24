@@ -857,6 +857,29 @@ This project includes SOC 2-aligned security controls. See `docs/05-security/soc
 - Schedule `data:purge` for retention compliance
 - Run `composer audit` regularly for dependency vulnerabilities
 
+> **Gotcha:** **Credentials never go in the audit trail.** The audit-trail screen shows every
+> old/new value to admins, so `config/audit.php` `exclude` lists `password`, `remember_token`
+> and the 2FA columns. That list is **replaced, not merged**, by a model's own
+> `$auditExclude` — a model that sets one must repeat them. Any new secret column (API keys,
+> webhook secrets) goes in `#[Hidden]` *and* the audit exclude list.
+
+> **Gotcha:** **Trusted proxies live in `config/trustedproxy.php`, never
+> `trustProxies(at: '*')`.** A wildcard in `bootstrap/app.php` applies in production too, so any
+> client can send `X-Forwarded-For` and walk past IP-keyed rate limits and poison audit /
+> auth-log IPs. Local/testing trust `*` (for `bin/share` tunnels); elsewhere the default is
+> loopback + private ranges. Behind Cloudflare or another public CDN, set `TRUSTED_PROXIES`.
+
+> **Gotcha:** **An unverified account is a claim, not an identity.** The SSO package links an
+> identity to any local account with the same email. `App\Http\Controllers\Auth\SsoController`
+> (wired via `config-sso.routes.controller`) revokes the password, remember token, 2FA, API
+> tokens and passkeys of an *unverified* match before signing the SSO owner in — otherwise
+> whoever pre-registered the address keeps a way in. Keep that override when touching SSO, and
+> never trust an email match onto an unverified account anywhere else (invites, imports, APIs).
+
+> **Gotcha:** **Docker services bind to `127.0.0.1`.** The dev credentials are defaults
+> (`root`, `minioadmin`, `masterKey`, Redis without a password); published on `0.0.0.0` they
+> are reachable by anyone on the same Wi-Fi. Keep the `127.0.0.1:` prefix on every port.
+
 ## Quick Reference
 
 ```bash

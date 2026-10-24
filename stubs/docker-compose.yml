@@ -3,7 +3,7 @@ services:
     image: mysql:8.4
     container_name: mysql
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "127.0.0.1:${DB_PORT:-3306}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${DB_DATABASE:-laravel}
@@ -23,7 +23,7 @@ services:
     container_name: redis
     command: redis-server --requirepass "${REDIS_PASSWORD:-}"
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -37,8 +37,8 @@ services:
     image: axllent/mailpit
     container_name: mailpit
     ports:
-      - "${MAIL_PORT:-1025}:1025"
-      - "${MAILPIT_UI_PORT:-8025}:8025"
+      - "127.0.0.1:${MAIL_PORT:-1025}:1025"
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"
     restart: unless-stopped
 
   meilisearch:
@@ -51,7 +51,7 @@ services:
       - MEILI_LOG_LEVEL
       - MEILI_DB_PATH=${MEILI_DB_PATH:-/data.ms}
     ports:
-      - ${MEILI_PORT:-7700}:7700
+      - "127.0.0.1:${MEILI_PORT:-7700}:7700"
     volumes:
       - meilisearch-data:/data.ms
     restart: unless-stopped
@@ -61,8 +61,8 @@ services:
     container_name: minio
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}

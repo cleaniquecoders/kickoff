@@ -29,7 +29,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Yadahan\AuthenticationLog\AuthenticationLogable;
 
 #[Fillable(['name', 'email', 'password', 'uuid'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'])]
 class User extends Authenticatable implements AuditableContract, HasMedia, MustVerifyEmail, PasskeyUser
 {
     use AuditableTrait;

@@ -16,11 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Trust the reverse proxy / tunnel (load balancer, ngrok, cloudflared) so
-        // X-Forwarded-Proto is honoured. Without this, behind an HTTPS proxy that
-        // forwards to plain-HTTP `php artisan serve`, request()->isSecure() is
-        // false and Livewire/Flux emit http:// script URLs → mixed-content blocks.
-        $middleware->trustProxies(at: '*');
+        // Trusted proxies come from config/trustedproxy.php (TRUSTED_PROXIES),
+        // read per request by the framework's TrustProxies middleware. Do not call
+        // trustProxies(at: '*') here: it applies in production too, letting any
+        // client spoof X-Forwarded-For past IP-keyed throttles and audit logs.
 
         $middleware->append(SecurityHeaders::class);
 
