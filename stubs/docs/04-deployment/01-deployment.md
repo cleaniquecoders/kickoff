@@ -20,7 +20,7 @@ $ ssh-add -k /Users/you/.ssh/id_algorithm
 $ cat /Users/you/.ssh/id_algorithm.pub
 ```
 
-Copy the output then add key in [Deploy Keys](https://github.com/nasrulhazim/project-template/settings/keys)
+Copy the output then add key in [Deploy Keys](https://github.com/${OWNER}/${PROJECT_NAME}/settings/keys)
 
 References:
 
@@ -29,11 +29,49 @@ References:
 
 ## Running the Script
 
-Deploy it anywhere in your server, then run:
+From the project root on the server:
 
 ```bash
-sudo su
-. ./deploy
+sudo bin/deploy -b main
+```
+
+Run it as a script, never `source` it (`. ./deploy`): it uses `set -e`, so a failing step would
+close the shell you sourced it into. Overrides: `APP_URL` (health check), `WEB_USER` (default
+`nginx`), `PHP_FPM_SERVICE` (reloaded when set), `SKIP_BACKUP=1`.
+
+What a failure means:
+
+| Output | State | Next step |
+|---|---|---|
+| `pre-deploy database backup failed — nothing has been changed` | Site untouched | Fix `bin/backup-db` (or `SKIP_BACKUP=1`) |
+| `❌ Deploy failed at line N` | **Maintenance mode on, on purpose** | Fix the cause, then `php artisan up` or re-run |
+| `health check failed … Rolling back` | Code back on the previous commit, site up | Migrations that ran are listed and **not** reversed |
+
+## Production Environment
+
+Before the first deploy, set in `.env`:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+QUEUE_CONNECTION=redis   # .env.example ships `sync`: jobs then run inside the web request
+CACHE_STORE=redis
+```
+
+and install the scheduler cron — retention, pruning and Horizon metrics in `routes/console.php`
+only run through it:
+
+```cron
+* * * * * cd /var/www/${PROJECT_NAME} && php artisan schedule:run >> /dev/null 2>&1
+```
+
+## Restoring a Backup
+
+`bin/backup-db` proves the archive is readable and non-empty, not that it restores. Rehearse a
+restore into a scratch database regularly:
+
+```bash
+gunzip -c /home/${PROJECT_NAME}/backup/db/<file>.sql.gz | mysql -u root -p restore_check
 ```
 
 ## Deploy Operations
@@ -69,7 +107,7 @@ return new class extends Operation
 
 ### Running Deploy Operations
 
-The `bin/deploy` script runs `php artisan operations --force` automatically after
+The `bin/deploy` script runs `php artisan operations --isolated --no-interaction` automatically after
 `php artisan migrate --force`. To run manually:
 
 ```bash
@@ -77,7 +115,7 @@ The `bin/deploy` script runs `php artisan operations --force` automatically afte
 php artisan operations
 
 # Run in production (skip confirmation)
-php artisan operations --force
+php artisan operations --isolated --no-interaction
 
 # Check status
 php artisan operations:status

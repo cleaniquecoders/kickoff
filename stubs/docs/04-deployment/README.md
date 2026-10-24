@@ -72,7 +72,7 @@ This project uses a Git-based deployment workflow with automated scripts for con
    - Pulls latest tagged release
    - Installs dependencies
    - Runs migrations
-   - Runs deploy operations (`php artisan operations --force`)
+   - Runs deploy operations (`php artisan operations --isolated --no-interaction`)
    - Clears caches
    - Restarts services
 
@@ -93,7 +93,7 @@ npm ci && npm run build
 php artisan migrate --force
 
 # Run deploy operations (one-off post-deploy tasks)
-php artisan operations --force
+php artisan operations --isolated --no-interaction
 
 # Clear and cache config
 php artisan config:cache

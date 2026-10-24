@@ -35,16 +35,17 @@ This document describes the security controls implemented in this project to sup
 
 ### Backup & Recovery
 - **Application Backup** (`bin/backup-app`): Full application + database dump, zip compression, integrity verification
-- **Database Backup** (`bin/backup-db`): Dedicated database backup with `--single-transaction`, gzip compression
+- **Database Backup** (`bin/backup-db`): Dedicated database backup with `--single-transaction`, gzip compression; fails unless the archive passes `gzip -t` and is non-empty (integrity, not restorability — rehearse restores)
 - **Media Backup** (`bin/backup-media`): Incremental (last 24 hours) media file backup
 - **Encryption**: Optional GPG encryption via `BACKUP_GPG_RECIPIENT` env var
 - **Retention Policy**: Automatic cleanup of backups older than `BACKUP_RETENTION_DAYS` (default 30)
 
 ### Deployment
 - **Maintenance Mode**: `php artisan down --retry=60` during deployment
-- **Health Check**: Automated HTTP check to `/up` endpoint post-deployment
-- **Auto-Rollback**: Reverts to previous commit if health check fails
-- **Pre-Deploy Backup**: Database backup before code changes
+- **Fail-fast**: every step is checked (`set -e`); a failure after `down` leaves maintenance mode on rather than serving a half-applied release
+- **Health Check**: HTTP check of `/up` and `/` post-deployment
+- **Auto-Rollback**: Reverts **code** to the previous commit if the health check fails — migrations are not reversed (ship schema changes expand → migrate → contract)
+- **Pre-Deploy Backup**: Database backup before code changes; a failed backup aborts the deploy (`SKIP_BACKUP=1` to override)
 
 ### Infrastructure
 - Docker Compose with health checks on MySQL, Redis, MinIO
@@ -97,8 +98,8 @@ This document describes the security controls implemented in this project to sup
 - User model hides `password` and `remember_token` from serialization
 
 ### Data Retention
-- `data:purge` artisan command with configurable retention:
-  - Audit records: `--audit-days=365` (default)
+- `data:purge` artisan command, scheduled daily in `routes/console.php`, with configurable retention:
+  - Audit records: `config('audit.retention.crud_audits_days')` (2555 days ≈ 7 years; `--audit-days` overrides)
   - Telescope entries: `--telescope-hours=48` (default)
   - Soft-deleted users: permanently removed after 90 days
   - Supports `--dry-run` for preview
@@ -177,8 +178,10 @@ class Customer extends Base
 
 ### Scheduling Data Purge
 
-Add to your scheduler (`routes/console.php` or `app/Console/Kernel.php`):
+`data:purge` is already scheduled daily in `routes/console.php`, using the retention windows in
+`config/audit.php` (audit records 2555 days ≈ 7 years by default). Change the window there, not with
+flags on the schedule. It only runs if production has the scheduler cron:
 
-```php
-Schedule::command('data:purge --audit-days=365 --telescope-hours=48')->daily();
+```cron
+* * * * * cd /var/www/app && php artisan schedule:run >> /dev/null 2>&1
 ```

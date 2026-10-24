@@ -89,13 +89,14 @@ Two placeholders are used throughout stubs and are replaced during setup:
 - `${PROJECT_NAME}`: Replaced with the project name argument
 - `${OWNER}`: Replaced with the owner argument
 
-These appear in:
+These appear in `stubs/README.md`, `stubs/.env.example`, `stubs/bin/*`, `stubs/.config/*` and
+the deployment docs.
 
-- `stubs/README.md`
-- `stubs/.env.example`
-- All `stubs/bin/*` scripts
-
-**Implementation**: `updatePlaceholder()` method in `StartCommand`
+**Implementation**: `placeholderFiles()` scans `stubs/` for any file carrying a placeholder
+(skipping `.claude/`, whose skills document them, and `.env.example`, which
+`setupEnvironmentFile()` snake-cases first) and `updatePlaceholder()` rewrites each. Never go back
+to a hand-written path list — one missed `.config/supervisord.ini` and shipped a literal
+`${PROJECT_NAME}` Horizon path.
 
 ### Helper Functions (`support/helpers.php`)
 

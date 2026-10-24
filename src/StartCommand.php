@@ -278,6 +278,9 @@ class StartCommand extends Command
                 ],
                 'post-update-cmd' => [
                     '@php artisan vendor:publish --tag=laravel-assets --ansi --force',
+                    // Published Livewire JS must match the updated server package, or the
+                    // browser runs an old client against a new server and breaks quietly.
+                    '@php artisan vendor:publish --tag=livewire:assets --ansi --force',
                 ],
                 'post-root-package-install' => [
                     "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
@@ -353,18 +356,12 @@ class StartCommand extends Command
 
     private function setupProjectName(OutputInterface $output, bool $verbose)
     {
-        step('Update project name in bin/ directory', function () {
-            $binDir = $this->getProjectPath().'/bin';
-
-            foreach (glob($binDir.'/*') as $file) {
+        step('Replace project name and owner placeholders', function () {
+            foreach ($this->placeholderFiles() as $relative) {
+                $file = $this->getProjectPath().'/'.$relative;
                 $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
+                $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $file);
             }
-        }, $output, $verbose);
-
-        step('Update README', function () {
-            $file = $this->getProjectPath().'/README.md';
-            $this->updatePlaceholder(self::PLACEHOLDER_PROJECT_NAME, $file);
-            $this->updatePlaceholder(self::PLACEHOLDER_OWNER, $file);
         }, $output, $verbose);
 
         // .env.example placeholder substitution is handled in setupEnvironmentFile() so
@@ -410,6 +407,42 @@ class StartCommand extends Command
         $snake = preg_replace('/_+/', '_', $snake);
 
         return trim($snake, '_');
+    }
+
+    /**
+     * Stub files (relative paths) that carry a placeholder. Scanning the stubs rather than
+     * listing paths means a new file with ${PROJECT_NAME} cannot ship unreplaced — a hand
+     * list once missed .config/supervisord.ini. .claude/ is skipped (its skills document the
+     * placeholders); .env.example is handled by setupEnvironmentFile (snake-casing first).
+     *
+     * @return list<string>
+     */
+    public function placeholderFiles(): array
+    {
+        $stubs = realpath(__DIR__.'/../stubs');
+        $files = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($stubs, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $item) {
+            $relative = substr($item->getPathname(), strlen($stubs) + 1);
+
+            if (str_starts_with($relative, '.claude/') || $relative === '.env.example') {
+                continue;
+            }
+
+            $content = file_get_contents($item->getPathname());
+
+            if (str_contains($content, self::PLACEHOLDER_PROJECT_NAME) || str_contains($content, self::PLACEHOLDER_OWNER)) {
+                $files[] = $relative;
+            }
+        }
+
+        sort($files);
+
+        return $files;
     }
 
     private function updatePlaceholder($placeholder, $file)

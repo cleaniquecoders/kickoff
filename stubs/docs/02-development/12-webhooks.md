@@ -25,10 +25,10 @@ Receivers verify the `X-Webhook-Signature` header: `hash_hmac('sha256', $rawBody
 
 ## Maintenance
 
-Prune old delivery logs periodically — add to your scheduler (`routes/console.php`):
+Old delivery logs are pruned daily (30 days) by the scheduler in `routes/console.php`:
 
 ```php
-Schedule::command('config-webhook:prune --days=30')->daily();
+Schedule::command('config-webhook:prune --days=30')->daily()->withoutOverlapping()->onOneServer();
 ```
 
 ## Env Toggles

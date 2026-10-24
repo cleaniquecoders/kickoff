@@ -197,13 +197,17 @@ Operations live in `operations/`, run once per environment, and are tracked in t
 ```bash
 php artisan make:operation backfill_user_uuids   # scaffold
 php artisan operations                            # run pending
-php artisan operations --force                    # run in production (no prompt)
+php artisan operations --isolated --no-interaction  # production (there is NO --force option)
 php artisan operations:status                     # show ran/pending
 php artisan operations:rollback                   # rollback last batch
 php artisan operations:fresh                      # re-run all from scratch
 ```
 
-`bin/deploy` runs `php artisan operations --force` automatically after `migrate --force`.
+`bin/deploy` runs `php artisan operations --isolated --no-interaction` automatically after `migrate --force`.
+
+> **Gotcha:** **`operations` has no `--force` option.** `php artisan operations --force` fails
+> with *"The --force option does not exist"* — and an earlier `bin/deploy` without `set -e`
+> carried on past it, so deploy operations silently never ran. Use `--isolated --no-interaction`.
 
 | Use Case | Tool |
 |---|---|
