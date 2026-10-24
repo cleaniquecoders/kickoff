@@ -1,46 +1,62 @@
 <?php
 
-use App\Http\Controllers\Auth\SsoController;
 use App\Models\User;
+use CleaniqueCoders\ConfigSso\Models\SsoProvider;
 use Database\Seeders\AccessControlSeeder;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Contracts\Provider;
+use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
-beforeEach(fn () => $this->seed(AccessControlSeeder::class));
+beforeEach(function () {
+    $this->seed(AccessControlSeeder::class);
 
-function ssoFindOrCreate(string $email): ?User
+    SsoProvider::create([
+        'name' => 'GitHub',
+        'driver' => 'github',
+        'client_id' => 'id',
+        'client_secret' => 'secret',
+        'is_active' => true,
+    ]);
+});
+
+function ssoSignIn(string $email): void
 {
     $identity = (new SocialiteUser)->map(['id' => 'idp-1', 'name' => 'Owner', 'email' => $email]);
+    $driver = Mockery::mock(Provider::class);
+    $driver->shouldReceive('user')->andReturn($identity);
+    Socialite::shouldReceive('driver')->with('github')->andReturn($driver);
 
-    return (fn () => $this->findOrCreateUser($identity))->call(new SsoController);
+    test()->get(route('sso.callback', 'github'))->assertRedirect();
 }
 
-it('revokes the registrant credentials before handing an unverified account to SSO', function () {
+it('revokes every registrant credential before handing an unverified account to SSO', function () {
     $squatter = User::factory()->unverified()->create(['email' => 'owner@example.com', 'password' => 'squatter-pass']);
     $squatter->createToken('squatter');
     $squatter->forceFill(['two_factor_secret' => 'secret'])->save();
 
-    $user = ssoFindOrCreate('owner@example.com');
-
-    expect($user->is($squatter))->toBeTrue();
+    ssoSignIn('owner@example.com');
 
     $squatter->refresh();
     expect(Hash::check('squatter-pass', $squatter->password))->toBeFalse()
         ->and($squatter->two_factor_secret)->toBeNull()
         ->and($squatter->tokens()->count())->toBe(0)
         ->and($squatter->hasVerifiedEmail())->toBeTrue();
+    $this->assertAuthenticatedAs($squatter);
 });
 
 it('leaves a verified account credentials alone', function () {
     $owner = User::factory()->create(['email' => 'owner@example.com', 'password' => 'owner-pass']);
 
-    ssoFindOrCreate('owner@example.com');
+    ssoSignIn('owner@example.com');
 
     expect(Hash::check('owner-pass', $owner->fresh()->password))->toBeTrue();
 });
 
-it('marks a user created by SSO as verified', function () {
-    $user = ssoFindOrCreate('new@example.com');
+it('creates SSO users verified, with the default role', function () {
+    ssoSignIn('new@example.com');
 
-    expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
+    $user = User::where('email', 'new@example.com')->first();
+    expect($user->hasVerifiedEmail())->toBeTrue()
+        ->and($user->hasRole('user'))->toBeTrue();
 });

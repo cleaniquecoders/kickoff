@@ -72,9 +72,6 @@ class SecurityHeaders
         $sources = [
             'style-src' => ['https://fonts.bunny.net'],
             'font-src' => ['https://fonts.bunny.net'],
-            // cleaniquecoders/media-manager's published media-collection view loads
-            // SortableJS from jsDelivr. Drop this once the package bundles it.
-            'script-src' => ['https://cdn.jsdelivr.net'],
         ];
 
         if (config('seo.google.tag_manager_id') || config('seo.google.analytics_id')) {

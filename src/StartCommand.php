@@ -479,8 +479,10 @@ class StartCommand extends Command
                 'blade-ui-kit/blade-icons',
                 'cleaniquecoders/laravel-artisan-runner',
                 'cleaniquecoders/laravel-config-backup',
-                'cleaniquecoders/laravel-config-sso',
-                'cleaniquecoders/laravel-config-webhook',
+                // Minimums carry security fixes Kickoff relies on: SSO claims unverified email
+                // matches (1.1), webhooks refuse private hosts and send the signed bytes (1.1).
+                'cleaniquecoders/laravel-config-sso:^1.1',
+                'cleaniquecoders/laravel-config-webhook:^1.1',
                 'cleaniquecoders/laravel-mcp-kit',
                 'cleaniquecoders/laravel-media-secure',
                 'cleaniquecoders/mailhistory',
@@ -497,7 +499,7 @@ class StartCommand extends Command
                 'predis/predis',
                 'spatie/laravel-activitylog',
                 'spatie/laravel-medialibrary',
-                'cleaniquecoders/media-manager',
+                'cleaniquecoders/media-manager:^1.2.2', // 1.2.2: no CDN script (CSP-safe sorting)
                 'spatie/laravel-permission',
                 'spatie/laravel-settings',
                 'spatie/laravel-sitemap',

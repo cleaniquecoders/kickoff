@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\SsoController;
+use CleaniqueCoders\ConfigSso\Http\Controllers\SsoController;
 use CleaniqueCoders\ConfigSso\Livewire\SsoProviders;
 use SocialiteProviders\Azure\AzureExtendSocialite;
 use SocialiteProviders\Keycloak\KeycloakExtendSocialite;
@@ -113,9 +113,9 @@ return [
     | Auth Routes
     |--------------------------------------------------------------------------
     | Registers sso.redirect ({provider}/redirect) and sso.callback
-    | ({provider}/callback). The controller is the app's subclass, which refuses
-    | to hand an unverified local account to an SSO identity without first
-    | revoking the registrant's credentials.
+    | ({provider}/callback). An unverified email match is claimed, not handed
+    | over (package >= 1.1); App\Listeners\RevokeClaimedAccountCredentials
+    | revokes the app-specific credentials on UnverifiedAccountClaimed.
     */
     'routes' => [
         'enabled' => true,

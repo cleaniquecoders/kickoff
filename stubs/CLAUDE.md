@@ -898,16 +898,18 @@ This project includes SOC 2-aligned security controls. See `docs/05-security/soc
 > loopback + private ranges. Behind Cloudflare or another public CDN, set `TRUSTED_PROXIES`.
 
 > **Gotcha:** **An unverified account is a claim, not an identity.** The SSO package links an
-> identity to any local account with the same email. `App\Http\Controllers\Auth\SsoController`
-> (wired via `config-sso.routes.controller`) revokes the password, remember token, 2FA, API
-> tokens and passkeys of an *unverified* match before signing the SSO owner in — otherwise
-> whoever pre-registered the address keeps a way in. Keep that override when touching SSO, and
-> never trust an email match onto an unverified account anywhere else (invites, imports, APIs).
+> identity to the local account with the same email. Since laravel-config-sso 1.1 an
+> *unverified* match is claimed: the package rotates the password and remember token, marks the
+> email verified and dispatches `UnverifiedAccountClaimed`, and
+> `App\Listeners\RevokeClaimedAccountCredentials` revokes 2FA, API tokens and passkeys —
+> otherwise whoever pre-registered the address keeps a way in. Add any new credential type to
+> that listener, and never trust an email match onto an unverified account anywhere else
+> (invites, imports, APIs).
 
 > **Gotcha:** **CSP failures are silent and production-only.** `SecurityHeaders` turns CSP on in
 > production and composes the policy from `config('security.headers.csp_policy')` plus the
-> third-party origins Kickoff's own views load (Bunny fonts, jsDelivr for media-manager, GTM/GA
-> once an ID is set, the g8desk origin once its widget is on). A view that loads anything else
+> third-party origins Kickoff's own views load (Bunny fonts, GTM/GA once an ID is set, the g8desk
+> origin once its widget is on). A view that loads anything else
 > from another origin is blocked with nothing but a browser-console error — add the origin to
 > `SecurityHeaders::thirdPartySources()` gated on the same setting that renders it.
 > `ContentSecurityPolicyTest` fails on an unknown remote `src`/`href` in any view.
