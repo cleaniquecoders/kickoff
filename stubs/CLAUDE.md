@@ -299,6 +299,25 @@ tests in Pest syntax either way. CI always runs the full suite.
 > anything in Alpine or a Flux custom element works. See the Database Portability and Alpine.js
 > gotchas.
 
+### Guardrail tests (keep them green, extend their allowlists only with a reason)
+
+| Test | Fails when |
+|---|---|
+| `RouteSmokeTest` | any parameterless GET page returns 5xx for a superadmin over seeded rows |
+| `DeployParityTest` | `view:cache` / `route:cache` fail — i.e. `bin/deploy`'s `optimize` would fail on the server |
+| `FluxIconsExistTest` | a view, config or menu uses an icon that was never imported (`php artisan flux:icon …`) |
+| `ContentSecurityPolicyTest` | a view loads a remote asset the production CSP does not allow |
+| `ArchitectureTest` | the `DB` facade is used outside its allowlist, `env()` outside `config/`, etc. |
+
+> **Gotcha:** **A view no test renders can still be uncompilable.** Feature tests compile only
+> the views they open; a two-factor modal step once used an `<x-input-otp>` component that never
+> existed, and every suite stayed green while `php artisan optimize` — and therefore every deploy
+> — would have failed. `DeployParityTest` compiles all of them.
+
+> **Gotcha:** **Strict Eloquent is on outside production** (`AppServiceProvider`): lazy loading
+> and silently-discarded mass assignment throw. Eager-load (`with()`) what a loop touches, and
+> write non-fillable columns with `forceFill()` — never relax the check to make a test pass.
+
 Use Pest syntax (not PHPUnit):
 
 ```php

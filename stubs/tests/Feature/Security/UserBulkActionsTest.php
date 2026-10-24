@@ -78,3 +78,24 @@ test('select page selects all visible users', function () {
 
     expect($component->get('selected'))->toBeEmpty();
 });
+
+test('bulk actions say why each user was skipped', function () {
+    $superadmin = User::factory()->create();
+    $superadmin->assignRole('superadmin');
+    $holder = User::factory()->create();
+    $holder->assignRole('user');
+    $fresh = User::factory()->create();
+
+    Livewire::actingAs($this->admin)
+        ->test(Index::class)
+        ->set('selected', [$fresh->uuid, $holder->uuid, 'gone-uuid'])
+        ->set('bulkRole', 'user')
+        ->call('bulkAssignRole')
+        ->assertDispatched('toast', message: 'Role User assigned to 1 user(s). Skipped: 1 already had it, 1 no longer exist.');
+
+    Livewire::actingAs($this->admin)
+        ->test(Index::class)
+        ->set('selected', [$this->admin->uuid, $superadmin->uuid])
+        ->call('bulkDelete')
+        ->assertDispatched('toast', message: '0 users deleted. Skipped: 1 yourself, 1 not permitted.');
+});

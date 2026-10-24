@@ -10,6 +10,7 @@ use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
 use App\Settings\SeoSettings;
 use CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -31,6 +32,13 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        // Outside production, fail loudly on two silent Eloquent bugs: N+1 lazy loads, and
+        // mass-assigned columns that are not #[Fillable] (dropped without a word — e.g.
+        // email_verified_at). Not preventAccessingMissingAttributes(): a model built by
+        // create()/factories lacks DB-defaulted columns until refreshed, which only adds noise.
+        Model::preventLazyLoading(! $this->app->isProduction());
+        Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
 
         Password::defaults(function () {
             $config = config('security.password');

@@ -38,7 +38,22 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        # install, not update: CI must test the locked versions production deploys.
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Prepare environment
+        run: cp .env.example .env && php artisan key:generate --ansi
+
+      - name: Deploy parity (config, routes, views, events)
+        # bin/deploy runs `php artisan optimize`. A view that cannot compile (a missing
+        # component, a vendor view using host components) or a duplicate route name fails
+        # here — not on the server, in maintenance mode.
+        run: |
+          php artisan optimize
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+          php artisan event:clear
 
       - name: Test with Pest
         run: vendor/bin/pest

@@ -266,11 +266,15 @@ new class extends Component {
             @if ($showVerificationStep)
                 <div class="space-y-6">
                     <div class="flex flex-col items-center space-y-3">
-                        <x-input-otp
-                            :digits="6"
-                            name="code"
+                        {{-- Flux's OTP input; the old <x-input-otp> component never shipped, so this view could not compile. --}}
+                        <flux:otp
                             wire:model="code"
+                            length="6"
+                            name="code"
+                            :label="__('OTP Code')"
+                            label:sr-only
                             autocomplete="one-time-code"
+                            class="mx-auto"
                         />
                         @error('code')
                             <flux:text color="red">
