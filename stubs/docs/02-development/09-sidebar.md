@@ -104,6 +104,34 @@ Located in `app/Actions/Builder/Menu/`:
 | `SidebarFooter.php` | `sidebar-footer` | Footer (pinned bottom) | Resources |
 | `SectionResolver.php` | — | Resolves sections for the switcher | — |
 
+### Rail + panel
+
+The sidebar adapts to how much navigation a user can see. `NavRail::resolve()` counts the
+sections this user is allowed to see:
+
+| Visible sections | Sidebar |
+|---|---|
+| 0 or 1 | Plain sidebar: globals, section switcher, footer |
+| 2 or more | Rail + panel: `resources/views/components/nav/rail.blade.php` |
+
+In rail mode:
+
+| Part | Comes from |
+|---|---|
+| Rail areas | `sections`, using `setRailLabel()` for the short label under the icon |
+| Logo | Links to the dashboard, so the dashboard gets no row of its own |
+| Rail foot | Search, other `globals` items, `footer` items in a Help menu, the account menu |
+| Panel | The current area. Docked from 1280px, an overlay from 1024px, pinned with `[` |
+| Below 1024px | The same areas in Flux's stashable drawer |
+
+Cmd/Ctrl-K opens a palette in both sidebars, built from the same builders.
+
+**Hidden is never a gate.** A row a user cannot see is presentation only: every route keeps
+its own `can:` middleware or policy, and `setVisible()` must mirror that gate, not replace it.
+
+Keep menus at three levels at most: rail, disclosure, row. Add a second section only when it
+is a real area of the product, because that is what turns the rail on.
+
 ### Menu router
 
 `app/Actions/Builder/Menu.php` maps builder keys to classes. An unknown key throws

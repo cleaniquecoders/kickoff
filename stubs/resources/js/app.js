@@ -1,6 +1,7 @@
 import './bootstrap';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import { registerNav } from './nav';
 
 tippy('[data-tippy-content]');
 
@@ -12,6 +13,8 @@ document.addEventListener('livewire:navigated', () => {
 // Sidebar collapse state — mirrored in a plain cookie so Blade can render the
 // collapsed rail server-side under wire:navigate without flicker.
 document.addEventListener('alpine:init', () => {
+    registerNav(Alpine);
+
     Alpine.store('sidebar', {
         collapsed: /(?:^|;\s*)sidebar_collapsed=1/.test(document.cookie),
         toggle() {

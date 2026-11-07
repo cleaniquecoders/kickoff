@@ -28,6 +28,7 @@ class Administration extends Base
     public function build(): self
     {
         $this->setHeadingLabel(__('Administration'))
+            ->setRailLabel(__('Admin'))
             ->setHeadingIcon('settings')
             ->setHeadingUrl(Route::has('admin.index') ? route('admin.index') : null)
             ->setAuthorization(fn () => Gate::any([
