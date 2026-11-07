@@ -31,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', EnsureUserIsNotSuspended::class);
 
         // Written by JS for the sidebar rail toggle; must stay readable server-side.
-        $middleware->encryptCookies(except: ['sidebar_collapsed']);
+        $middleware->encryptCookies(except: ['sidebar_collapsed', 'nav_panel']);
 
         $middleware->alias([
             'role' => RoleMiddleware::class,

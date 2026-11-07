@@ -1057,6 +1057,12 @@ php artisan operations:status            # Show ran/pending operations
 > (soft-deleted, hidden). Never overload soft deletes to mean suspension. Status display is
 > derived via `User::status()` returning the `UserStatus` enum — do not store a status column.
 
+### Sidebar
+
+> **Gotcha:** A second entry in `config/menu.php` `sections` switches every user who can see
+> both to the rail + panel (`NavRail`). Hiding a row is presentation, never authorization:
+> routes keep their own gates. See `docs/02-development/09-sidebar.md`.
+
 ### Cookies Written by JavaScript
 
 > **Gotcha:** Laravel encrypts cookies by default, so a cookie written by JavaScript

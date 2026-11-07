@@ -25,8 +25,8 @@ class SectionResolver
 {
     /**
      * @return array{
-     *     sections: array<int, array{key: string, label: string, icon: string, items: Collection, landing: string, matchLen: int, owns: bool}>,
-     *     active: array{key: string, label: string, icon: string, items: Collection, landing: string, matchLen: int, owns: bool}|null
+     *     sections: array<int, array{key: string, label: string, railLabel: string, icon: string, items: Collection, landing: string, matchLen: int, owns: bool}>,
+     *     active: array{key: string, label: string, railLabel: string, icon: string, items: Collection, landing: string, matchLen: int, owns: bool}|null
      * }
      */
     public static function resolve(): array
@@ -66,6 +66,7 @@ class SectionResolver
             $sections[] = [
                 'key' => $key,
                 'label' => $menu->getHeadingLabel() ?? $key,
+                'railLabel' => ($menu instanceof Base ? $menu->getRailLabel() : null) ?? $menu->getHeadingLabel() ?? $key,
                 'icon' => $menu->getHeadingIcon() ?? 'circle',
                 'items' => $items,
                 'landing' => $menu->getHeadingUrl() ?? self::firstLeafUrl($items->all()) ?? '#',

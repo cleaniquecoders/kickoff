@@ -16,6 +16,8 @@ abstract class Base implements AuthorizedMenuBuilder, Builder, HeadingMenuBuilde
 {
     use ProcessesMenuItems;
 
+    private ?string $railLabel = null;
+
     protected Collection $menus;
 
     protected ?string $headingLabel = null;
@@ -58,6 +60,21 @@ abstract class Base implements AuthorizedMenuBuilder, Builder, HeadingMenuBuilde
         $this->menus = $this->menus->merge($menuItems);
 
         return $this;
+    }
+
+    /**
+     * The short label under this section's rail icon, which has about 7 characters of room.
+     */
+    public function setRailLabel(string $railLabel): self
+    {
+        $this->railLabel = $railLabel;
+
+        return $this;
+    }
+
+    public function getRailLabel(): ?string
+    {
+        return $this->railLabel ?? $this->getHeadingLabel();
     }
 
     public function hasHeadingLabel(): bool

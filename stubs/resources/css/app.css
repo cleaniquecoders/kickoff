@@ -105,6 +105,32 @@ select:focus[data-flux-control] {
     display: none;
 }
 
+/* Rail + panel: the panel docks by breakpoint unless the user pinned or unpinned it
+   (`nav_panel` cookie -> data-nav-panel). Auto docks at >=1280px and floats as an
+   overlay at 1024-1279px; pinned docks from 1024px; unpinned never docks. */
+.nav-docked {
+    display: none;
+}
+
+@media (min-width: 64rem) {
+    [data-nav-panel='pinned'] .nav-docked {
+        display: flex;
+    }
+}
+
+@media (min-width: 80rem) {
+    [data-nav-panel='auto'] .nav-docked {
+        display: flex;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-nav-overlay],
+    [data-flux-sidebar] {
+        transition: none !important;
+    }
+}
+
 @media (min-width: 64rem) {
     [data-flux-sidebar][data-collapsed] {
         width: 4.5rem;
