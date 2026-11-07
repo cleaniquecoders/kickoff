@@ -10,9 +10,17 @@ use App\Actions\Builder\Menu\SidebarFooter;
 use App\Exceptions\ContractException;
 use CleaniqueCoders\Traitify\Contracts\Builder;
 use CleaniqueCoders\Traitify\Contracts\Menu as ContractsMenu;
+use InvalidArgumentException;
 
 class Menu
 {
+    /** @var array<string, class-string> Every builder key config/menu.php may name. */
+    public const BUILDERS = [
+        'sidebar' => Sidebar::class,
+        'administration' => Administration::class,
+        'sidebar-footer' => SidebarFooter::class,
+    ];
+
     public static function make(): self
     {
         return new self;
@@ -20,12 +28,8 @@ class Menu
 
     public function build(string $builder): Builder|ContractsMenu
     {
-        $class = match ($builder) {
-            'sidebar' => Sidebar::class,
-            'administration' => Administration::class,
-            'sidebar-footer' => SidebarFooter::class,
-            default => Sidebar::class,
-        };
+        // An unknown key is a typo. Falling back to Sidebar rendered it a second time.
+        $class = self::BUILDERS[$builder] ?? throw new InvalidArgumentException("Unknown menu builder [{$builder}].");
 
         $instance = new $class;
 

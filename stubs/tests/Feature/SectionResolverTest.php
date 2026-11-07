@@ -53,3 +53,10 @@ test('with no section owning the URL, the first section is the fallback active',
     expect($resolved['active'])->not->toBeNull()
         ->and($resolved['active']['key'])->toBe($resolved['sections'][0]['key']);
 });
+
+test('a section stays active on its own landing page', function () {
+    actingAs($this->admin);
+    app()->instance('request', Request::create(route('admin.index')));
+
+    expect(SectionResolver::resolve()['active']['key'])->toBe('administration');
+});

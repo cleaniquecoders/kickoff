@@ -41,9 +41,9 @@ composed. Every value is a menu-builder key (resolved by `app/Actions/Builder/Me
 
 ```php
 return [
-    'globals'  => ['sidebar'],                             // pinned on top (no heading)
-    'sections' => ['administration', 'media-management'],  // shown one-at-a-time via the switcher
-    'footer'   => ['sidebar-footer'],                      // pinned to the bottom
+    'globals'  => ['sidebar'],         // pinned on top (no heading)
+    'sections' => ['administration'],  // shown one-at-a-time via the switcher
+    'footer'   => ['sidebar-footer'],  // pinned to the bottom
 ];
 ```
 
@@ -101,22 +101,20 @@ Located in `app/Actions/Builder/Menu/`:
 | `Base.php` | — | Abstract base class | — |
 | `Sidebar.php` | `sidebar` | Global (pinned top) | *(none)* — Dashboard, Notifications |
 | `Administration.php` | `administration` | Section | Administration → `admin.index` |
-| `MediaManagement.php` | `media-management` | Section | Media |
 | `SidebarFooter.php` | `sidebar-footer` | Footer (pinned bottom) | Resources |
 | `SectionResolver.php` | — | Resolves sections for the switcher | — |
 
 ### Menu router
 
-`app/Actions/Builder/Menu.php` routes builder keys to classes:
+`app/Actions/Builder/Menu.php` maps builder keys to classes. An unknown key throws
+`InvalidArgumentException`, so a typo in `config/menu.php` fails loudly:
 
 ```php
-$class = match ($builder) {
+public const BUILDERS = [
     'sidebar' => Sidebar::class,
     'administration' => Administration::class,
-    'media-management' => MediaManagement::class,
     'sidebar-footer' => SidebarFooter::class,
-    default => Sidebar::class,
-};
+];
 ```
 
 ## Base Menu Builder
@@ -300,7 +298,7 @@ class Reports extends Base
    builder so the switcher and breadcrumb use the right landing page:
 
 ```php
-'sections' => ['administration', 'media-management', 'reports'],
+'sections' => ['administration', 'reports'],
 ```
 
 That's the only wiring step — the sidebar and breadcrumbs both read `config/menu.php`.
