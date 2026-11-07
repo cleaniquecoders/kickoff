@@ -16,7 +16,11 @@ class MenuItem implements Builder
 {
     private string $label;
 
-    private string $url;
+    /**
+     * Empty for a parent item, which is a disclosure control rather than a link.
+     * Typed and uninitialised, a parent with no URL was a 500 on every page.
+     */
+    private string $url = '';
 
     private string $target = '_self';
 
@@ -38,6 +42,9 @@ class MenuItem implements Builder
 
     /** @var callable|bool */
     private $visible = true;
+
+    /** Active only on its exact URL: a hub at /admin must not light up on /admin/roles. */
+    private bool $exact = false;
 
     /** @var array<string, mixed> */
     private array $output = [];
@@ -130,6 +137,16 @@ class MenuItem implements Builder
     }
 
     /**
+     * Mark the item active on its exact URL only, not on pages beneath it.
+     */
+    public function exactMatch(): self
+    {
+        $this->exact = true;
+
+        return $this;
+    }
+
+    /**
      * Set the type of the menu item.
      */
     public function setType(string $type): self
@@ -175,10 +192,22 @@ class MenuItem implements Builder
             return $this;
         }
 
+        $children = array_values(array_filter(
+            array_map(fn (MenuItem $child) => $child->build()->toArray(), $this->children),
+            fn (array $child) => $child !== [] // Exclude hidden children
+        ));
+
+        // A group with nothing permitted under it and nowhere of its own to go is not drawn.
+        if ($this->children !== [] && $children === [] && in_array($this->url, ['', '#'], true)) {
+            $this->output = [];
+
+            return $this;
+        }
+
         $this->output = [
             'label' => $this->label,
             'url' => $this->url,
-            'active' => $this->url === request()->url(),
+            'active' => $this->isCurrentUrl(),
             'target' => $this->target,
             'attributes' => $this->attributes,
             'icon' => $this->icon,
@@ -186,14 +215,35 @@ class MenuItem implements Builder
             'tooltip' => $this->tooltip,
             'type' => $this->type,
             'formAttributes' => $this->type === 'form' ? $this->formAttributes : [],
-            'children' => array_filter(
-                array_map(fn (MenuItem $child) => $child->build()->toArray(), $this->children),
-                fn (array $child) => $child !== [] // Exclude hidden children
-            ),
+            'children' => $children,
             'visible' => true, // Add visible flag to output for blade template
         ];
 
         return $this;
+    }
+
+    /**
+     * Whether this item is where the user currently is.
+     *
+     * Prefix match, so a detail page belongs to its index. The slash is load-bearing:
+     * without it /billing would claim /billing-history. The site root is exact, or it
+     * would own every page.
+     */
+    private function isCurrentUrl(): bool
+    {
+        $url = rtrim($this->url, '/');
+
+        if ($url === '' || $url === '#') {
+            return false;
+        }
+
+        $current = request()->url();
+
+        if ($this->exact || $url === rtrim(request()->root(), '/')) {
+            return $current === $url;
+        }
+
+        return $current === $url || str_starts_with($current, $url.'/');
     }
 
     /**

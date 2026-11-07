@@ -49,7 +49,15 @@ class SectionResolver
 
             $matchLen = 0;
 
-            foreach (self::leafUrls($items->all()) as $url) {
+            // Leaves AND the landing page: on /admin no leaf is a prefix of the URL,
+            // so the section would otherwise lose its active state.
+            $urls = self::leafUrls($items->all());
+
+            if (! in_array($menu->getHeadingUrl(), [null, '', '#'], true)) {
+                $urls[] = $menu->getHeadingUrl();
+            }
+
+            foreach ($urls as $url) {
                 if ($currentUrl === $url || str_starts_with($currentUrl, rtrim($url, '/').'/')) {
                     $matchLen = max($matchLen, strlen($url));
                 }

@@ -12,11 +12,10 @@ declare(strict_types=1);
 |
 | - globals:  builders pinned at the top, always visible (no section heading),
 |             e.g. Dashboard and Notifications.
-| - sections: builders rendered as collapsible groups below the globals. Each one
-|             renders its own heading (setHeadingLabel / setHeadingIcon) as an
-|             expandable group with its items nested underneath — e.g.
-|             Administration (Identity, Mail, Media Library, Backups, Settings,
-|             Developers). A builder with no heading renders as a flat list.
+| - sections: builders offered one at a time through the section switcher below
+|             the globals. Each supplies its label, icon and landing page through
+|             setHeadingLabel / setHeadingIcon / setHeadingUrl — e.g. Administration
+|             (Identity, Mail, Media Library, Backups, Settings, Developers).
 | - footer:   builders pinned to the bottom, below the spacer (e.g. Resources).
 |
 | The breadcrumb builder (App\Actions\Builder\Breadcrumb) reads this SAME list,

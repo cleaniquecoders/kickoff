@@ -26,7 +26,9 @@
          compiled stylesheet. The vertical guide line matches the top-level group. --}}
     <div class="grid" style="grid-template-rows: {{ $hasActiveChild ? '1fr' : '0fr' }};"
         x-bind:style="{ gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows 200ms ease-out' }">
-        <div style="overflow: hidden;">
+        {{-- min-height: 0 is required: a grid item will not shrink below its content
+             otherwise, so 0fr does nothing and the sub-group stays open. --}}
+        <div style="overflow: hidden; min-height: 0;">
             <div class="relative space-y-[2px] ps-7 pt-1">
                 <div class="absolute inset-y-[3px] start-0 ms-4 w-px bg-zinc-200 dark:bg-white/30"></div>
 

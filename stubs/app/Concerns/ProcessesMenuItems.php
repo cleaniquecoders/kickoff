@@ -22,6 +22,7 @@ trait ProcessesMenuItems
         return $menuItems
             ->filter(fn (MenuItem $menu) => $menu->isVisible())
             ->map(fn (MenuItem $menu) => $menu->build()->toArray())
+            ->filter(fn (array $menu) => $menu !== []) // A group whose children were all hidden builds to []
             ->values(); // Re-index the collection
     }
 
