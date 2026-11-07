@@ -2,6 +2,37 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## 1.40.0 - 2026-11-07
+
+A new sidebar standard, based on how g8deck and GatherHub each outgrew the section switcher.
+
+### Added
+
+- **Rail + panel sidebar** (#63). Once a user can see two or more sections, the sidebar becomes a rail of areas with a panel for the current one. With fewer, the plain sidebar stays, so a new app looks the same as before. No new config keys: it reads `config/menu.php` `sections`.
+- **Cmd/Ctrl-K page search** in both sidebars, built from the same menu builders.
+- `MenuItem::exactMatch()` and `setRailLabel()` on menu builders.
+
+### Fixed
+
+- A parent `MenuItem` with no URL no longer causes a 500 (#62).
+- An unknown menu builder key now throws instead of rendering `Sidebar` a second time.
+- Menu items stay active on pages beneath them, with a slash boundary, and the site root stays exact.
+- Groups whose children are all hidden are no longer drawn.
+- A section stays active on its own landing page.
+- Collapsed `navlist-with-child` sub-groups now actually collapse (`min-height: 0`).
+- Sidebar docs and config comments that named a `media-management` builder.
+
+### Upgrading an existing app
+
+Use the `kickoff-patch` skill, and check these before deploying:
+
+- `menu('unknown-key')` now throws. Fix any typo or unregistered key.
+- Menu items are active on pages beneath them. Use `exactMatch()` on a hub whose URL is a prefix of its siblings.
+- Users who can see two or more sections switch to the rail.
+- Rebuild assets, and add `nav_panel` to the `encryptCookies` exceptions in `bootstrap/app.php`.
+
+**Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.39.0...1.40.0
+
 ## 1.39.0 - 2026-10-24
 
 Baseline hardening from a review of 113 dev.to drafts + 81 devlogs against the stubs (#59, #60, #61).
@@ -1367,6 +1398,7 @@ $this->dispatch('toast', [
 
 
 
+
   ```
 ### 💡 Migration Guide
 
@@ -1386,6 +1418,7 @@ The **version 1.4.0** introduces Livewire Flux package integration, refactors ca
 
 ```bash
 composer global require cleaniquecoders/kickoff
+
 
 
 
@@ -1463,6 +1496,7 @@ composer global require cleaniquecoders/kickoff
 ```bash
 bin/sandbox run          # Create fresh Laravel app + run kickoff start
 bin/sandbox reset        # Delete sandbox and start clean
+
 
 
 
@@ -1663,6 +1697,7 @@ kickoff start owner project
 
 
 
+
 ```
 **After (Automated):**
 
@@ -1672,6 +1707,7 @@ bin/sandbox run          # Creates Laravel + applies kickoff
 # inspect test-output/sandbox
 bin/sandbox reset        # Clean slate
 # repeat instantly
+
 
 
 
@@ -1782,11 +1818,13 @@ cd test-output/sandbox
 
 
 
+
 ```
 Then create tables & seed data:
 
 ```bash
 php artisan reload:db
+
 
 
 
@@ -1893,11 +1931,13 @@ php artisan serve
 
 
 
+
 ```
 To clean up sandbox, run:
 
 ```bash
 bin/sandbox reset
+
 
 
 
@@ -2169,11 +2209,13 @@ composer global require cleaniquecoders/kickoff
 
 
 
+
 ```
 ##### Update from Previous Version
 
 ```bash
 composer global update cleaniquecoders/kickoff
+
 
 
 
@@ -2286,11 +2328,13 @@ kickoff start your-owner your-project-name
 
 
 
+
 ```
 For verbose output:
 
 ```bash
 kickoff start your-owner your-project-name -vvv
+
 
 
 
