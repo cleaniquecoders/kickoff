@@ -42,6 +42,11 @@ Getting your application to production:
 
 - [Deployment Guide](04-deployment/01-deployment.md) - Production deployment process
 
+### Security
+
+- [Dependency Audit](05-security/01-dependency-audit.md) - Auditing `composer.lock`, Dependabot, fixing and triaging advisories
+- [SOC 2 Compliance](05-security/soc2-compliance.md) - Security controls mapped to the Trust Service Criteria
+
 ## Documentation Structure
 
 This documentation follows a progressive disclosure approach:
@@ -50,6 +55,7 @@ This documentation follows a progressive disclosure approach:
 2. **02-development/** - Day-to-day development workflows
 3. **03-architecture/** - Code standards and patterns
 4. **04-deployment/** - Production deployment
+5. **05-security/** - Dependency audit and compliance controls
 
 Each section builds upon previous knowledge, with clear cross-references where topics intersect.
 

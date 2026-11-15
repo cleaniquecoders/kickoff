@@ -1,6 +1,12 @@
 name: Security
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    # Weekly, so a repo with no pushes still catches advisories published after its last commit.
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
 
 jobs:
   security-audit:
@@ -31,11 +37,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Install Composer dependencies
-        run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
+      # Audit the committed composer.lock (what production installs), never a fresh `composer update`
+      # resolve: that audits versions nobody deploys and passes while the lock is still vulnerable.
       - name: Composer Security Audit
-        run: composer audit
+        run: composer audit --locked
+
+      - name: Install Composer dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: PHPStan Analysis
         run: vendor/bin/phpstan analyse --memory-limit=512M

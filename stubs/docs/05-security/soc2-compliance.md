@@ -70,7 +70,7 @@ This document describes the security controls implemented in this project to sup
 - PHPStan at level 5 with Larastan
 - Rector for automated PHP 8.5+ refactoring
 - Laravel Pint for code style enforcement
-- Security CI workflow runs `composer audit` on every push
+- Security CI workflow runs `composer audit --locked` against the committed lock on every push, pull request and weekly schedule; Dependabot opens update PRs weekly (see [Dependency Audit](01-dependency-audit.md))
 
 ## 4. Confidentiality (C1)
 

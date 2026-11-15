@@ -883,7 +883,7 @@ This project includes SOC 2-aligned security controls. See `docs/05-security/soc
 - Use `EncryptsPii` for sensitive fields (but NOT fields used in WHERE clauses)
 - Use `RedactsPiiInAudit` on models with PII to mask audit trail values
 - Schedule `data:purge` for retention compliance
-- Run `composer audit` regularly for dependency vulnerabilities
+- Run `composer audit --locked` (audit the committed lock — never `composer update` first) for dependency vulnerabilities; see `docs/05-security/01-dependency-audit.md`
 
 > **Gotcha:** **Credentials never go in the audit trail.** The audit-trail screen shows every
 > old/new value to admins, so `config/audit.php` `exclude` lists `password`, `remember_token`
