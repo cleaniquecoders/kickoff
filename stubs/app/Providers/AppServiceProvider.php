@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\AuthenticationSettings;
+use App\Settings\BliptraceSettings;
 use App\Settings\GeneralSettings;
 use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
@@ -62,6 +63,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->applyDatabaseSettings();
+
+        // Separate from applyDatabaseSettings(): it never throws, and must still
+        // run (falling back to env) when an earlier settings group is missing.
+        BliptraceSettings::apply();
         $this->registerVendorLivewireNamespaces();
     }
 

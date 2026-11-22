@@ -2,6 +2,30 @@
 
 All notable changes to `kickoff` will be documented in this file.
 
+## Unreleased
+
+### Added
+
+- **Bliptrace error tracking built in** (#65). Every new app installs `bliptrace/laravel:^1.2`. A new
+  **Administration → Settings → Error Tracking** page (`manage.settings`) edits every SDK option:
+  enabled (Auto/On/Off), ingest key (encrypted, write-only, shown masked), endpoint, environment,
+  release, sample rate, timeout, retries, retry delays, max frames, max message, ignored exceptions and scrubbed
+  keys. Each field shows whether its value comes from the UI, `BLIPTRACE_*` env (or the
+  deprecated `G8SCOPE_*`, via the SDK) or the SDK default.
+  **Send test event** posts a real event and shows the ingest API's answer.
+- `BliptraceSettings::apply()` overrides `config('bliptrace')` at boot and after a save (cached,
+  cleared on save, `queue:restart`), and falls back to env when the settings table or database is
+  missing. Capture stays off until a key exists. Saves are written to the Audit Trail with the key
+  redacted.
+- The SDK's own DB settings layer and settings page stay off (their default in `bliptrace/laravel`).
+
+### Upgrading an existing app
+
+See `docs/02-development/18-error-tracking.md` and the PR for the file list:
+`composer require bliptrace/laravel:^1.2`, copy `BliptraceSettings`, its settings migration, the
+Livewire page + views, the route, menu entry, settings hub card, the `BliptraceSettings::apply()`
+call in `AppServiceProvider::boot()` and the test, then `php artisan migrate`.
+
 ## 1.40.1 - 2026-11-15
 
 **Full Changelog**: https://github.com/cleaniquecoders/kickoff/compare/1.40.0...1.40.1

@@ -156,6 +156,7 @@ Application-level settings are stored in the **database** via `spatie/laravel-se
 - `MailSettings` — mailer/SMTP, `from_address`, `from_name`, `track_opens`, `track_clicks` (overlaid onto `mailhistory.tracking.*`)
 - `NotificationSettings` — `enabled`, `channels`
 - `SeoSettings` — meta defaults, Open Graph, canonical toggle, robots.txt, GA4/GTM IDs, organization schema
+- `BliptraceSettings` — Bliptrace error tracking (`bliptrace/laravel`). Every field is nullable: null = not set in the UI, so `BLIPTRACE_*` env then the SDK default apply. `BliptraceSettings::apply()` overlays `config('bliptrace')`; never seed it from env. See `docs/02-development/18-error-tracking.md`
 
 **How it works**: `AppServiceProvider::boot()` reads from DB and overrides `config()` values, so all existing `config('app.name')`, `config('mail.from.*')`, `config('notification.*')` calls automatically use DB values.
 

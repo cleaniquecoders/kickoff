@@ -199,6 +199,7 @@ class Administration extends Base
                 || (Route::has('config-webhook.index') && Gate::allows('admin.manage.webhooks')))
             ->addChild($this->child('General', 'admin.settings.show', 'sliders-horizontal', 'manage.settings', 'Configure system-wide settings', false, ['section' => 'general']))
             ->addChild($this->child('Authentication', 'admin.settings.authentication', 'lock-keyhole', 'manage.settings', 'Control sign-in and public registration'))
+            ->addChild($this->child('Error Tracking', 'admin.settings.bliptrace', 'bug', 'manage.settings', 'Bliptrace exception capture, keys and test events'))
             ->addChild($this->child('Support', 'admin.settings.g8desk', 'life-buoy', 'manage.settings', 'Embed the g8desk support widget'))
             ->addChild($this->child('SEO & Analytics', 'admin.settings.seo', 'search', 'manage.settings', 'Search engine defaults, robots.txt and analytics'))
             ->addChild($this->child('Notifications', 'admin.settings.show', 'bell', 'manage.settings', 'Enable notifications and choose delivery channels', false, ['section' => 'notifications']))

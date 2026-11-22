@@ -349,6 +349,8 @@ If a run fails midway, the project directory still exists with partial setup. Yo
 
 20. **The starter kit's auth views are `resources/views/livewire/auth/*`, and Kickoff overrides only `login` and `register`.** Fortify renders `livewire.auth.login` / `livewire.auth.register` (registered by the starter kit's `FortifyServiceProvider`). Kickoff used to ship `stubs/resources/views/auth/*`, which nothing rendered — edits there (the registration toggle, SSO buttons) silently never reached a generated app. The stub `livewire/auth/login` and `register` add `@include('partials.sso')`, and `login` guards the "Sign up" link with `Route::has('register')`: turning public registration off removes that route, and an unguarded `route('register')` throws on `/login`. When the starter kit changes these two views, re-copy them from a fresh `laravel new` and re-apply both edits; don't add other auth view overrides without a reason.
 
+21. **Bliptrace settings live in Kickoff, not in the SDK.** `bliptrace/laravel` (namespace `G8Scope\\`, config key `bliptrace`, env `BLIPTRACE_*`, falling back to the deprecated `G8SCOPE_*`) has its own DB settings layer and page, both off by default (`bliptrace.settings.enabled`, `bliptrace.ui.enabled`). Keep them off: Kickoff's `BliptraceSettings` (group `bliptrace`, every field nullable so env keeps working) is the one source, applied over `config('bliptrace')` by `BliptraceSettings::apply()` in `AppServiceProvider::boot()`. Turning the SDK layer on would give two stores for the same values.
+
 ## Generated Project Stack
 
 Projects created with `kickoff start` receive:

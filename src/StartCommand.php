@@ -488,6 +488,8 @@ class StartCommand extends Command
                 'cleaniquecoders/mailhistory',
                 'cleaniquecoders/traitify',
                 'dragon-code/laravel-deploy-operations',
+                // Bliptrace error tracking; configured in Admin > Settings > Error tracking.
+                'bliptrace/laravel:^1.2',
                 'lab404/laravel-impersonate',
                 'laravel/horizon',
                 'laravel/telescope',
