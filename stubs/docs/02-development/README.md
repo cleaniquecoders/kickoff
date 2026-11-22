@@ -36,6 +36,7 @@ This project is built with:
 11. [Artisan Runner](15-artisan-runner.md) - Run allowlisted Artisan commands from the browser (superadmin only)
 12. [g8desk Support](16-g8desk-support.md) - Embedded support-ticket widget
 13. [SEO & Analytics](17-seo.md) - Meta tags, structured data, sitemap, robots.txt, GA4/GTM
+14. [Error Tracking](18-error-tracking.md) - Bliptrace (g8scope/laravel), UI > env > default
 
 ## Development Workflow
 

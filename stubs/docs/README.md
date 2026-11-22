@@ -28,6 +28,7 @@ Building features and working with the codebase:
 - [Sidebar Navigation](02-development/09-sidebar.md) - Menu configuration
 - [Toast Notifications](02-development/10-toast-notifications.md) - User notifications
 - [g8desk Support Widget](02-development/16-g8desk-support.md) - Native, SDK-free support widget integration
+- [Error Tracking](02-development/18-error-tracking.md) - Bliptrace exception capture, configurable from the admin UI
 
 ### Architecture
 

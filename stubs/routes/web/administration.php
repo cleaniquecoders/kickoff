@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Admin\Settings\Authentication;
+use App\Livewire\Admin\Settings\Bliptrace;
 use App\Livewire\Admin\Settings\G8Desk;
 use App\Livewire\Admin\Settings\Seo;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,11 @@ Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admi
             // Declared before the {section} catch-all so it isn't swallowed by it.
             Route::get('settings/authentication', Authentication::class)
                 ->name('settings.authentication');
+
+            // Same path as g8scope/laravel's own page (see AppServiceProvider), so this
+            // gated, env-aware page replaces it.
+            Route::get('settings/bliptrace', Bliptrace::class)
+                ->name('settings.bliptrace');
 
             Route::get('settings/g8desk', G8Desk::class)
                 ->name('settings.g8desk');

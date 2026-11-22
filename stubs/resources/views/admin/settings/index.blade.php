@@ -43,6 +43,25 @@
         <x-card>
             <x-card.header>
                 <div class="flex items-center">
+                    <x-lucide-bug class="h-6 w-6 text-brand-500 me-3" />
+                    <flux:heading size="lg">Error Tracking</flux:heading>
+                </div>
+            </x-card.header>
+            <x-card.body>
+                <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                    Send unhandled exceptions to Bliptrace and send a test event.
+                </p>
+            </x-card.body>
+            <x-card.footer>
+                <flux:button variant="primary" :href="route('admin.settings.bliptrace')" wire:navigate>
+                    Configure
+                </flux:button>
+            </x-card.footer>
+        </x-card>
+
+        <x-card>
+            <x-card.header>
+                <div class="flex items-center">
                     <x-lucide-life-buoy class="h-6 w-6 text-brand-500 me-3" />
                     <flux:heading size="lg">Support</flux:heading>
                 </div>

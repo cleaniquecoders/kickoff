@@ -133,6 +133,7 @@ Installs required Composer packages:
 - `livewire/flux`
 - `livewire/volt`
 - `mallardduck/blade-lucide-icons`
+- `g8scope/laravel` (Bliptrace error tracking)
 - `owen-it/laravel-auditing`
 - `predis/predis`
 - `spatie/laravel-activitylog`
