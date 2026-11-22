@@ -19,7 +19,7 @@ use Livewire\Livewire;
 
 const BLIPTRACE_KEY = 'bt_live_abcdefghijkl1234';
 
-/** Pretend these G8SCOPE_* values came from the environment, then re-resolve. */
+/** Pretend these BLIPTRACE_* values came from the environment, then re-resolve. */
 function bliptraceEnv(array $env = []): void
 {
     app()->instance(BliptraceSettings::BASELINE, array_replace((array) app(BliptraceSettings::BASELINE), $env));
@@ -69,12 +69,13 @@ describe('access', function () {
         expect(json_encode(menu('administration')->menus()))->toContain('admin\/settings\/bliptrace');
     });
 
-    it('replaces the SDK\'s own ungated settings page and settings migration', function () {
+    it('keeps the SDK\'s own settings layer and page off', function () {
         $action = Route::getRoutes()->match(Request::create('/admin/settings/bliptrace'))->getActionName();
 
         expect($action)->toContain(Bliptrace::class)
-            ->and(config('g8scope.ui.middleware'))->toContain('can:manage.settings')
-            ->and(collect(config('settings.migrations_paths'))->filter(fn ($p) => str_contains($p, 'vendor/g8scope'))->all())->toBe([]);
+            ->and(config('bliptrace.settings.enabled'))->toBeFalse()
+            ->and(config('bliptrace.ui.enabled'))->toBeFalse()
+            ->and(collect(Route::getRoutes()->getRoutes())->filter(fn ($route) => str_starts_with($route->getActionName(), 'G8Scope\\'))->all())->toBe([]);
     });
 });
 
@@ -88,6 +89,7 @@ describe('save and validation', function () {
             ->set('endpoint', 'https://ingest.example.com')
             ->set('environment', 'staging')
             ->set('release', 'app@2.0.0')
+            ->set('sampleRate', '0.25')
             ->set('timeout', '5')
             ->set('maxRetries', '3')
             ->set('retryBaseMs', '200')
@@ -105,6 +107,7 @@ describe('save and validation', function () {
 
         expect($settings->enabled)->toBeTrue()
             ->and($settings->key)->toBe(BLIPTRACE_KEY)
+            ->and($settings->sample_rate)->toBe(0.25)
             ->and($settings->timeout)->toBe(5)
             ->and($settings->retry_cap_ms)->toBe(4000)
             ->and($settings->ignore_exceptions)->toBe(['Illuminate\\Validation\\ValidationException', 'RuntimeException'])
@@ -126,6 +129,9 @@ describe('save and validation', function () {
     })->with([
         'endpoint not a url' => ['endpoint', 'not a url'],
         'endpoint not http' => ['endpoint', 'ftp://ingest.example.com'],
+        'sample rate above 1' => ['sampleRate', '1.5'],
+        'sample rate below 0' => ['sampleRate', '-0.1'],
+        'sample rate not numeric' => ['sampleRate', 'half'],
         'timeout too high' => ['timeout', '120'],
         'retries negative' => ['maxRetries', '-1'],
         'frames not numeric' => ['maxFrames', 'many'],
@@ -191,7 +197,7 @@ describe('masking', function () {
 describe('resolution order', function () {
     it('prefers UI, then env, then the SDK default', function () {
         $resolved = BliptraceSettings::resolve(
-            ['key' => 'env-key', 'endpoint' => 'https://env.example.com', 'environment' => '', 'timeout' => '7'],
+            ['key' => 'env-key', 'endpoint' => 'https://env.example.com', 'environment' => '', 'timeout' => '7', 'sample_rate' => '0.5'],
             ['endpoint' => 'https://ui.example.com'],
         );
 
@@ -201,11 +207,13 @@ describe('resolution order', function () {
             'timeout' => 7,
             'environment' => config('app.env'),
             'max_frames' => 30,
+            'sample_rate' => 0.5,
             'enabled' => true,
         ])->and($resolved['sources'])->toMatchArray([
             'endpoint' => 'ui',
             'key' => 'env',
             'timeout' => 'env',
+            'sample_rate' => 'env',
             'environment' => 'default',
             'max_frames' => 'default',
         ]);
@@ -222,11 +230,42 @@ describe('resolution order', function () {
             ->assertSeeInOrder(['Release', 'Default']);
     });
 
+    it('labels an env value equal to the SDK default as default', function () {
+        expect(BliptraceSettings::resolve(['sample_rate' => '1.0', 'timeout' => '3'], [])['sources'])
+            ->toMatchArray(['sample_rate' => 'default', 'timeout' => 'default']);
+    });
+
+    it('has the SDK honour BLIPTRACE_* env on its own, with nothing saved', function (bool $enabled) {
+        // Exactly what the SDK's merged config holds when G8Deck injects env.
+        config(['bliptrace.key' => 'env-key', 'bliptrace.endpoint' => 'https://env.example.com', 'bliptrace.enabled' => $enabled, 'bliptrace.sample_rate' => '0.5']);
+        app()->forgetInstance(Client::class);
+
+        $client = bliptraceClientConfig();
+
+        expect($client->endpoint)->toBe('https://env.example.com')
+            ->and($client->enabled)->toBe($enabled)
+            ->and($client->sampleRate)->toBe(0.5);
+    })->with(['enabled' => true, 'disabled' => false]);
+
+    it('still honours the deprecated G8SCOPE_* env through the SDK config', function () {
+        putenv('BLIPTRACE_ENDPOINT');
+        putenv('G8SCOPE_ENDPOINT=https://legacy.example.com');
+
+        try {
+            $sdkConfig = require glob(base_path('vendor/bliptrace/laravel/config/*.php'))[0];
+        } finally {
+            putenv('G8SCOPE_ENDPOINT');
+        }
+
+        expect($sdkConfig['endpoint'])->toBe('https://legacy.example.com')
+            ->and(BliptraceSettings::resolve($sdkConfig, [])['sources']['endpoint'])->toBe('env');
+    });
+
     it('lets env work with zero clicks', function () {
         bliptraceEnv(['key' => 'env-key', 'endpoint' => 'https://env.example.com']);
 
-        expect(config('g8scope.enabled'))->toBeTrue()
-            ->and(config('g8scope.key'))->toBe('env-key')
+        expect(config('bliptrace.enabled'))->toBeTrue()
+            ->and(config('bliptrace.key'))->toBe('env-key')
             ->and(bliptraceClientConfig()->endpoint)->toBe('https://env.example.com');
     });
 });
@@ -241,6 +280,7 @@ describe('runtime override', function () {
             ->set('endpoint', 'https://ui.example.com')
             ->set('release', 'app@3.0.0')
             ->set('maxFrames', '12')
+            ->set('sampleRate', '0.1')
             ->call('save');
 
         $client = bliptraceClientConfig();
@@ -249,6 +289,7 @@ describe('runtime override', function () {
             ->and($client->endpoint)->toBe('https://ui.example.com')
             ->and($client->release)->toBe('app@3.0.0')
             ->and($client->maxFrames)->toBe(12)
+            ->and($client->sampleRate)->toBe(0.1)
             ->and($client->enabled)->toBeTrue()
             ->and(Cache::get('illuminate:queue:restart'))->not->toBeNull();
     });
@@ -271,14 +312,14 @@ describe('runtime override', function () {
 
         Livewire::actingAs(bliptraceAdmin())->test(Bliptrace::class)->set('enabled', 'off')->call('save');
 
-        expect(config('g8scope.enabled'))->toBeFalse()
+        expect(config('bliptrace.enabled'))->toBeFalse()
             ->and(bliptraceClientConfig()->enabled)->toBeFalse();
     });
 });
 
 describe('disabled by default', function () {
     it('is off on a fresh app with no key', function () {
-        expect(config('g8scope.enabled'))->toBeFalse()
+        expect(config('bliptrace.enabled'))->toBeFalse()
             ->and(app(Client::class)->buildEnvelope(new RuntimeException('boom')))->toBeNull();
     });
 
@@ -340,8 +381,8 @@ describe('missing settings table', function () {
         bliptraceEnv(['key' => 'env-key', 'endpoint' => 'https://env.example.com']);
 
         expect(BliptraceSettings::overrides())->toBe([])
-            ->and(config('g8scope.key'))->toBe('env-key')
-            ->and(config('g8scope.enabled'))->toBeTrue()
+            ->and(config('bliptrace.key'))->toBe('env-key')
+            ->and(config('bliptrace.enabled'))->toBeTrue()
             ->and(bliptraceClientConfig()->endpoint)->toBe('https://env.example.com');
     });
 
@@ -359,6 +400,6 @@ describe('missing settings table', function () {
         bliptraceEnv(['key' => 'env-key']);
 
         expect(BliptraceSettings::overrides())->toBe([])
-            ->and(config('g8scope.key'))->toBe('env-key');
+            ->and(config('bliptrace.key'))->toBe('env-key');
     });
 });

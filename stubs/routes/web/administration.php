@@ -34,8 +34,7 @@ Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1', 'can:access.admi
             Route::get('settings/authentication', Authentication::class)
                 ->name('settings.authentication');
 
-            // Same path as g8scope/laravel's own page (see AppServiceProvider), so this
-            // gated, env-aware page replaces it.
+            // Bliptrace error tracking (bliptrace/laravel); the SDK's own page stays off.
             Route::get('settings/bliptrace', Bliptrace::class)
                 ->name('settings.bliptrace');
 

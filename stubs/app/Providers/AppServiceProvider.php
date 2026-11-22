@@ -11,64 +11,19 @@ use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
 use App\Settings\SeoSettings;
 use CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner;
-use G8Scope\Laravel\G8ScopeServiceProvider;
-use G8Scope\Laravel\Settings\G8ScopeSettings;
-use G8Scope\Php\Client;
-use G8Scope\Php\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Features;
 use Livewire\Livewire;
-use ReflectionClass;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
-        $this->replaceBliptraceSdkSettings();
-    }
-
-    /**
-     * g8scope/laravel ships its own settings group, migration, client binding and
-     * page at /g8scope/settings (any signed-in user). Kickoff replaces all four with
-     * BliptraceSettings + Admin > Settings > Error tracking, which keeps unset
-     * fields on env and is gated by manage.settings. Runs after the SDK's
-     * register() (package providers register first) and before any boot().
-     */
-    private function replaceBliptraceSdkSettings(): void
-    {
-        $config = $this->app->make('config');
-
-        $config->set('settings.settings', array_values(array_filter(
-            (array) $config->get('settings.settings', []),
-            fn ($class) => $class !== G8ScopeSettings::class,
-        )));
-        // Same string the SDK registers (__DIR__.'/../database/settings' from src/).
-        $sdkMigrations = dirname((string) (new ReflectionClass(G8ScopeServiceProvider::class))->getFileName()).'/../database/settings';
-        $config->set('settings.migrations_paths', array_values(array_filter(
-            (array) $config->get('settings.migrations_paths', []),
-            fn ($path) => $path !== $sdkMigrations,
-        )));
-
-        // The SDK builds its client from its own settings class, whose property
-        // defaults (endpoint, enabled = true) beat config('g8scope') even when its
-        // group was never migrated. Build it from config, which apply() owns.
-        $this->app->singleton(Client::class, fn ($app) => new Client(Config::fromArray([
-            ...(array) $config->get('g8scope', []),
-            'base_path' => $app->basePath(),
-            'sdk_name' => 'g8scope-laravel',
-        ])));
-
-        // The SDK page is registered at our page's path, so the app route (loaded
-        // after every provider boots) replaces it; the gate covers it regardless.
-        $config->set('g8scope.ui.path', 'admin/settings/bliptrace');
-        $config->set('g8scope.ui.middleware', ['web', 'auth', 'can:manage.settings']);
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap any application services.

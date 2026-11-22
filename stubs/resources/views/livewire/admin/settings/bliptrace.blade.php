@@ -4,7 +4,7 @@
 
     <div>
         <flux:heading size="xl" level="1">{{ __('Error tracking') }}</flux:heading>
-        <flux:text class="mt-2">{{ __('Send unhandled exceptions to Bliptrace. Leave a field blank to use the G8SCOPE_* environment value, or the SDK default.') }}</flux:text>
+        <flux:text class="mt-2">{{ __('Send unhandled exceptions to Bliptrace. Leave a field blank to use the BLIPTRACE_* environment value, or the SDK default.') }}</flux:text>
     </div>
 
     <flux:separator variant="subtle" class="my-6" />
@@ -80,7 +80,7 @@
                             <flux:radio value="on" :label="__('On')" />
                             <flux:radio value="off" :label="__('Off')" />
                         </flux:radio.group>
-                        <flux:description>{{ __('Auto follows G8SCOPE_ENABLED and captures only when an ingest key is set. Nothing is sent without a key.') }}</flux:description>
+                        <flux:description>{{ __('Auto follows BLIPTRACE_ENABLED and captures only when an ingest key is set. Nothing is sent without a key.') }}</flux:description>
                         <flux:error name="enabled" />
                     </flux:field>
 
@@ -96,7 +96,7 @@
                     </flux:field>
 
                     @if ($keyStored)
-                        <flux:checkbox wire:model="clearKey" :label="__('Remove the saved key and fall back to G8SCOPE_KEY')" />
+                        <flux:checkbox wire:model="clearKey" :label="__('Remove the saved key and fall back to BLIPTRACE_KEY')" />
                     @endif
 
                     <flux:field>
@@ -138,6 +138,7 @@
                 <x-card.body class="space-y-6">
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         @foreach ([
+                            ['sampleRate', 'sample_rate', __('Sample rate'), __('Share of events sent, from 0 (none) to 1 (all).')],
                             ['timeout', 'timeout', __('Timeout (seconds)'), __('Per send; kept short so a slow ingest never slows the app.')],
                             ['maxRetries', 'max_retries', __('Max retries'), __('Retries on timeouts, 429 and 5xx.')],
                             ['retryBaseMs', 'retry_base_ms', __('Retry base delay (ms)'), __('Doubles per attempt, with jitter.')],
@@ -150,7 +151,7 @@
                                     <flux:label>{{ $label }}</flux:label>
                                     @include('livewire.admin.settings.partials.bliptrace-source', ['source' => $sources[$field]])
                                 </div>
-                                <flux:input wire:model="{{ $property }}" type="number" inputmode="numeric" :placeholder="$inherited($field)" />
+                                <flux:input wire:model="{{ $property }}" type="number" :step="$field === 'sample_rate' ? '0.01' : '1'" :min="$field === 'sample_rate' ? '0' : null" :max="$field === 'sample_rate' ? '1' : null" :inputmode="$field === 'sample_rate' ? 'decimal' : 'numeric'" :placeholder="$inherited($field)" />
                                 <flux:description>{{ $help }}</flux:description>
                                 <flux:error :name="$property" />
                             </flux:field>

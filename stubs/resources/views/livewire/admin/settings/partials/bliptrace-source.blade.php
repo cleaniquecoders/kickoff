@@ -1,4 +1,4 @@
-{{-- Where a field's effective value comes from: saved here, the G8SCOPE_* env, or the SDK default. --}}
+{{-- Where a field's effective value comes from: saved here, the BLIPTRACE_* env, or the SDK default. --}}
 @switch($source)
     @case('ui')
         <flux:badge size="sm" color="blue" title="{{ __('Saved on this page') }}">{{ __('UI') }}</flux:badge>

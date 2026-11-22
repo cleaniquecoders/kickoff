@@ -489,7 +489,7 @@ class StartCommand extends Command
                 'cleaniquecoders/traitify',
                 'dragon-code/laravel-deploy-operations',
                 // Bliptrace error tracking; configured in Admin > Settings > Error tracking.
-                'g8scope/laravel:^1.0',
+                'bliptrace/laravel:^1.2',
                 'lab404/laravel-impersonate',
                 'laravel/horizon',
                 'laravel/telescope',

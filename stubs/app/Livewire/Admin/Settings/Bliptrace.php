@@ -18,10 +18,10 @@ use Livewire\Component;
 use RuntimeException;
 
 /**
- * Admin > Settings > Error tracking (Bliptrace, g8scope/laravel).
+ * Admin > Settings > Error tracking (Bliptrace, bliptrace/laravel).
  *
  * A blank field means "not set here": the value falls through to the
- * G8SCOPE_* env var, then the SDK default. The ingest key is write-only — the
+ * BLIPTRACE_* env var, then the SDK default. The ingest key is write-only — the
  * stored value is never put on a public property, so it never reaches the
  * browser; only a masked hint is rendered.
  */
@@ -33,6 +33,7 @@ class Bliptrace extends Component
         'endpoint' => 'endpoint',
         'environment' => 'environment',
         'release' => 'release',
+        'sampleRate' => 'sample_rate',
         'timeout' => 'timeout',
         'maxRetries' => 'max_retries',
         'retryBaseMs' => 'retry_base_ms',
@@ -54,6 +55,9 @@ class Bliptrace extends Component
     public string $environment = '';
 
     public string $release = '';
+
+    /** Share of events sent, 0–1. */
+    public string $sampleRate = '';
 
     public string $timeout = '';
 
@@ -101,6 +105,7 @@ class Bliptrace extends Component
         $this->authorize('manage.settings');
 
         $this->validate($this->rules(), [], [
+            'sampleRate' => 'sample rate',
             'maxRetries' => 'max retries',
             'retryBaseMs' => 'retry base delay',
             'retryCapMs' => 'retry delay cap',
@@ -138,6 +143,7 @@ class Bliptrace extends Component
         $settings->endpoint = $string($this->endpoint);
         $settings->environment = $string($this->environment);
         $settings->release = $string($this->release);
+        $settings->sample_rate = trim($this->sampleRate) === '' ? null : (float) $this->sampleRate;
         $settings->timeout = $int($this->timeout);
         $settings->max_retries = $int($this->maxRetries);
         $settings->retry_base_ms = $int($this->retryBaseMs);
@@ -178,7 +184,7 @@ class Bliptrace extends Component
     {
         $this->authorize('manage.settings');
 
-        $config = (array) config('g8scope');
+        $config = (array) config('bliptrace');
 
         if (! ($config['enabled'] ?? false)) {
             $this->testResult = ['ok' => false, 'message' => __('Error tracking is off. Add an ingest key and turn it on, then save.')];
@@ -250,6 +256,7 @@ class Bliptrace extends Component
             'endpoint' => ['nullable', 'url:http,https', 'max:255'],
             'environment' => ['nullable', 'string', 'max:64'],
             'release' => ['nullable', 'string', 'max:255'],
+            'sampleRate' => ['nullable', 'numeric', 'between:0,1'],
             'timeout' => $int(1, 30),
             'maxRetries' => $int(0, 10),
             'retryBaseMs' => $int(0, 60000),

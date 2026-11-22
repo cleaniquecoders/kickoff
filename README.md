@@ -107,7 +107,7 @@ kickoff start johndoe blog /path/to/existing/laravel
   - [cleaniquecoders/traitify](https://github.com/cleaniquecoders/traitify)
   - [cleaniquecoders/laravel-media-secure](https://github.com/cleaniquecoders/laravel-media-secure)
   - [owen-it/laravel-auditing](https://laravel-auditing.com)
-  - [g8scope/laravel](https://packagist.org/packages/g8scope/laravel) — Bliptrace error tracking, configurable at Admin > Settings > Error Tracking
+  - [bliptrace/laravel](https://packagist.org/packages/bliptrace/laravel) — Bliptrace error tracking, configurable at Admin > Settings > Error Tracking
 
 - 🛠 Dev tools:
   - [barryvdh/laravel-debugbar](https://github.com/barryvdh/laravel-debugbar)
