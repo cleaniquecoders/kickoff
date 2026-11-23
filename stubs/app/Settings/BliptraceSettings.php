@@ -41,9 +41,19 @@ class BliptraceSettings extends Settings
         'retry_cap_ms' => 'BLIPTRACE_RETRY_CAP_MS',
         'max_frames' => 'BLIPTRACE_MAX_FRAMES',
         'max_message' => 'BLIPTRACE_MAX_MESSAGE',
+        'max_breadcrumbs' => 'BLIPTRACE_MAX_BREADCRUMBS',
+        'breadcrumbs_requests' => 'BLIPTRACE_BREADCRUMBS_REQUESTS',
+        'breadcrumbs_queries' => 'BLIPTRACE_BREADCRUMBS_QUERIES',
+        'breadcrumbs_logs' => 'BLIPTRACE_BREADCRUMBS_LOGS',
+        'breadcrumbs_jobs' => 'BLIPTRACE_BREADCRUMBS_JOBS',
+        'breadcrumbs_cache' => 'BLIPTRACE_BREADCRUMBS_CACHE',
         'ignore_exceptions' => null,
         'scrub_keys' => null,
+        'tags' => null,
     ];
+
+    /** Breadcrumb sources: field breadcrumbs_{source} maps to config('bliptrace.breadcrumbs.{source}'). */
+    public const array BREADCRUMBS = ['requests', 'queries', 'logs', 'jobs', 'cache'];
 
     public ?bool $enabled;
 
@@ -69,11 +79,26 @@ class BliptraceSettings extends Settings
 
     public ?int $max_message;
 
+    public ?int $max_breadcrumbs;
+
+    public ?bool $breadcrumbs_requests;
+
+    public ?bool $breadcrumbs_queries;
+
+    public ?bool $breadcrumbs_logs;
+
+    public ?bool $breadcrumbs_jobs;
+
+    public ?bool $breadcrumbs_cache;
+
     /** @var array<int, string>|null */
     public ?array $ignore_exceptions;
 
     /** @var array<int, string>|null */
     public ?array $scrub_keys;
+
+    /** @var array<string, string>|null */
+    public ?array $tags;
 
     public static function group(): string
     {
@@ -129,7 +154,7 @@ class BliptraceSettings extends Settings
     public static function resolve(array $baseline, array $overrides): array
     {
         $defaults = self::defaults();
-        $config = [];
+        $config = $defaults; // every field is set below
         $sources = [];
 
         foreach (array_keys(self::FIELDS) as $field) {
@@ -141,7 +166,9 @@ class BliptraceSettings extends Settings
             }
 
             // An empty env var (BLIPTRACE_RELEASE=) counts as unset.
-            $value = $baseline[$field] ?? null;
+            $value = str_starts_with($field, 'breadcrumbs_')
+                ? $baseline['breadcrumbs'][substr($field, 12)] ?? null
+                : $baseline[$field] ?? null;
             $value = $value === null || $value === '' ? $defaults[$field] : $value;
             $config[$field] = $value;
             // Compared with the SDK default rather than env() so the label stays
@@ -153,8 +180,12 @@ class BliptraceSettings extends Settings
 
         $config['sample_rate'] = (float) $config['sample_rate'];
 
-        foreach (['timeout', 'max_retries', 'retry_base_ms', 'retry_cap_ms', 'max_frames', 'max_message'] as $int) {
+        foreach (['timeout', 'max_retries', 'retry_base_ms', 'retry_cap_ms', 'max_frames', 'max_message', 'max_breadcrumbs'] as $int) {
             $config[$int] = (int) $config[$int];
+        }
+
+        foreach (self::BREADCRUMBS as $source) {
+            $config["breadcrumbs_{$source}"] = filter_var($config["breadcrumbs_{$source}"], FILTER_VALIDATE_BOOLEAN);
         }
 
         $config['key'] = filled($config['key']) ? (string) $config['key'] : null;
@@ -179,8 +210,15 @@ class BliptraceSettings extends Settings
         }
 
         $resolved = self::resolve((array) $app->make(self::BASELINE), self::overrides());
+        $config = $resolved['config'];
 
-        config(['bliptrace' => array_replace((array) config('bliptrace', []), $resolved['config'])]);
+        // The SDK reads the toggles nested, as bliptrace.breadcrumbs.{source}.
+        foreach (self::BREADCRUMBS as $source) {
+            $config['breadcrumbs'][$source] = $config["breadcrumbs_{$source}"];
+            unset($config["breadcrumbs_{$source}"]);
+        }
+
+        config(['bliptrace' => array_replace((array) config('bliptrace', []), $config)]);
 
         $app->forgetInstance(Client::class);
         $app->forgetInstance(Reporter::class);
@@ -190,8 +228,9 @@ class BliptraceSettings extends Settings
     }
 
     /**
-     * SDK defaults (from bliptrace/php's Config), with the two Laravel-specific
-     * ones: environment follows APP_ENV, and capture is on once a key exists.
+     * SDK defaults (from bliptrace/php's Config), with the Laravel-specific
+     * ones: environment follows APP_ENV, capture is on once a key exists, and
+     * the breadcrumb toggles mirror bliptrace/laravel's config (cache off).
      *
      * @return array<string, mixed>
      */
@@ -212,8 +251,15 @@ class BliptraceSettings extends Settings
             'retry_cap_ms' => $sdk->retryCapMs,
             'max_frames' => $sdk->maxFrames,
             'max_message' => $sdk->maxMessage,
+            'max_breadcrumbs' => $sdk->maxBreadcrumbs,
+            'breadcrumbs_requests' => true,
+            'breadcrumbs_queries' => true,
+            'breadcrumbs_logs' => true,
+            'breadcrumbs_jobs' => true,
+            'breadcrumbs_cache' => false,
             'ignore_exceptions' => [],
             'scrub_keys' => [],
+            'tags' => [],
         ];
     }
 

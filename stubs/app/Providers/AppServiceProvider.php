@@ -11,6 +11,7 @@ use App\Settings\MailSettings;
 use App\Settings\NotificationSettings;
 use App\Settings\SeoSettings;
 use CleaniqueCoders\ArtisanRunner\Livewire\CommandRunner;
+use G8Scope\Laravel\G8ScopeServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -23,7 +24,14 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void {}
+    public function register(): void
+    {
+        // Just before bliptrace/laravel boots: it reads bliptrace.enabled and the breadcrumb
+        // toggles in its own boot(), so the UI values must already be in place. Not an app
+        // booting() callback: Eloquent (which the settings read) is not ready until the
+        // framework providers have booted. apply() never throws, and falls back to env.
+        $this->app->getProvider(G8ScopeServiceProvider::class)?->booting(fn () => BliptraceSettings::apply());
+    }
 
     /**
      * Bootstrap any application services.
@@ -63,10 +71,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->applyDatabaseSettings();
-
-        // Separate from applyDatabaseSettings(): it never throws, and must still
-        // run (falling back to env) when an earlier settings group is missing.
-        BliptraceSettings::apply();
         $this->registerVendorLivewireNamespaces();
     }
 

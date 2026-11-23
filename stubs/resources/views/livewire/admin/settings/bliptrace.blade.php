@@ -105,7 +105,7 @@
                             @include('livewire.admin.settings.partials.bliptrace-source', ['source' => $sources['endpoint']])
                         </div>
                         <flux:input wire:model="endpoint" type="url" :placeholder="$inherited('endpoint')" />
-                        <flux:description>{{ __('Ingest API base URL; events post to {endpoint}/v1/ingest.') }}</flux:description>
+                        <flux:description>{{ __('Ingest URL, e.g. https://ingest.bliptrace.com/v1/ingest. A bare base URL gets /v1/ingest added.') }}</flux:description>
                         <flux:error name="endpoint" />
                     </flux:field>
 
@@ -128,6 +128,58 @@
                             <flux:error name="release" />
                         </flux:field>
                     </div>
+                </x-card.body>
+            </x-card>
+
+            <x-card>
+                <x-card.header>
+                    <flux:heading size="lg">{{ __('Breadcrumbs & tags') }}</flux:heading>
+                </x-card.header>
+                <x-card.body class="space-y-6">
+                    <flux:field>
+                        <div class="flex items-center justify-between gap-2">
+                            <flux:label>{{ __('Max breadcrumbs') }}</flux:label>
+                            @include('livewire.admin.settings.partials.bliptrace-source', ['source' => $sources['max_breadcrumbs']])
+                        </div>
+                        <flux:input wire:model="maxBreadcrumbs" type="number" step="1" min="0" max="200" inputmode="numeric" :placeholder="$inherited('max_breadcrumbs')" />
+                        <flux:description>{{ __('Events kept before an error and sent with it, 0 to 200. 0 turns breadcrumbs off.') }}</flux:description>
+                        <flux:error name="maxBreadcrumbs" />
+                    </flux:field>
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        @foreach ([
+                            'requests' => [__('Requests'), __('Method, path and route of each request.')],
+                            'queries' => [__('Database queries'), __('SQL text only, never the bound values.')],
+                            'logs' => [__('Log messages'), __('Messages written to the Laravel log.')],
+                            'jobs' => [__('Queued jobs'), __('Each job a worker starts.')],
+                            'cache' => [__('Cache misses'), __('Keys looked up and not found.')],
+                        ] as $source => [$label, $help])
+                            <flux:field wire:key="bliptrace-breadcrumbs-{{ $source }}">
+                                <div class="flex items-center justify-between gap-2">
+                                    <flux:label>{{ $label }}</flux:label>
+                                    @include('livewire.admin.settings.partials.bliptrace-source', ['source' => $sources['breadcrumbs_'.$source]])
+                                </div>
+                                <flux:radio.group wire:model="breadcrumbs.{{ $source }}" variant="segmented" class="w-full sm:w-auto">
+                                    <flux:radio value="" :label="__('Auto')" />
+                                    <flux:radio value="on" :label="__('On')" />
+                                    <flux:radio value="off" :label="__('Off')" />
+                                </flux:radio.group>
+                                <flux:description>{{ $help }} {{ $effective['breadcrumbs_'.$source] ? __('Now on.') : __('Now off.') }}</flux:description>
+                                <flux:error :name="'breadcrumbs.'.$source" />
+                            </flux:field>
+                        @endforeach
+                    </div>
+
+                    <flux:field>
+                        <div class="flex items-center justify-between gap-2">
+                            <flux:label>{{ __('Tags') }}</flux:label>
+                            @include('livewire.admin.settings.partials.bliptrace-source', ['source' => $sources['tags']])
+                        </div>
+                        <flux:textarea wire:model="tags" rows="4" class="font-mono text-xs"
+                            :placeholder="$inheritedTags ?: 'tenant=acme'" />
+                        <flux:description>{{ __('Sent with every event, one key=value per line (up to 50).') }}</flux:description>
+                        <flux:error name="tags" />
+                    </flux:field>
                 </x-card.body>
             </x-card>
 
