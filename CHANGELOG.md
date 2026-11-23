@@ -18,13 +18,26 @@ All notable changes to `kickoff` will be documented in this file.
   missing. Capture stays off until a key exists. Saves are written to the Audit Trail with the key
   redacted.
 - The SDK's own DB settings layer and settings page stay off (their default in `bliptrace/laravel`).
+- **bliptrace/laravel 1.3** (`bliptrace/laravel:^1.3`). The Error Tracking page gains a
+  **Breadcrumbs & tags** card: max breadcrumbs (0–200), Auto/On/Off for each breadcrumb source
+  (requests, SQL queries without bindings, logs, jobs, cache misses) and tags (`key=value` per
+  line), with the same UI → env → SDK default resolution and source badges. New nullable fields
+  come from the settings migration `2026_11_23_000200_add_bliptrace_breadcrumb_settings`.
+  The default endpoint is now `https://ingest.bliptrace.com/v1/ingest`; **Send test event**
+  accepts the full URL or a bare base URL.
+
+### Changed
+
+- `BliptraceSettings::apply()` now runs as a `booting` callback on the SDK's service provider
+  (registered in `AppServiceProvider::register()`), not in `AppServiceProvider::boot()`: the SDK
+  registers its breadcrumb listeners in its own `boot()`, so UI values must be applied first.
 
 ### Upgrading an existing app
 
 See `docs/02-development/18-error-tracking.md` and the PR for the file list:
-`composer require bliptrace/laravel:^1.2`, copy `BliptraceSettings`, its settings migration, the
+`composer require bliptrace/laravel:^1.3`, copy `BliptraceSettings`, its two settings migrations, the
 Livewire page + views, the route, menu entry, settings hub card, the `BliptraceSettings::apply()`
-call in `AppServiceProvider::boot()` and the test, then `php artisan migrate`.
+hook in `AppServiceProvider::register()` and the test, then `php artisan migrate`.
 
 ## 1.40.1 - 2026-11-15
 

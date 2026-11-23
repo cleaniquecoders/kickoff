@@ -5,6 +5,7 @@ use App\Models\Audit;
 use App\Models\User;
 use App\Settings\BliptraceSettings;
 use Database\Seeders\AccessControlSeeder;
+use G8Scope\Laravel\G8ScopeServiceProvider;
 use G8Scope\Php\Client;
 use G8Scope\Php\Config;
 use Illuminate\Http\Client\ConnectionException;
@@ -96,6 +97,10 @@ describe('save and validation', function () {
             ->set('retryCapMs', '4000')
             ->set('maxFrames', '40')
             ->set('maxMessage', '1000')
+            ->set('maxBreadcrumbs', '20')
+            ->set('breadcrumbs.queries', 'off')
+            ->set('breadcrumbs.cache', 'on')
+            ->set('tags', "tenant=acme\nregion = my-1\n")
             ->set('ignoreExceptions', "Illuminate\\Validation\\ValidationException\n\\RuntimeException")
             ->set('scrubKeys', "password\nnric\n")
             ->call('save')
@@ -111,7 +116,12 @@ describe('save and validation', function () {
             ->and($settings->timeout)->toBe(5)
             ->and($settings->retry_cap_ms)->toBe(4000)
             ->and($settings->ignore_exceptions)->toBe(['Illuminate\\Validation\\ValidationException', 'RuntimeException'])
-            ->and($settings->scrub_keys)->toBe(['password', 'nric']);
+            ->and($settings->scrub_keys)->toBe(['password', 'nric'])
+            ->and($settings->max_breadcrumbs)->toBe(20)
+            ->and($settings->breadcrumbs_queries)->toBeFalse()
+            ->and($settings->breadcrumbs_cache)->toBeTrue()
+            ->and($settings->breadcrumbs_requests)->toBeNull()
+            ->and($settings->tags)->toBe(['tenant' => 'acme', 'region' => 'my-1']);
 
         $audit = Audit::where('auditable_type', BliptraceSettings::class)->sole();
 
@@ -137,7 +147,30 @@ describe('save and validation', function () {
         'frames not numeric' => ['maxFrames', 'many'],
         'unknown ignored class' => ['ignoreExceptions', 'App\\Nope\\MissingException'],
         'enabled garbage' => ['enabled', 'maybe'],
+        'max breadcrumbs too high' => ['maxBreadcrumbs', '201'],
+        'max breadcrumbs negative' => ['maxBreadcrumbs', '-1'],
+        'breadcrumb toggle garbage' => ['breadcrumbs.queries', 'maybe'],
+        'tag without value' => ['tags', 'tenant'],
+        'tag with empty value' => ['tags', 'tenant='],
+        'tag key with spaces' => ['tags', 'my tenant=acme'],
+        'tag value too long' => ['tags', 'tenant='.str_repeat('a', 201)],
+        'tag listed twice' => ['tags', "tenant=a\ntenant=b"],
+        'too many tags' => ['tags', implode("\n", array_map(fn ($i) => "t{$i}=v", range(1, 51)))],
     ]);
+
+    it('keeps the breadcrumb toggles and tags when the page is reopened', function () {
+        $admin = bliptraceAdmin();
+
+        Livewire::actingAs($admin)->test(Bliptrace::class)
+            ->set('breadcrumbs.logs', 'off')
+            ->set('tags', "tenant=acme\nregion=my")
+            ->call('save');
+
+        Livewire::actingAs($admin)->test(Bliptrace::class)
+            ->assertSet('breadcrumbs.logs', 'off')
+            ->assertSet('breadcrumbs.jobs', '')
+            ->assertSet('tags', "tenant=acme\nregion=my");
+    });
 
     it('refuses to turn capture on with no key anywhere', function () {
         Livewire::actingAs(bliptraceAdmin())->test(Bliptrace::class)
@@ -219,6 +252,28 @@ describe('resolution order', function () {
         ]);
     });
 
+    it('resolves breadcrumb toggles from the SDK\'s nested config', function () {
+        $resolved = BliptraceSettings::resolve(
+            ['breadcrumbs' => ['queries' => false, 'logs' => true, 'cache' => false], 'max_breadcrumbs' => '20'],
+            ['breadcrumbs_cache' => true],
+        );
+
+        expect($resolved['config'])->toMatchArray([
+            'max_breadcrumbs' => 20,
+            'breadcrumbs_requests' => true,
+            'breadcrumbs_queries' => false,
+            'breadcrumbs_cache' => true,
+            'tags' => [],
+        ])->and($resolved['sources'])->toMatchArray([
+            'max_breadcrumbs' => 'env',
+            'breadcrumbs_requests' => 'default',
+            'breadcrumbs_queries' => 'env',
+            'breadcrumbs_logs' => 'default',
+            'breadcrumbs_cache' => 'ui',
+            'tags' => 'default',
+        ]);
+    });
+
     it('shows the source of each field on the page', function () {
         bliptraceEnv(['key' => 'env-key-0000000000']);
 
@@ -294,6 +349,29 @@ describe('runtime override', function () {
             ->and(Cache::get('illuminate:queue:restart'))->not->toBeNull();
     });
 
+    it('applies breadcrumb and tag values to the SDK config and client', function () {
+        bliptraceEnv(['key' => 'env-key']);
+
+        Livewire::actingAs(bliptraceAdmin())->test(Bliptrace::class)
+            ->set('maxBreadcrumbs', '5')
+            ->set('breadcrumbs.queries', 'off')
+            ->set('breadcrumbs.cache', 'on')
+            ->set('tags', 'tenant=acme')
+            ->call('save');
+
+        expect(config('bliptrace.breadcrumbs'))->toBe(['requests' => true, 'queries' => false, 'logs' => true, 'jobs' => true, 'cache' => true])
+            ->and(config('bliptrace'))->not->toHaveKey('breadcrumbs_queries')
+            ->and(bliptraceClientConfig()->maxBreadcrumbs)->toBe(5)
+            ->and(app(Client::class)->buildEnvelope(new RuntimeException('boom'))['tags'] ?? null)->toBe(['tenant' => 'acme']);
+    });
+
+    it('applies the saved values just before the SDK provider boots', function () {
+        // The SDK registers its breadcrumb listeners in boot(), from config('bliptrace').
+        $callbacks = (fn () => $this->bootingCallbacks)->call(app()->getProvider(G8ScopeServiceProvider::class));
+
+        expect($callbacks)->toHaveCount(1);
+    });
+
     it('serves overrides from cache and refreshes it on save', function () {
         $admin = bliptraceAdmin();
         Livewire::actingAs($admin)->test(Bliptrace::class)->set('release', 'one')->call('save');
@@ -349,6 +427,15 @@ describe('test event', function () {
         Http::assertSent(fn (HttpRequest $request) => $request->url() === 'https://ingest.example.com/v1/ingest'
             && $request->hasHeader('X-Ingest-Key', BLIPTRACE_KEY)
             && str_contains((string) json_encode($request->data()), 'Bliptrace test event'));
+    });
+
+    it('posts to a full ingest URL as is', function () {
+        bliptraceEnv(['endpoint' => 'https://ingest.example.com/v1/ingest']);
+        Http::fake(['ingest.example.com/*' => Http::response([], 202)]);
+
+        Livewire::actingAs(bliptraceAdmin())->test(Bliptrace::class)->call('sendTestEvent')->assertSet('testResult.ok', true);
+
+        Http::assertSent(fn (HttpRequest $request) => $request->url() === 'https://ingest.example.com/v1/ingest');
     });
 
     it('shows a rejection', function () {
